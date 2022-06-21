@@ -16,3 +16,16 @@ stages:
       jobName: 'BuildLookupWebApi'
       projectName: 'lookup-webapi'
       publishArtifact: true
+
+- stage: DeployPrdPlatform
+  jobs:
+  - job: DeployAADResources
+    steps:
+      - task: AzureCLI@2
+        displayName: CreateAppRegistrations
+        inputs:
+          azureSubscription: 'sub-fm-geolocation-prd'
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: 'prd'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrations.ps1'
