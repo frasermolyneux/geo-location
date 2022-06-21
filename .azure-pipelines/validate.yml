@@ -1,0 +1,19 @@
+trigger:
+  branches:
+    include:
+    - '*'
+
+pool: 'Dedicated'
+
+stages: 
+- stage: Build
+  jobs:
+  - template: templates/build-web-app.yml
+    parameters: 
+      jobName: 'BuildPublicWebApp'
+      projectName: 'public-webapp'
+
+  - template: templates/build-web-app.yml
+    parameters: 
+      jobName: 'BuildLookupWebApi'
+      projectName: 'lookup-webapi'
