@@ -27,7 +27,7 @@ stages:
           azureSubscription: 'sub-fm-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
-          arguments: 'prd'
+          arguments: '"prd" "uksouth"'
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrations.ps1'
 
   - job: DeployPrdPlatformBicep
@@ -55,7 +55,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"prd" "uksouth"'
-          scriptPath: '$(Build.sourcesDirectory)/scripts/SetPublicWebAppPermissions.ps1'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetPublicWebAppPermissions.ps1'
 
 - stage: DeployPrdServices
   jobs:
