@@ -70,6 +70,26 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           name: 'WEBSITE_RUN_FROM_PACKAGE'
           value: '1'
         }
+        {
+          'name': 'AzureAd:TenantId'
+          'value': tenant().tenantId
+        }
+        {
+          'name': 'AzureAd:Instance'
+          'value': environment().authentication.loginEndpoint
+        }
+        {
+          'name': 'AzureAd:ClientId'
+          'value': '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
+        }
+        {
+          'name': 'AzureAd:ClientSecret'
+          'value': '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientsecret)'
+        }
+        {
+          'name': 'AzureAd:Audience'
+          'value': 'api://geolocation-lookup-api-${parEnvironment}'
+        }
       ]
     }
   }
