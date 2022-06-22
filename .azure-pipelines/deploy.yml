@@ -45,9 +45,18 @@ stages:
               --parameters parLocation='uksouth' `
                 parEnvironment='prd'
 
-  - job: DeployPrdServicesPermissions
+  - job: DeployPrdPermissions
     dependsOn: [DeployPrdPlatformBicep]
     steps:
+      - task: AzureCLI@2
+        displayName: SetDeployPrincipalPermissions
+        inputs:
+          azureSubscription: 'sub-fm-geolocation-prd'
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: '"prd" "uksouth"'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetDeployPrincipalPermissions.ps1'
+
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
         inputs:
