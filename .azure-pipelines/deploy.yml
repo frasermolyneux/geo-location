@@ -19,6 +19,7 @@ stages:
 
 - stage: DeployPrdPlatform
   jobs:
+
   - job: DeployAADResources
     steps:
       - task: AzureCLI@2
@@ -29,3 +30,18 @@ stages:
           scriptLocation: 'scriptPath'
           arguments: 'prd'
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrations.ps1'
+
+  - job: DeployPlatformBicep
+    steps:
+      - task: AzureCLI@2
+        displayName: DeployPlatformBicep
+        inputs:
+          azureSubscription: 'sub-fm-geolocation-prd'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az deployment sub create `
+              --template-file bicep/platform.bicep `
+              --location 'uksouth' `
+              --parameters parLocation='uksouth' `
+                parEnvironment='prd'
