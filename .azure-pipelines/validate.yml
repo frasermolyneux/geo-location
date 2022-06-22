@@ -38,7 +38,7 @@ stages:
         displayName: Run Preflight Validation
         inputs:
           azureSubscription: 'sub-fm-geolocation-prd'
-          scriptType: 'bash'
+          scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
             az deployment sub validate `
