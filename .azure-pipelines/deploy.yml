@@ -44,6 +44,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"prd" "uksouth"'
+          addSpnToEnvironment: true
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetDeployPrincipalPermissions.ps1'
 
       - task: AzureCLI@2
