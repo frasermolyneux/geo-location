@@ -4,7 +4,42 @@
         "title": "GeoLocation Lookup API",
         "version": "v1"
     },
-    "paths": {},
+    "paths": {
+        "/geolocation/lookup/{hostname}": {
+            "get": {
+                "tags": [
+                    "GeoLookup"
+                ],
+                "parameters": [
+                    {
+                        "name": "hostname",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        },
+        "/geolocation/lookup": {
+            "post": {
+                "tags": [
+                    "GeoLookup"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
+            }
+        }
+    },
     "components": {
         "securitySchemes": {
             "Bearer": {
