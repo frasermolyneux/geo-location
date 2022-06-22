@@ -30,10 +30,10 @@ stages:
           arguments: 'prd'
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrations.ps1'
 
-  - job: DeployPlatformBicep
+  - job: DeployPrdPlatformBicep
     steps:
       - task: AzureCLI@2
-        displayName: DeployPlatformBicep
+        displayName: DeployPrdPlatformBicep
         inputs:
           azureSubscription: 'sub-fm-geolocation-prd'
           scriptType: 'pscore'
@@ -47,10 +47,10 @@ stages:
 
 - stage: DeployPrdServices
   jobs:
-  - job: DeployPrdServices
+  - job: DeployPrdServicesBicep
     steps:
       - task: AzureCLI@2
-        displayName: DeployPrdServices
+        displayName: DeployPrdServicesBicep
         inputs:
           azureSubscription: 'sub-fm-geolocation-prd'
           scriptType: 'pscore'
@@ -61,3 +61,21 @@ stages:
               --template-file bicep/services.bicep `
               --parameters parLocation='uksouth' `
                 parEnvironment='prd'
+
+  - template: templates/deploy-web-app.yml
+    parameters:
+      dependsOn: ['DeployPrdServicesBicep']
+      projectName: lookup-webapi
+      jobName: DeployLookupWebApi
+      webAppName: 'webapi-geolocation-lookup-prd-uksouth'
+      webAppNameResourceGroup: 'rg-geolocation-prd-uksouth'
+      subscription: 'sub-fm-geolocation-prd'
+
+  - template: templates/deploy-web-app.yml
+    parameters:
+      dependsOn: ['DeployPrdServicesBicep']
+      projectName: public-webapp
+      jobName: DeployPublicWebApp
+      webAppName: 'webapp-geolocation-public-prd-uksouth'
+      webAppNameResourceGroup: 'rg-geolocation-prd-uksouth'
+      subscription: 'sub-fm-geolocation-prd'
