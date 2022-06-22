@@ -9,7 +9,7 @@ var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
 var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
 
-module lookupWebApp 'services/lookupWebApp.bicep' = {
+module lookupWebApp 'services/lookupWebApi.bicep' = {
   name: 'lookupWebApp'
   params: {
     parLocation: parLocation
