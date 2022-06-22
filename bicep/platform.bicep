@@ -5,12 +5,12 @@ param parLocation string
 param parEnvironment string
 
 // Variables
-var varResourceGroupName = 'rg-geo-${parEnvironment}-${parLocation}'
-var varKeyVaultName = 'kv-geo-${parEnvironment}-${parLocation}'
-var varLogWorkspaceName = 'log-geo-${parEnvironment}-${parLocation}'
-var varAppInsightsName = 'ai-geo-${parEnvironment}-${parLocation}'
-var varApimName = 'apim-geo-${parEnvironment}-${parLocation}'
-var varAppServicePlanName = 'plan-geo-${parEnvironment}-${parLocation}'
+var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
+var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
+var varLogWorkspaceName = 'log-geolocation-${parEnvironment}-${parLocation}'
+var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
+var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
+var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
 
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varResourceGroupName
