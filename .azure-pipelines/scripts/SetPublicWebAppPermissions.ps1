@@ -6,4 +6,4 @@ param (
 $webApp = (az webapp show --name "webapp-geolocation-public-$environment-$location" --resource-group "rg-geolocation-$environment-$location") | ConvertFrom-Json
 $principalId = $webApp.identity.principalId
 
-. "./scripts/functions/GrantLookupApiPermissionsToApp.ps1" -principalId $principalId -environment $environment
+. "/.azure-pipelines/scripts/functions/GrantLookupApiPermissionsToApp.ps1" -principalId $principalId -environment $environment
