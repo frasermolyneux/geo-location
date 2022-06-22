@@ -19,7 +19,6 @@ stages:
 
 - stage: DeployPrdPlatform
   jobs:
-
   - job: DeployAADResources
     steps:
       - task: AzureCLI@2
@@ -42,6 +41,23 @@ stages:
           inlineScript: |
             az deployment sub create `
               --template-file bicep/platform.bicep `
+              --location 'uksouth' `
+              --parameters parLocation='uksouth' `
+                parEnvironment='prd'
+
+- stage: DeployPrdServices
+  jobs:
+  - job: DeployPrdServices
+    steps:
+      - task: AzureCLI@2
+        displayName: DeployPrdServices
+        inputs:
+          azureSubscription: 'sub-fm-geolocation-prd'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az deployment sub create `
+              --template-file bicep/services.bicep `
               --location 'uksouth' `
               --parameters parLocation='uksouth' `
                 parEnvironment='prd'

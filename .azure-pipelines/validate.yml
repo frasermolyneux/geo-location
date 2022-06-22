@@ -25,6 +25,7 @@ stages:
     steps:
       - script: |
           az bicep build --file bicep/platform.bicep
+          az bicep build --file bicep/services.bicep
         name: LintBicepCode
         displayName: Run Bicep Linter
 
@@ -41,6 +42,12 @@ stages:
           inlineScript: |
             az deployment sub validate `
               --template-file bicep/platform.bicep `
+              --location 'uksouth' `
+              --parameters parLocation='uksouth' `
+                parEnvironment='prd'
+
+            az deployment sub validate `
+              --template-file bicep/services.bicep `
               --location 'uksouth' `
               --parameters parLocation='uksouth' `
                 parEnvironment='prd'
