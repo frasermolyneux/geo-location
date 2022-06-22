@@ -2,30 +2,22 @@
     "openapi": "3.0.1",
     "info": {
         "title": "GeoLocation Lookup API",
-        "description": "",
-        "version": "1.0"
+        "version": "v1"
     },
     "paths": {},
     "components": {
         "securitySchemes": {
-            "apiKeyHeader": {
+            "Bearer": {
                 "type": "apiKey",
-                "name": "Ocp-Apim-Subscription-Key",
+                "description": "",
+                "name": "Authorization",
                 "in": "header"
-            },
-            "apiKeyQuery": {
-                "type": "apiKey",
-                "name": "subscription-key",
-                "in": "query"
             }
         }
     },
     "security": [
         {
-            "apiKeyHeader": []
-        },
-        {
-            "apiKeyQuery": []
+            "Bearer": []
         }
     ]
 }

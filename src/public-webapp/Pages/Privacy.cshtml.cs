@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace public_webapp.Pages
+namespace MX.GeoLocation.PublicWebApp.Pages
 {
     public class PrivacyModel : PageModel
     {
