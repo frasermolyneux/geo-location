@@ -18,7 +18,7 @@ stages:
       jobName: 'BuildLookupWebApi'
       projectName: 'lookup-webapi'
 
-- stage: BicepLint
+- stage: ValidateBicep
   jobs: 
   - job: LintCode
     displayName: Lint Code
@@ -28,8 +28,6 @@ stages:
         name: LintBicepCode
         displayName: Run Bicep Linter
 
-- stage: ValidateBicep
-  jobs: 
   - job: ValidateBicepCode
     displayName: Validate Bicep Code
     steps:
