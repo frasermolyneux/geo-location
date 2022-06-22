@@ -30,6 +30,7 @@ stages:
         displayName: Run Bicep Linter
 
   - job: ValidateBicepCode
+    dependsOn: [LintCode]
     displayName: Validate Bicep Code
     steps:
       - task: AzureCLI@2
