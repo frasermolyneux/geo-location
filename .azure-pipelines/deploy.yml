@@ -56,7 +56,8 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            az deployment sub create `
+            az deployment group create `
+              --resource-group 'rg-geolocation-prd-uksouth' `
               --template-file bicep/services.bicep `
               --location 'uksouth' `
               --parameters parLocation='uksouth' `
