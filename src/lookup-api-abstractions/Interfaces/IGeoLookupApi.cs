@@ -6,5 +6,7 @@ namespace MX.GeoLocation.LookupApi.Abstractions.Interfaces
     {
         Task<ApiResponseDto<GeoLocationDto>> GetGeoLocation(string hostname);
         Task<ApiResponseDto<GeoLocationCollectionDto>> GetGeoLocations(List<string> hostnames);
+
+        Task<ApiResponseDto> DeleteMetadata(string hostname);
     }
 }

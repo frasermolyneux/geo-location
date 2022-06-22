@@ -58,5 +58,19 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         {
             throw new NotImplementedException();
         }
+
+        [HttpDelete]
+        [Route("geolocation/lookup/{hostname}")]
+        public async Task<IActionResult> DeleteMetadata(string hostname)
+        {
+            var response = await ((IGeoLookupApi)this).DeleteMetadata(hostname);
+
+            return response.ToHttpResult();
+        }
+
+        Task<ApiResponseDto> IGeoLookupApi.DeleteMetadata(string hostname)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

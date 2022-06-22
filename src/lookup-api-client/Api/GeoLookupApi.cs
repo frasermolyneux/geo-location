@@ -32,5 +32,13 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Api
 
             return response.ToApiResponse<GeoLocationCollectionDto>();
         }
+
+        public async Task<ApiResponseDto> DeleteMetadata(string hostname)
+        {
+            var request = await CreateRequest($"lookup/{hostname}", Method.Delete);
+            var response = await ExecuteAsync(request);
+
+            return response.ToApiResponse();
+        }
     }
 }

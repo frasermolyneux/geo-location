@@ -25,6 +25,26 @@
                         "description": "Success"
                     }
                 }
+            },
+            "delete": {
+                "tags": [
+                    "GeoLookup"
+                ],
+                "parameters": [
+                    {
+                        "name": "hostname",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    }
+                }
             }
         },
         "/geolocation/lookup": {
