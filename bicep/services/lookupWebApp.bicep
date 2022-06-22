@@ -44,7 +44,6 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
     httpsOnly: true
 
     siteConfig: {
-      alwaysOn: true
       ftpsState: 'Disabled'
 
       netFrameworkVersion: 'v6.0'
