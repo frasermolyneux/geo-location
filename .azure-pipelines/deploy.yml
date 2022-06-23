@@ -2,6 +2,12 @@ trigger: none
 
 pool: 'Dedicated'
 
+resources:
+  pipelines:
+  - pipeline: geo-location.Validate
+    source: geo-location.Validate
+    trigger: true
+
 stages: 
 - stage: Build
   jobs:
