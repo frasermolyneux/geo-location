@@ -10,7 +10,6 @@ param parApiManagementName string
 
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
-var varFrontDoorName = 'fd-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
