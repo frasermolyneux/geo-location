@@ -120,7 +120,7 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
 
 resource frontDoor 'Microsoft.Network/frontDoors@2020-05-01' = {
   name: 'frontDoor'
-  location: parLocation
+  location: 'global'
 
   properties: {
     backendPools: []
