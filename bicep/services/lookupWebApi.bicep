@@ -118,30 +118,6 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   }
 }
 
-resource frontDoor 'Microsoft.Network/frontDoors@2020-05-01' = {
-  name: 'frontDoor'
-  location: 'global'
-
-  properties: {
-    backendPools: []
-
-    backendPoolsSettings: {
-      enforceCertificateNameCheck: 'Enabled'
-    }
-
-    enabledState: 'Enabled'
-    friendlyName: varFrontDoorName
-
-    frontendEndpoints: []
-
-    healthProbeSettings: []
-
-    loadBalancingSettings: []
-
-    routingRules: []
-  }
-}
-
 resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
   name: webApp.name
   parent: apiManagement
