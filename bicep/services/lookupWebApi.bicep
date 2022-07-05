@@ -10,6 +10,7 @@ param parApiManagementName string
 
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
+var varFrontDoorName = 'fd-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -71,24 +72,24 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           value: '1'
         }
         {
-          'name': 'AzureAd:TenantId'
-          'value': tenant().tenantId
+          name: 'AzureAd:TenantId'
+          value: tenant().tenantId
         }
         {
-          'name': 'AzureAd:Instance'
-          'value': environment().authentication.loginEndpoint
+          name: 'AzureAd:Instance'
+          value: environment().authentication.loginEndpoint
         }
         {
-          'name': 'AzureAd:ClientId'
-          'value': '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
+          name: 'AzureAd:ClientId'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
         }
         {
-          'name': 'AzureAd:ClientSecret'
-          'value': '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientsecret)'
+          name: 'AzureAd:ClientSecret'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientsecret)'
         }
         {
-          'name': 'AzureAd:Audience'
-          'value': 'api://geolocation-lookup-api-${parEnvironment}'
+          name: 'AzureAd:Audience'
+          value: 'api://geolocation-lookup-api-${parEnvironment}'
         }
       ]
     }
@@ -114,6 +115,30 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
         tenantId: tenant().tenantId
       }
     ]
+  }
+}
+
+resource frontDoor 'Microsoft.Network/frontDoors@2020-05-01' = {
+  name: 'frontDoor'
+  location: parLocation
+
+  properties: {
+    backendPools: []
+
+    backendPoolsSettings: {
+      enforceCertificateNameCheck: 'Enabled'
+    }
+
+    enabledState: 'Enabled'
+    friendlyName: varFrontDoorName
+
+    frontendEndpoints: []
+
+    healthProbeSettings: []
+
+    loadBalancingSettings: []
+
+    routingRules: []
   }
 }
 
