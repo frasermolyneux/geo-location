@@ -38,7 +38,8 @@ stages:
               --template-file bicep/platform.bicep `
               --location 'uksouth' `
               --parameters parLocation='uksouth' `
-                parEnvironment='prd'
+                parEnvironment='prd' `
+                parLogWorkspaceName='log-platform-prd-uksouth'
 
   - job: DeployPrdPermissions
     dependsOn: [DeployPrdPlatformBicep]
@@ -86,8 +87,7 @@ stages:
               --resource-group 'rg-geolocation-prd-uksouth' `
               --template-file bicep/services.bicep `
               --parameters parLocation='uksouth' `
-                parEnvironment='prd' `
-                parLogWorkspaceName='log-platform-prd-uksouth'
+                parEnvironment='prd'
 
   - template: templates/deploy-web-app.yml
     parameters:
