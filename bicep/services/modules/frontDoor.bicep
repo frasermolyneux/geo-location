@@ -32,7 +32,7 @@ resource frontDoor 'Microsoft.Cdn/profiles@2021-06-01' = {
 
 resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdendpoints@2021-06-01' = {
   parent: frontDoor
-  name: 'default-endpoint'
+  name: parFrontDoorDns
   location: 'Global'
   tags: parTags
 
