@@ -55,7 +55,7 @@ stages:
         name: RunWhatIfDeploy
         displayName: Run What-If Deploy
         inputs:
-          azureSubscription: 'tenant-mgmt-root'
+          azureSubscription: 'sub-fm-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
