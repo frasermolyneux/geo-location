@@ -134,8 +134,8 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   }
 }
 
-module frontDoor 'modules/frontDoor.bicep' = {
-  name: 'dnsZone'
+module publicWebAppFrontDoor 'modules/frontDoor.bicep' = {
+  name: 'publicWebAppFrontDoor'
 
   params: {
     parFrontDoorName: varFrontDoorName
