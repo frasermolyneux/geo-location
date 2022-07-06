@@ -38,8 +38,7 @@ stages:
               --template-file bicep/platform.bicep `
               --location 'uksouth' `
               --parameters parLocation='uksouth' `
-                parEnvironment='prd' `
-                parLogWorkspaceName='log-platform-prd-uksouth'
+                parEnvironment='prd'
 
   - job: DeployPrdPermissions
     dependsOn: [DeployPrdPlatformBicep]

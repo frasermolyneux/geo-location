@@ -45,8 +45,7 @@ stages:
               --template-file bicep/platform.bicep `
               --location 'uksouth' `
               --parameters parLocation='uksouth' `
-                parEnvironment='prd' `
-                parLogWorkspaceName='log-platform-prd-uksouth'
+                parEnvironment='prd'
 
             az deployment group validate `
               --resource-group 'rg-geolocation-prd-uksouth' `
