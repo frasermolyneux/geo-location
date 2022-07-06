@@ -126,7 +126,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2021-06-01' 
 }
 
 module dns 'dns.bicep' = {
-  name: 'dns'
+  name: 'dns-${parFrontDoorDns}.${parParentDnsName}'
   scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
 
   params: {
