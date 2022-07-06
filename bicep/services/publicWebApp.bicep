@@ -7,9 +7,14 @@ param parKeyVaultName string
 param parAppServicePlanName string
 param parAppInsightsName string
 param parApiManagementName string
+param parManagementSubscriptionId string
+param parDnsResourceGroupName string
+param parParentDnsName string
 
 // Variables
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
+var varFrontDoorName = 'fd-webapp-geolocation-public-${parEnvironment}'
+var varFrontDoorDns = 'webapp-geolocation-public-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -123,5 +128,18 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
         tenantId: tenant().tenantId
       }
     ]
+  }
+}
+
+module frontDoor 'modules/frontDoor.bicep' = {
+  name: 'dnsZone'
+  scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
+  params: {
+    parFrontDoorName: varFrontDoorName
+    parFrontDoorDns: varFrontDoorDns
+    parParentDnsName: parParentDnsName
+    parManagementSubscriptionId: parManagementSubscriptionId
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parOriginHostName: webApp.properties.defaultHostName
   }
 }

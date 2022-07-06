@@ -30,7 +30,7 @@ resource frontDoor 'Microsoft.Cdn/profiles@2021-06-01' = {
 
 resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdendpoints@2021-06-01' = {
   parent: frontDoor
-  name: 'geolocation-lookup'
+  name: 'default-endpoint'
   location: 'Global'
 
   properties: {
@@ -62,7 +62,7 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/origingroups@2021-06-01' =
 
 resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customdomains@2021-06-01' = {
   parent: frontDoor
-  name: 'geolocation-lookup'
+  name: 'vanity-domain'
 
   properties: {
     hostName: '${parFrontDoorDns}.${parParentDnsName}'
@@ -132,3 +132,7 @@ module dns 'dns.bicep' = {
     parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken
   }
 }
+
+// Outputs
+output outFrontDoorId string = frontDoor.properties.frontDoorId
+output outFrontDoorHostname string = frontDoorEndpoint.properties.hostName

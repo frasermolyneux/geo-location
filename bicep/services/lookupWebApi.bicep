@@ -13,7 +13,7 @@ param parParentDnsName string
 
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
-var varFrontDoorName = 'fd-geolocation-lookup-${parEnvironment}'
+var varFrontDoorName = 'fd-webapi-geolocation-lookup-${parEnvironment}'
 var varFrontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
@@ -142,7 +142,7 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
   properties: {
     title: webApp.name
     description: webApp.name
-    url: 'https://${webApp.properties.defaultHostName}/'
+    url: 'https://${frontDoor.outputs.outFrontDoorHostname}/'
     protocol: 'http'
     properties: {}
 
