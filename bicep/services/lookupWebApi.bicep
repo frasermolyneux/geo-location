@@ -124,8 +124,8 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   }
 }
 
-module frontDoor 'modules/frontDoor.bicep' = {
-  name: 'dnsZone'
+module lookupWebApiFrontDoor 'modules/frontDoor.bicep' = {
+  name: 'lookupWebApiFrontDoor'
 
   params: {
     parFrontDoorName: varFrontDoorName
@@ -145,7 +145,7 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
   properties: {
     title: webApp.name
     description: webApp.name
-    url: 'https://${frontDoor.outputs.outFrontDoorHostname}/'
+    url: 'https://${lookupWebApiFrontDoor.outputs.outFrontDoorHostname}/'
     protocol: 'http'
     properties: {}
 
