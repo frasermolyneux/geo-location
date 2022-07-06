@@ -37,8 +37,7 @@ stages:
             az deployment sub create `
               --template-file bicep/platform.bicep `
               --location 'uksouth' `
-              --parameters parLocation='uksouth' `
-                parEnvironment='prd'
+              --parameters @params/platform.prd.json
 
   - job: DeployPrdPermissions
     dependsOn: [DeployPrdPlatformBicep]
@@ -85,8 +84,7 @@ stages:
             az deployment group create `
               --resource-group 'rg-geolocation-prd-uksouth' `
               --template-file bicep/services.bicep `
-              --parameters parLocation='uksouth' `
-                parEnvironment='prd'
+              --parameters @params/services.prd.json
 
   - template: templates/deploy-web-app.yml
     parameters:

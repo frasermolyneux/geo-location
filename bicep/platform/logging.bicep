@@ -4,6 +4,9 @@ targetScope = 'resourceGroup'
 param parAppInsightsName string
 param parKeyVaultName string
 param parLocation string
+param parLoggingSubscriptionId string
+param parLoggingResourceGroupName string
+param parLoggingWorkspaceName string
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -11,8 +14,8 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
 }
 
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
-  name: 'log-platform-prd-uksouth'
-  scope: resourceGroup('7760848c-794d-4a19-8cb2-52f71a21ac2b', 'rg-platform-logging-prd-uksouth')
+  name: parLoggingWorkspaceName
+  scope: resourceGroup(parLoggingSubscriptionId, parLoggingResourceGroupName)
 }
 
 // Module Resources
