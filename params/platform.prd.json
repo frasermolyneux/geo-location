@@ -16,6 +16,13 @@
         },
         "parLoggingWorkspaceName": {
             "value": "log-platform-prd-uksouth"
+        },
+        "parResourceTags": {
+            "value": {
+                "Environment": "prd",
+                "DeployedBy": "AzDo-Bicep",
+                "Git": "https://github.com/frasermolyneux/geo-location"
+            }
         }
     }
 }

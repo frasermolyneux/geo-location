@@ -2,10 +2,12 @@ targetScope = 'resourceGroup'
 
 param parKeyVaultName string
 param parLocation string
+param parTags object
 
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
   name: parKeyVaultName
   location: parLocation
+  tags: parTags
 
   properties: {
     accessPolicies: []

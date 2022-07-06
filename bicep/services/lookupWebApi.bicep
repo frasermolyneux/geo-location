@@ -10,6 +10,7 @@ param parApiManagementName string
 param parManagementSubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
+param parTags object
 
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
@@ -38,6 +39,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
   name: varWebAppName
   location: parLocation
   kind: 'app'
+  tags: parTags
 
   identity: {
     type: 'SystemAssigned'
@@ -132,6 +134,7 @@ module frontDoor 'modules/frontDoor.bicep' = {
     parManagementSubscriptionId: parManagementSubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parOriginHostName: webApp.properties.defaultHostName
+    parTags: parTags
   }
 }
 

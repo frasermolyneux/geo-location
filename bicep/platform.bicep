@@ -6,6 +6,7 @@ param parEnvironment string
 param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
+param parTags object
 
 // Variables
 var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
@@ -17,6 +18,8 @@ var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varResourceGroupName
   location: parLocation
+  tags: parTags
+
   properties: {}
 }
 
@@ -27,6 +30,7 @@ module keyVault 'platform/keyVault.bicep' = {
   params: {
     parKeyVaultName: varKeyVaultName
     parLocation: parLocation
+    parTags: parTags
   }
 }
 
@@ -40,6 +44,7 @@ module logging 'platform/logging.bicep' = {
     parLoggingSubscriptionId: parLoggingSubscriptionId
     parLoggingResourceGroupName: parLoggingResourceGroupName
     parLoggingWorkspaceName: parLoggingWorkspaceName
+    parTags: parTags
   }
 }
 
@@ -51,6 +56,7 @@ module apiManagment 'platform/apiManagement.bicep' = {
     parAppInsightsName: logging.outputs.outAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName
     parLocation: parLocation
+    parTags: parTags
   }
 }
 
@@ -60,5 +66,6 @@ module appServicePlan 'platform/appServicePlan.bicep' = {
   params: {
     parAppServicePlanName: varAppServicePlanName
     parLocation: parLocation
+    parTags: parTags
   }
 }

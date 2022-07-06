@@ -5,6 +5,7 @@ param parApimName string
 param parLocation string
 param parAppInsightsName string
 param parKeyVaultName string
+param parTags object
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -23,6 +24,7 @@ resource appInsightsInstrumentationKeySecret 'Microsoft.KeyVault/vaults/secrets@
 resource apiManagement 'Microsoft.ApiManagement/service@2021-08-01' = {
   name: parApimName
   location: parLocation
+  tags: parTags
 
   sku: {
     capacity: 0

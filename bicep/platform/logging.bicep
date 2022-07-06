@@ -7,6 +7,7 @@ param parLocation string
 param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
+param parTags object
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -23,6 +24,8 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: parAppInsightsName
   location: parLocation
   kind: 'web'
+  tags: parTags
+
   properties: {
     Application_Type: 'web'
     WorkspaceResourceId: logAnalyticsWorkspace.id
@@ -32,6 +35,8 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 resource appInsightsConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   name: '${appInsights.name}-connectionstring'
   parent: keyVault
+  tags: parTags
+
   properties: {
     contentType: 'text/plain'
     value: appInsights.properties.ConnectionString
@@ -41,6 +46,8 @@ resource appInsightsConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@20
 resource appInsightsInstrumentationKeySecret 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   name: '${appInsights.name}-instrumentationkey'
   parent: keyVault
+  tags: parTags
+
   properties: {
     contentType: 'text/plain'
     value: appInsights.properties.InstrumentationKey

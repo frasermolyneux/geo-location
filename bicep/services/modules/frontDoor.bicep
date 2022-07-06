@@ -7,6 +7,7 @@ param parParentDnsName string
 param parManagementSubscriptionId string
 param parDnsResourceGroupName string
 param parOriginHostName string
+param parTags object
 
 // Existing Resources
 resource parentDnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
@@ -18,6 +19,7 @@ resource parentDnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
 resource frontDoor 'Microsoft.Cdn/profiles@2021-06-01' = {
   name: parFrontDoorName
   location: 'Global'
+  tags: parTags
 
   sku: {
     name: 'Standard_AzureFrontDoor'
@@ -32,6 +34,7 @@ resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdendpoints@2021-06-01' = {
   parent: frontDoor
   name: 'default-endpoint'
   location: 'Global'
+  tags: parTags
 
   properties: {
     enabledState: 'Enabled'

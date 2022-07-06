@@ -16,6 +16,13 @@
         },
         "parParentDnsName": {
             "value": "molyneux.dev"
+        },
+        "parResourceTags": {
+            "value": {
+                "Environment": "prd",
+                "DeployedBy": "AzDo-Bicep",
+                "Git": "https://github.com/frasermolyneux/geo-location"
+            }
         }
     }
 }

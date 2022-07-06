@@ -10,6 +10,7 @@ param parApiManagementName string
 param parManagementSubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
+param parTags object
 
 // Variables
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
@@ -48,6 +49,7 @@ resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscription
 resource webAppApiMgmtKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
   name: '${apiManagement.name}-${varWebAppName}-apikey'
   parent: keyVault
+  tags: parTags
 
   properties: {
     contentType: 'text/plain'
@@ -59,6 +61,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
   name: varWebAppName
   location: parLocation
   kind: 'app'
+  tags: parTags
 
   identity: {
     type: 'SystemAssigned'
@@ -141,5 +144,6 @@ module frontDoor 'modules/frontDoor.bicep' = {
     parManagementSubscriptionId: parManagementSubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parOriginHostName: webApp.properties.defaultHostName
+    parTags: parTags
   }
 }
