@@ -14,6 +14,7 @@ param parParentDnsName string
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
 var varFrontDoorName = 'fd-geolocation-lookup-${parEnvironment}'
+var frontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -173,10 +174,10 @@ resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/origingroups@2021-06-01' =
 
 resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customdomains@2021-06-01' = {
   parent: frontDoor
-  name: '${varWebAppName}.${parParentDnsName}'
+  name: 'geolocation-lookup'
 
   properties: {
-    hostName: '${varWebAppName}.${parParentDnsName}'
+    hostName: '${frontDoorDns}.${parParentDnsName}'
     tlsSettings: {
       certificateType: 'ManagedCertificate'
       minimumTlsVersion: 'TLS12'
