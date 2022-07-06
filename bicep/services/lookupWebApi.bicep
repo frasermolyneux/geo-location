@@ -126,7 +126,7 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
 
 module frontDoor 'modules/frontDoor.bicep' = {
   name: 'dnsZone'
-  scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
+
   params: {
     parFrontDoorName: varFrontDoorName
     parFrontDoorDns: varFrontDoorDns
