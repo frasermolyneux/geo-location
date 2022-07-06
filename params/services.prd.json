@@ -17,7 +17,7 @@
         "parParentDnsName": {
             "value": "molyneux.dev"
         },
-        "parResourceTags": {
+        "parTags": {
             "value": {
                 "Environment": "prd",
                 "DeployedBy": "AzDo-Bicep",

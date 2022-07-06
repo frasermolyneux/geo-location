@@ -17,7 +17,7 @@
         "parLoggingWorkspaceName": {
             "value": "log-platform-prd-uksouth"
         },
-        "parResourceTags": {
+        "parTags": {
             "value": {
                 "Environment": "prd",
                 "DeployedBy": "AzDo-Bicep",
