@@ -50,3 +50,21 @@ stages:
               --resource-group 'rg-geolocation-prd-uksouth' `
               --template-file bicep/services.bicep `
               --parameters @params/services.prd.json
+
+      - task: AzureCLI@2
+        name: RunWhatIfDeploy
+        displayName: Run What-If Deploy
+        inputs:
+          azureSubscription: 'tenant-mgmt-root'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az deployment sub what-if `
+              --template-file bicep/platform.bicep `
+              --location 'uksouth' `
+              --parameters @params/platform.prd.json
+
+            az deployment group what-if `
+              --resource-group 'rg-geolocation-prd-uksouth' `
+              --template-file bicep/services.bicep `
+              --parameters @params/services.prd.json
