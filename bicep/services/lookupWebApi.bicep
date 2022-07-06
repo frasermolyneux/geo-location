@@ -145,7 +145,7 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
   properties: {
     title: varFrontDoorDns
     description: varFrontDoorDns
-    url: 'https://${lookupWebApiFrontDoor.outputs.outFrontDoorHostname}/'
+    url: 'https://${varFrontDoorDns}.${parParentDnsName}/'
     protocol: 'http'
     properties: {}
 
