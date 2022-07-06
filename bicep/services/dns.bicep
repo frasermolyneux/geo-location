@@ -1,6 +1,6 @@
 targetScope = 'resourceGroup'
 
-param parDnsHostname string
+param parDns string
 param parDnsZoneName string
 param parParentDnsName string
 param parCname string
@@ -26,7 +26,7 @@ resource cname 'Microsoft.Network/dnszones/CNAME@2018-05-01' = {
 
 resource authRecord 'Microsoft.Network/dnszones/TXT@2018-05-01' = {
   parent: parentZone
-  name: '_dnsauth.${parDnsHostname}'
+  name: '_dnsauth.${parDns}'
   properties: {
     TTL: 3600
     TXTRecords: [

@@ -238,7 +238,7 @@ module dns 'dns.bicep' = {
   name: 'dnsZone'
   scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
   params: {
-    parDnsHostname: '${frontDoorDns}.${parParentDnsName}'
+    parDns: frontDoorDns
     parDnsZoneName: varWebAppName
     parParentDnsName: parParentDnsName
     parCname: frontDoorEndpoint.properties.hostName
