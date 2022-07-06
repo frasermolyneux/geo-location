@@ -5,6 +5,7 @@
     <RootNamespace>MX.GeoLocation.LookupWebApi</RootNamespace>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
+	<UserSecretsId>940efaf5-e045-4699-a635-3ce88dce9fc2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
