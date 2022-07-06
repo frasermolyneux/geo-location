@@ -241,6 +241,7 @@ module dns 'dns.bicep' = {
     parDnsZoneName: varWebAppName
     parParentDnsName: parParentDnsName
     parCname: frontDoorEndpoint.properties.hostName
+    parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken
   }
 }
 
