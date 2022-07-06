@@ -25,7 +25,7 @@ resource cname 'Microsoft.Network/dnszones/CNAME@2018-05-01' = {
 
 resource authRecord 'Microsoft.Network/dnszones/TXT@2018-05-01' = {
   parent: parentZone
-  name: '_dnsauth.${parCname}'
+  name: '_dnsauth.${parDnsZoneName}.${parParentDnsName}'
   properties: {
     TTL: 3600
     TXTRecords: [
