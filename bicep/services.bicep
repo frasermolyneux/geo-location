@@ -36,5 +36,8 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parAppServicePlanName: varAppServicePlanName
     parAppInsightsName: varAppInsightsName
     parApiManagementName: varApimName
+    parManagementSubscriptionId: parManagementSubscriptionId
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parParentDnsName: parParentDnsName
   }
 }
