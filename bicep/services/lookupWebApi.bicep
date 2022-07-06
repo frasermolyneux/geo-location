@@ -239,7 +239,6 @@ module dns 'dns.bicep' = {
   scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
   params: {
     parDns: frontDoorDns
-    parDnsZoneName: varWebAppName
     parParentDnsName: parParentDnsName
     parCname: frontDoorEndpoint.properties.hostName
     parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken

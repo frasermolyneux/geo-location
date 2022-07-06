@@ -1,7 +1,6 @@
 targetScope = 'resourceGroup'
 
 param parDns string
-param parDnsZoneName string
 param parParentDnsName string
 param parCname string
 param parCnameValidationToken string
@@ -14,7 +13,7 @@ resource parentZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
 // Module Resources
 resource cname 'Microsoft.Network/dnszones/CNAME@2018-05-01' = {
   parent: parentZone
-  name: parDnsZoneName
+  name: parDns
 
   properties: {
     TTL: 3600
