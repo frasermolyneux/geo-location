@@ -14,7 +14,7 @@ param parParentDnsName string
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
 var varFrontDoorName = 'fd-geolocation-lookup-${parEnvironment}'
-var frontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
+var varFrontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -31,11 +31,6 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 
 resource apiManagement 'Microsoft.ApiManagement/service@2021-08-01' existing = {
   name: parApiManagementName
-}
-
-resource parentDnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
-  name: parParentDnsName
-  scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
 }
 
 // Module Resources
@@ -127,121 +122,16 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   }
 }
 
-resource frontDoor 'Microsoft.Cdn/profiles@2021-06-01' = {
-  name: varFrontDoorName
-  location: 'Global'
-
-  sku: {
-    name: 'Standard_AzureFrontDoor'
-  }
-
-  properties: {
-    originResponseTimeoutSeconds: 60
-  }
-}
-
-resource frontDoorEndpoint 'Microsoft.Cdn/profiles/afdendpoints@2021-06-01' = {
-  parent: frontDoor
-  name: 'geolocation-lookup'
-  location: 'Global'
-
-  properties: {
-    enabledState: 'Enabled'
-  }
-}
-
-resource frontDoorOriginGroup 'Microsoft.Cdn/profiles/origingroups@2021-06-01' = {
-  parent: frontDoor
-  name: 'default-origin-group'
-
-  properties: {
-    loadBalancingSettings: {
-      sampleSize: 4
-      successfulSamplesRequired: 3
-      additionalLatencyInMilliseconds: 50
-    }
-
-    healthProbeSettings: {
-      probePath: '/'
-      probeRequestType: 'HEAD'
-      probeProtocol: 'Http'
-      probeIntervalInSeconds: 100
-    }
-
-    sessionAffinityState: 'Disabled'
-  }
-}
-
-resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customdomains@2021-06-01' = {
-  parent: frontDoor
-  name: 'geolocation-lookup'
-
-  properties: {
-    hostName: '${frontDoorDns}.${parParentDnsName}'
-    tlsSettings: {
-      certificateType: 'ManagedCertificate'
-      minimumTlsVersion: 'TLS12'
-    }
-
-    azureDnsZone: {
-      id: parentDnsZone.id
-    }
-  }
-}
-
-resource frontDoorOrigin 'Microsoft.Cdn/profiles/origingroups/origins@2021-06-01' = {
-  parent: frontDoorOriginGroup
-  name: 'default-origin'
-
-  properties: {
-    hostName: webApp.properties.defaultHostName
-    httpPort: 80
-    httpsPort: 443
-    originHostHeader: webApp.properties.defaultHostName
-    priority: 1
-    weight: 1000
-    enabledState: 'Enabled'
-    enforceCertificateNameCheck: true
-  }
-}
-
-resource frontDoorRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2021-06-01' = {
-  parent: frontDoorEndpoint
-  name: 'default-route'
-
-  properties: {
-    customDomains: [
-      {
-        id: frontDoorCustomDomain.id
-      }
-    ]
-
-    originGroup: {
-      id: frontDoorOriginGroup.id
-    }
-
-    ruleSets: []
-    supportedProtocols: [
-      'Https'
-    ]
-    patternsToMatch: [
-      '/*'
-    ]
-    forwardingProtocol: 'HttpsOnly'
-    linkToDefaultDomain: 'Enabled'
-    httpsRedirect: 'Enabled'
-    enabledState: 'Enabled'
-  }
-}
-
-module dns 'dns.bicep' = {
+module frontDoor 'modules/frontDoor.bicep' = {
   name: 'dnsZone'
   scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
   params: {
-    parDns: frontDoorDns
+    parFrontDoorName: varFrontDoorName
+    parFrontDoorDns: varFrontDoorDns
     parParentDnsName: parParentDnsName
-    parCname: frontDoorEndpoint.properties.hostName
-    parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken
+    parManagementSubscriptionId: parManagementSubscriptionId
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parOriginHostName: webApp.properties.defaultHostName
   }
 }
 
