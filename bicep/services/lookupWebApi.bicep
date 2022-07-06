@@ -139,12 +139,12 @@ module lookupWebApiFrontDoor 'modules/frontDoor.bicep' = {
 }
 
 resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
-  name: webApp.name
+  name: varFrontDoorDns
   parent: apiManagement
 
   properties: {
-    title: webApp.name
-    description: webApp.name
+    title: varFrontDoorDns
+    description: varFrontDoorDns
     url: 'https://${lookupWebApiFrontDoor.outputs.outFrontDoorHostname}/'
     protocol: 'http'
     properties: {}
