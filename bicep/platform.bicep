@@ -3,11 +3,11 @@ targetScope = 'subscription'
 // Parameters
 param parLocation string
 param parEnvironment string
+param parLogWorkspaceName string
 
 // Variables
 var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
-var varLogWorkspaceName = 'log-geolocation-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
 var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
@@ -32,7 +32,7 @@ module logging 'platform/logging.bicep' = {
   name: 'logging'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
-    parLogWorkspaceName: varLogWorkspaceName
+    parLogWorkspaceName: parLogWorkspaceName
     parAppInsightsName: varAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName
     parLocation: parLocation

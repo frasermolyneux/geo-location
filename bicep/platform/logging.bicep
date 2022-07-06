@@ -11,18 +11,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
 }
 
-// Module Resources
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
   name: parLogWorkspaceName
-  location: parLocation
-  properties: {
-    retentionInDays: 30
-    sku: {
-      name: 'PerGB2018'
-    }
-  }
 }
 
+// Module Resources
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
   name: parAppInsightsName
   location: parLocation

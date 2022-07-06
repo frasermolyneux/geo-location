@@ -86,7 +86,8 @@ stages:
               --resource-group 'rg-geolocation-prd-uksouth' `
               --template-file bicep/services.bicep `
               --parameters parLocation='uksouth' `
-                parEnvironment='prd'
+                parEnvironment='prd' `
+                parLogWorkspaceName='log-platform-prd-uksouth'
 
   - template: templates/deploy-web-app.yml
     parameters:
