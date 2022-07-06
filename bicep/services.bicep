@@ -2,6 +2,9 @@ targetScope = 'resourceGroup'
 
 param parLocation string
 param parEnvironment string
+param parManagementSubscriptionId string
+param parDnsResourceGroupName string
+param parParentDnsName string
 
 // Variables
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
@@ -18,6 +21,9 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parAppServicePlanName: varAppServicePlanName
     parAppInsightsName: varAppInsightsName
     parApiManagementName: varApimName
+    parManagementSubscriptionId: parManagementSubscriptionId
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parParentDnsName: parParentDnsName
   }
 }
 

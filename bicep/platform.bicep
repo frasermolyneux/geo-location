@@ -6,9 +6,6 @@ param parEnvironment string
 param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
-param parManagementSubscriptionId string
-param parManagementResourceGroupName string
-param parParentDnsName string
 
 // Variables
 var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
@@ -16,7 +13,6 @@ var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
 var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
-var varDnsZoneName = 'geolocation-${parEnvironment}'
 
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varResourceGroupName
@@ -64,16 +60,5 @@ module appServicePlan 'platform/appServicePlan.bicep' = {
   params: {
     parAppServicePlanName: varAppServicePlanName
     parLocation: parLocation
-  }
-}
-
-module dnsZone 'platform/dns.bicep' = {
-  name: 'dnsZone'
-  scope: resourceGroup(defaultResourceGroup.name)
-  params: {
-    parDnsZoneName: varDnsZoneName
-    parManagementSubscriptionId: parManagementSubscriptionId
-    parManagementResourceGroupName: parManagementResourceGroupName
-    parParentDnsName: parParentDnsName
   }
 }
