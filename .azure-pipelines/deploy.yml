@@ -23,6 +23,15 @@ stages:
       projectName: 'lookup-webapi'
       publishArtifact: true
 
+- stage: Packages
+  jobs:
+  - template: templates/build-net-library.yml
+    parameters: 
+      jobName: 'PublishLookupApiClient'
+      projectName: 'lookup-api-client'
+      publishToNuGet: true
+      MajorMinorVersion: '1.0'
+
 - stage: DeployPrdPlatform
   jobs:
   - job: DeployPrdPlatformBicep
