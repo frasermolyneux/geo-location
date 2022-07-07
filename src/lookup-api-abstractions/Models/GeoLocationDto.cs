@@ -18,6 +18,6 @@
         public double? Longitude { get; internal set; }
         public int? AccuracyRadius { get; internal set; }
         public string? Timezone { get; internal set; }
-        public Dictionary<string, string> Traits { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string?> Traits { get; internal set; } = new Dictionary<string, string?>();
     }
 }

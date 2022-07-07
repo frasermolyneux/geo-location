@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 
 using MX.GeoLocation.LookupWebApi;
 using MX.GeoLocation.LookupWebApi.OpenApiOperationFilters;
+using MX.GeoLocation.LookupWebApi.Repositories;
 
 using Newtonsoft.Json.Converters;
 
@@ -54,6 +55,8 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+builder.Services.AddSingleton<IMaxMindGeoLocationRepository, MaxMindGeoLocationRepository>();
 
 var app = builder.Build();
 
