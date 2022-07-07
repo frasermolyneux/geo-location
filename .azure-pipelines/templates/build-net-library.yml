@@ -56,6 +56,7 @@ jobs:
       buildProperties: 'Version="${{ parameters.MajorMinorVersion }}.$(Build.BuildId)"'
 
   - task: NuGetAuthenticate@0
+    condition: and(succeeded(), eq('${{ parameters.publishToNuGet }}', 'true'))
     displayName: 'NuGet Authenticate'
 
   - task: NuGetCommand@2
