@@ -6,7 +6,7 @@ param (
 az ad app create --display-name $applicationName --identifier-uris "api://$applicationName" | Out-Null
 $applicationId = (az ad app list --filter "displayName eq '$applicationName'" --query '[].appId') | ConvertFrom-Json
 
-az ad app update --id $applicationId --sign-in-audience 'AzureADMyOrg' | Out-Null
+az ad app update --id $applicationId --sign-in-audience 'AzureADMyOrg' --enable-id-token-issuance true --enable-access-token-issuance false | Out-Null
 
 $applicationServicePrincipal = az ad sp show --id $applicationId
 if ($null -eq $applicationServicePrincipal) {
