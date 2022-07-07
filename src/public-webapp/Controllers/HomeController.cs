@@ -17,15 +17,13 @@ namespace MX.GeoLocation.PublicWebApp.Controllers
 
         private readonly IGeoLocationApiClient geoLocationApiClient;
         private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly ILogger<HomeController> logger;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public HomeController(ILogger<HomeController> logger,
+        public HomeController(
             IGeoLocationApiClient geoLocationClient,
             IHttpContextAccessor httpContext,
             IWebHostEnvironment environment)
         {
-            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             geoLocationApiClient = geoLocationClient ?? throw new ArgumentNullException(nameof(geoLocationClient));
             httpContextAccessor = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
             webHostEnvironment = environment ?? throw new ArgumentNullException(nameof(environment));
@@ -48,7 +46,7 @@ namespace MX.GeoLocation.PublicWebApp.Controllers
             }
             else
             {
-                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupAddressResponse);
+                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupAddressResponse.Result);
 
                 return View(lookupAddressResponse.Result);
             }
