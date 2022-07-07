@@ -5,6 +5,14 @@
 		<RootNamespace>MX.GeoLocation.GeoLocationApi.Client</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<Authors>Fraser Molyneux</Authors>
+		<Product>GeoLocation Client</Product>
+		<Description>This package provides a web service client to query the geolocation service.</Description>
+		<Copyright>GNUv3</Copyright>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
+		<RepositoryType>Git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
