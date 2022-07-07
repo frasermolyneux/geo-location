@@ -95,7 +95,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'AzureAd:Audience'
-          value: 'api://geolocation-lookup-api-${parEnvironment}'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
         }
       ]
     }
