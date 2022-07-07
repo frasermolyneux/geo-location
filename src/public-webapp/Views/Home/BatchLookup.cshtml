@@ -1,0 +1,112 @@
+﻿@using MX.GeoLocation.PublicWebApp.Models
+@model BatchLookupViewModel
+
+@{
+    ViewData["Title"] = "Batch Lookup";
+}
+
+@if (Model.GeoLocationCollectionDto != null)
+{
+    <row>
+        <div class="text-center">
+            <div class="col-sm-12">
+                <div id="map" style="height: 450px; width: 100%;"></div>
+            </div>
+        </div>
+    </row>
+
+    <row class="row col-sm-12" style="margin-top: 20px">
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Address</th>
+                <th scope="col">Accuracy Radius (KM)</th>
+                <th scope="col">Lat, Long</th>
+                <th scope="col">Postal Code</th>
+                <th scope="col">Timezone</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Entries)
+            {
+                <tr>
+                    <td>
+                        <img src="~/images/flags/@(geoLocationDto.CountryCode.ToLower()).png"/> @geoLocationDto.TranslatedAddress</td>
+                    <td>@geoLocationDto.AccuracyRadius</td>
+                    <td>@geoLocationDto.Latitude, @geoLocationDto.Longitude</td>
+                    <td>@(geoLocationDto.PostalCode ?? "unknown")</td>
+                    <td>@geoLocationDto.Timezone</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </row>
+
+    <row>
+        <div>
+            <hr/>
+        </div>
+    </row>
+}
+
+<row>
+    <h1>@ViewData["Title"]</h1>
+
+    <form asp-controller="Home" asp-action="BatchLookup" method="post" autocomplete="false">
+        <div class="input-group">
+            <textarea asp-for="@Model.AddressData" class="form-control" rows="10"></textarea>
+            <span>
+                <button class="btn" type="submit" id="search">
+                    <span class="fa fa-search"></span>
+                </button>
+            </span>
+        </div>
+        <div>
+            <span class="text-danger">@Html.ValidationSummary(false)</span>
+        </div>
+    </form>
+</row>
+
+<row>
+    <p>
+        Enter a line separated list of domains or IP addresses to retrieve the geo-data.
+    </p>
+</row>
+
+@if (Model.GeoLocationCollectionDto != null)
+{
+@section Scripts {
+    <script>
+        function initMap() {
+
+            var map = new google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 2,
+                    center: { lat: 0.00, lng: 0.00 }
+                });
+
+            var locations = [
+                @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Entries)
+                {
+                    <text>
+                        [
+                            '@geoLocationDto.Address',
+                            @geoLocationDto.Latitude,
+                            @geoLocationDto.Longitude
+                        ],
+                    </text>
+                }
+            ];
+
+            for (count = 0; count < locations.length; count++) {
+                new google.maps.Marker({
+                    position: new google.maps.LatLng(locations[count][1], locations[count][2]),
+                    map: map,
+                    title: locations[count][0]
+                });
+            }
+        }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
+}}

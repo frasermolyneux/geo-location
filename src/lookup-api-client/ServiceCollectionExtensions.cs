@@ -7,7 +7,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddServersApiClient(this IServiceCollection serviceCollection,
+        public static void AddGeoLocationApiClient(this IServiceCollection serviceCollection,
             Action<GeoLocationApiClientOptions> configure)
         {
             serviceCollection.Configure(configure);

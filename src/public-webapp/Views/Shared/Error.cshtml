@@ -1,0 +1,31 @@
+﻿@using MX.GeoLocation.PublicWebApp.Models
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<h1 class="text-danger">Error.</h1>
+<h2 class="text-danger">An error occurred while processing your request.</h2>
+
+@if (Model.ShowRequestId)
+{
+    <p>
+        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+    </p>
+}
+
+<h3>Sorry something has gone wrong :(</h3>
+<p>
+    Hopefully this is a transient error and you can retry whatevever you were trying to do. If you try again and it still doesn't work then we will need to fix something. 
+</p>
+<p>
+    We will be alerted to persistent errors and will try our best to resolve them quickly.
+</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+    <h3>Detailed Response</h3>
+    <p>
+        @Model.Message
+    </p>
+}

@@ -1,0 +1,142 @@
+﻿@using MX.GeoLocation.PublicWebApp.Extensions
+@using MX.GeoLocation.PublicWebApp.Models
+@model LookupAddressViewModel
+
+@{
+    ViewData["Title"] = "Lookup Address";
+}
+
+@if (Model.GeoLocationDto != null)
+{
+    <row>
+        <div class="text-center">
+            <h1 class="display-4">You searched for @Model.AddressData</h1>
+            <p>The address is located in @Model.GeoLocationDto.LocationSummary()</p>
+        </div>
+    </row>
+
+    <row class="row">
+        <div class="col-sm-8">
+            <div id="map" style="height: 450px; width: 100%;"></div>
+        </div>
+
+        <div class="col-sm-4">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Attribute</th>
+                    <th scope="col">Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Accuracy Radius (KM)</td>
+                    <td>@Model.GeoLocationDto.AccuracyRadius</td>
+                </tr>
+                <tr>
+                    <td>Latitude, Longitude</td>
+                    <td>@Model.GeoLocationDto.Latitude, @Model.GeoLocationDto.Longitude</td>
+                </tr>
+                <tr>
+                    <td>IP Address</td>
+                    <td>
+                        @Model.GeoLocationDto.FlagImage() @Model.GeoLocationDto.TranslatedAddress
+                    </td>
+                </tr>
+                @if (Model.GeoLocationDto.PostalCode != null)
+                {
+                    <tr>
+                        <td>Postal Code</td>
+                        <td>@Model.GeoLocationDto.PostalCode</td>
+                    </tr>
+                }
+                <tr>
+                    <td>Timezone</td>
+                    <td>@Model.GeoLocationDto.Timezone</td>
+                </tr>
+                </tbody>
+            </table>
+            <button class="btn-primary" data-toggle="collapse" data-target="#traits">View All Traits</button>
+        </div>
+    </row>
+
+    <row class="row">
+        <div id="traits" class="col-sm-12 collapse" style="margin-top: 20px">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Trait</th>
+                    <th scope="col">Value</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                @foreach (var trait in Model.GeoLocationDto.Traits.Where(trait => !string.IsNullOrWhiteSpace(trait.Value)))
+                {
+                    <tr>
+                        <td>@trait.Key</td>
+                        <td>@trait.Value</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </row>
+
+    <row class="row">
+        <div style="padding-top: 20px">
+            <hr/>
+        </div>
+    </row>
+}
+
+<row>
+    <h1>@ViewData["Title"]</h1>
+
+    <form asp-controller="Home" asp-action="LookupAddress" method="post" autocomplete="false">
+        <div class="input-group">
+            <input asp-for="@Model.AddressData" class="form-control">
+            <span>
+                <button class="btn" type="submit" id="search">
+                    <span class="fa fa-search"></span>
+                </button>
+            </span>
+        </div>
+        <div>
+            <span class="text-danger">@Html.ValidationSummary(false)</span>
+        </div>
+    </form>
+</row>
+
+<row>
+    <p>
+        Enter an domain or IP address to retrieve the geo-data.
+    </p>
+</row>
+
+@if (Model.GeoLocationDto != null)
+{
+@section Scripts {
+    <script>
+        function initMap() {
+            var myLatLng = {
+                lat: @Model.GeoLocationDto.Latitude,
+                lng: @Model.GeoLocationDto.Longitude
+            };
+
+            var map = new google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 4,
+                    center: myLatLng
+                });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: '@Model.AddressData Location'
+            });
+        }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
+}}

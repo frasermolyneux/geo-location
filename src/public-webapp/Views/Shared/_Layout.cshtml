@@ -1,0 +1,75 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161834016-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() { dataLayer.push(arguments); }
+
+        gtag('js', new Date());
+
+        gtag('config', 'UA-161834016-1');
+    </script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GeoLocation</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/all.css" />
+    <script data-ad-client="ca-pub-7235499647345816" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GeoLocation</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarLookupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Lookup Service
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarLookupDropdown">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="LookupAddress">Lookup Address</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="BatchLookup">Batch Lookup</a>
+                        </div>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarPrivacyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Privacy
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarPrivacyDropdown">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="RemoveData">Remove My Data</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; @DateTime.UtcNow.Year - Fraser Molyneux - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        - Location data provided by <a href="https://www.maxmind.com/">MaxMind</a>
+    </div>
+</footer>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@RenderSection("Scripts", false)
+</body>
+</html>

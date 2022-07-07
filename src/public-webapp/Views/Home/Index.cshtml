@@ -1,0 +1,102 @@
+﻿@using MX.GeoLocation.LookupApi.Abstractions.Models
+@model GeoLocationDto
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<row>
+    <div class="text-center">
+        <h1 class="display-4">Welcome - @Model.Address</h1>
+        <p>We believe you are from @Model.CityName, @Model.CountryName</p>
+    </div>
+</row>
+
+<row class="row">
+    <div class="col-sm-8">
+        <div id="map" style="height: 450px; width: 100%;"></div>
+    </div>
+
+    <div class="col-sm-4">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Attribute</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Accuracy Radius (KM)</td>
+                    <td>@Model.AccuracyRadius</td>
+                </tr>
+                <tr>
+                    <td>Latitude, Longitude</td>
+                    <td>@Model.Latitude, @Model.Longitude</td>
+                </tr>
+                <tr>
+                    <td>IP Address</td>
+                    <td>
+                        <img src="~/images/flags/@(Model.CountryCode?.ToLower()).png" /> @Model.TranslatedAddress
+                    </td>
+                </tr>
+                @if (Model.PostalCode != null)
+                {
+                    <tr>
+                        <td>Postal Code</td>
+                        <td>@Model.PostalCode</td>
+                    </tr>
+                }
+                <tr>
+                    <td>Timezone</td>
+                    <td>@Model.Timezone</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn-primary" data-toggle="collapse" data-target="#traits">View All Traits</button>
+    </div>
+</row>
+
+<row class="row">
+    <div id="traits" class="col-sm-12 collapse" style="margin-top: 20px">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Trait</th>
+                    <th scope="col">Value</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var trait in Model.Traits.Where(trait => !string.IsNullOrWhiteSpace(trait.Value)))
+                {
+                    <tr>
+                        <td>@trait.Key</td>
+                        <td>@trait.Value</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</row>
+
+@section Scripts {
+    <script>
+        function initMap() {
+            var myLatLng = { lat: @Model.Latitude, lng: @Model.Longitude };
+
+            var map = new google.maps.Map(document.getElementById('map'),
+                {
+                    zoom: 4,
+                    center: myLatLng
+                });
+
+            var marker = new google.maps.Marker({
+                position: myLatLng,
+                map: map,
+                title: '@Model.Address Location'
+            });
+        }
+    </script>
+
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
+}
