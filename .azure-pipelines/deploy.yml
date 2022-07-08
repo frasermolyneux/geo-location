@@ -39,7 +39,7 @@ stages:
       - task: AzureCLI@2
         displayName: DeployPrdPlatformBicep
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
@@ -54,7 +54,7 @@ stages:
       - task: AzureCLI@2
         displayName: SetDeployPrincipalPermissions
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"prd" "uksouth"'
@@ -64,7 +64,7 @@ stages:
       - task: AzureCLI@2
         displayName: CreateAppRegistrations
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"prd" "uksouth"'
@@ -73,7 +73,7 @@ stages:
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"prd" "uksouth"'
@@ -86,7 +86,7 @@ stages:
       - task: AzureCLI@2
         displayName: DeployPrdServicesBicep
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
@@ -102,7 +102,7 @@ stages:
       jobName: DeployLookupWebApi
       webAppName: 'webapi-geolocation-lookup-prd-uksouth'
       webAppNameResourceGroup: 'rg-geolocation-prd-uksouth'
-      subscription: 'sub-fm-geolocation-prd'
+      subscription: 'spn-ado-Personal-Public-geolocation-prd'
 
   - template: templates/deploy-web-app.yml
     parameters:
@@ -111,4 +111,4 @@ stages:
       jobName: DeployPublicWebApp
       webAppName: 'webapp-geolocation-public-prd-uksouth'
       webAppNameResourceGroup: 'rg-geolocation-prd-uksouth'
-      subscription: 'sub-fm-geolocation-prd'
+      subscription: 'spn-ado-Personal-Public-geolocation-prd'

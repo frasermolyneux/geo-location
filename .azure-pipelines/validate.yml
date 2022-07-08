@@ -51,7 +51,7 @@ stages:
         name: RunPreflightValidation
         displayName: Run Preflight Validation
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
@@ -69,7 +69,7 @@ stages:
         name: RunWhatIfDeploy
         displayName: Run What-If Deploy
         inputs:
-          azureSubscription: 'sub-fm-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
