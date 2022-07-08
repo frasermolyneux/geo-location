@@ -48,7 +48,7 @@ stages:
               --location 'uksouth' `
               --parameters @params/platform.prd.json
 
-  - job: DeployPrdPermissions
+  - job: DeployPrdPlatformPermissions
     dependsOn: [DeployPrdPlatformBicep]
     steps:
       - task: AzureCLI@2
@@ -70,15 +70,6 @@ stages:
           arguments: '"prd" "uksouth"'
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrations.ps1'
 
-      - task: AzureCLI@2
-        displayName: SetPublicWebAppPermissions
-        inputs:
-          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
-          scriptType: 'pscore'
-          scriptLocation: 'scriptPath'
-          arguments: '"prd" "uksouth"'
-          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetPublicWebAppPermissions.ps1'
-
 - stage: DeployPrdServices
   jobs:
   - job: DeployPrdServicesBicep
@@ -94,6 +85,18 @@ stages:
               --resource-group 'rg-geolocation-prd-uksouth' `
               --template-file bicep/services.bicep `
               --parameters @params/services.prd.json
+
+  - job: DeployPrdPlatformPermissions
+    dependsOn: [DeployPrdPlatformBicep]
+    steps:
+      - task: AzureCLI@2
+        displayName: SetPublicWebAppPermissions
+        inputs:
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: '"prd" "uksouth"'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetPublicWebAppPermissions.ps1'
 
   - template: templates/deploy-web-app.yml
     parameters:
