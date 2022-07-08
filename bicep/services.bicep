@@ -3,7 +3,7 @@ targetScope = 'resourceGroup'
 // Parameters
 param parLocation string
 param parEnvironment string
-param parManagementSubscriptionId string
+param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parTags object
@@ -23,7 +23,7 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parAppServicePlanName: varAppServicePlanName
     parAppInsightsName: varAppInsightsName
     parApiManagementName: varApimName
-    parManagementSubscriptionId: parManagementSubscriptionId
+    parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parTags: parTags
@@ -39,7 +39,7 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parAppServicePlanName: varAppServicePlanName
     parAppInsightsName: varAppInsightsName
     parApiManagementName: varApimName
-    parManagementSubscriptionId: parManagementSubscriptionId
+    parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parTags: parTags

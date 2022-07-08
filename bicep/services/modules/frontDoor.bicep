@@ -4,7 +4,7 @@ targetScope = 'resourceGroup'
 param parFrontDoorName string
 param parFrontDoorDns string
 param parParentDnsName string
-param parManagementSubscriptionId string
+param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parOriginHostName string
 param parTags object
@@ -12,7 +12,7 @@ param parTags object
 // Existing Resources
 resource parentDnsZone 'Microsoft.Network/dnsZones@2018-05-01' existing = {
   name: parParentDnsName
-  scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
+  scope: resourceGroup(parConnectivitySubscriptionId, parDnsResourceGroupName)
 }
 
 // Module Resources
@@ -127,7 +127,7 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2021-06-01' 
 
 module dns 'dns.bicep' = {
   name: 'dns-${parFrontDoorDns}.${parParentDnsName}'
-  scope: resourceGroup(parManagementSubscriptionId, parDnsResourceGroupName)
+  scope: resourceGroup(parConnectivitySubscriptionId, parDnsResourceGroupName)
 
   params: {
     parDns: parFrontDoorDns

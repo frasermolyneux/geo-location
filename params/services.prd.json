@@ -8,8 +8,8 @@
         "parEnvironment": {
             "value": "prd"
         },
-        "parManagementSubscriptionId": {
-            "value": "7760848c-794d-4a19-8cb2-52f71a21ac2b"
+        "parConnectivitySubscriptionId": {
+            "value": "db34f572-8b71-40d6-8f99-f29a27612144"
         },
         "parDnsResourceGroupName": {
             "value": "rg-dns-prd-uksouth"

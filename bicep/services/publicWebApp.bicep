@@ -7,7 +7,7 @@ param parKeyVaultName string
 param parAppServicePlanName string
 param parAppInsightsName string
 param parApiManagementName string
-param parManagementSubscriptionId string
+param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parTags object
@@ -145,7 +145,7 @@ module publicWebAppFrontDoor 'modules/frontDoor.bicep' = {
     parFrontDoorName: varFrontDoorName
     parFrontDoorDns: varFrontDoorDns
     parParentDnsName: parParentDnsName
-    parManagementSubscriptionId: parManagementSubscriptionId
+    parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parOriginHostName: webApp.properties.defaultHostName
     parTags: parTags
