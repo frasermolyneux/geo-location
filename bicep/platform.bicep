@@ -13,7 +13,6 @@ var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
-var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
 
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varResourceGroupName
@@ -55,16 +54,6 @@ module apiManagment 'platform/apiManagement.bicep' = {
     parApimName: varApimName
     parAppInsightsName: logging.outputs.outAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName
-    parLocation: parLocation
-    parTags: parTags
-  }
-}
-
-module appServicePlan 'platform/appServicePlan.bicep' = {
-  name: 'appServicePlan'
-  scope: resourceGroup(defaultResourceGroup.name)
-  params: {
-    parAppServicePlanName: varAppServicePlanName
     parLocation: parLocation
     parTags: parTags
   }

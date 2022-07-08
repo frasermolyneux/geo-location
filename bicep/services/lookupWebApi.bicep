@@ -4,12 +4,14 @@ targetScope = 'resourceGroup'
 param parLocation string
 param parEnvironment string
 param parKeyVaultName string
-param parAppServicePlanName string
 param parAppInsightsName string
 param parApiManagementName string
 param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
+param parStrategicServicesSubscriptionId string
+param parAppServicePlanResourceGroupName string
+param parAppServicePlanName string
 param parTags object
 
 // Variables
@@ -24,6 +26,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
   name: parAppServicePlanName
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parAppServicePlanResourceGroupName)
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
@@ -67,7 +70,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~2'
+          value: '~3'
         }
         {
           name: 'ASPNETCORE_ENVIRONMENT'

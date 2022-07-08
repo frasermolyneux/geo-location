@@ -6,13 +6,15 @@ param parEnvironment string
 param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
+param parStrategicServicesSubscriptionId string
+param parAppServicePlanResourceGroupName string
+param parAppServicePlanName string
 param parTags object
 
 // Variables
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
-var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}'
 
 module lookupWebApp 'services/lookupWebApi.bicep' = {
   name: 'lookupWebApp'
@@ -20,12 +22,14 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parLocation: parLocation
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
-    parAppServicePlanName: varAppServicePlanName
     parAppInsightsName: varAppInsightsName
     parApiManagementName: varApimName
     parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
+    parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
+    parAppServicePlanResourceGroupName: parAppServicePlanResourceGroupName
+    parAppServicePlanName: parAppServicePlanName
     parTags: parTags
   }
 }
@@ -36,12 +40,14 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parLocation: parLocation
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
-    parAppServicePlanName: varAppServicePlanName
     parAppInsightsName: varAppInsightsName
     parApiManagementName: varApimName
     parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
+    parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
+    parAppServicePlanResourceGroupName: parAppServicePlanResourceGroupName
+    parAppServicePlanName: parAppServicePlanName
     parTags: parTags
   }
 }
