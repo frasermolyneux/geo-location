@@ -10,23 +10,17 @@ param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
-param parAppServicePlanResourceGroupName string
+param parWebAppsResourceGroupName string
 param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
 var varFrontDoorName = 'fd-webapi-geolocation-lookup-${parEnvironment}'
 var varFrontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
-}
-
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
-  name: parAppServicePlanName
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parAppServicePlanResourceGroupName)
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
@@ -38,80 +32,19 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-08-01' existing = {
 }
 
 // Module Resources
-resource webApp 'Microsoft.Web/sites@2020-06-01' = {
-  name: varWebAppName
-  location: parLocation
-  kind: 'app'
-  tags: parTags
+module scopedLookupWebApi 'modules/scopedLookupWebApi.bicep' = {
+  name: 'scopedLookupWebApi'
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
-  identity: {
-    type: 'SystemAssigned'
-  }
-
-  properties: {
-    serverFarmId: appServicePlan.id
-
-    httpsOnly: true
-
-    siteConfig: {
-      ftpsState: 'Disabled'
-
-      alwaysOn: true
-      linuxFxVersion: 'DOTNETCORE|6.0'
-      netFrameworkVersion: 'v6.0'
-      minTlsVersion: '1.2'
-
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appInsights.name}-instrumentationkey)'
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appInsights.name}-connectionstring)'
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'ASPNETCORE_ENVIRONMENT'
-          value: 'Production'
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
-        {
-          name: 'AzureAd:TenantId'
-          value: tenant().tenantId
-        }
-        {
-          name: 'AzureAd:Instance'
-          value: environment().authentication.loginEndpoint
-        }
-        {
-          name: 'AzureAd:ClientId'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
-        }
-        {
-          name: 'AzureAd:ClientSecret'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientsecret)'
-        }
-        {
-          name: 'AzureAd:Audience'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
-        }
-        {
-          name: 'maxmind-apikey'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=maxmind-apikey)'
-        }
-        {
-          name: 'maxmind-userid'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=maxmind-userid)'
-        }
-      ]
-    }
+  params: {
+    parLocation: parLocation
+    parEnvironment: parEnvironment
+    parKeyVaultName: parKeyVaultName
+    parAppInsightsName: parAppInsightsName
+    parAppServicePlanName: parAppServicePlanName
+    parWorkloadSubscriptionId: subscription().id
+    parWorkloadResourceGroupName: resourceGroup().name
+    parTags: parTags
   }
 }
 
@@ -122,7 +55,7 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   properties: {
     accessPolicies: [
       {
-        objectId: webApp.identity.principalId
+        objectId: scopedLookupWebApi.outputs.outWebAppIdentityPrincipalId
         permissions: {
           certificates: []
           keys: []
@@ -146,7 +79,7 @@ module lookupWebApiFrontDoor 'modules/frontDoor.bicep' = {
     parParentDnsName: parParentDnsName
     parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
-    parOriginHostName: webApp.properties.defaultHostName
+    parOriginHostName: scopedLookupWebApi.outputs.outWebAppDefaultHostName
     parTags: parTags
   }
 }

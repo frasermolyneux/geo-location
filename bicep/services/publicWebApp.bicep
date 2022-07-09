@@ -10,7 +10,7 @@ param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
-param parAppServicePlanResourceGroupName string
+param parWebAppsResourceGroupName string
 param parAppServicePlanName string
 param parTags object
 
@@ -24,20 +24,28 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
 }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
-  name: parAppServicePlanName
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parAppServicePlanResourceGroupName)
-}
-
-resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
-  name: parAppInsightsName
-}
-
 resource apiManagement 'Microsoft.ApiManagement/service@2021-08-01' existing = {
   name: parApiManagementName
 }
 
 // Module Resources
+module scopedPublicWebApp 'modules/scopedPublicWebApp.bicep' = {
+  name: 'scopedPublicWebApp'
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
+
+  params: {
+    parLocation: parLocation
+    parEnvironment: parEnvironment
+    parKeyVaultName: parKeyVaultName
+    parAppInsightsName: parAppInsightsName
+    parApiManagementName: parApiManagementName
+    parAppServicePlanName: parAppServicePlanName
+    parWorkloadSubscriptionId: subscription().id
+    parWorkloadResourceGroupName: resourceGroup().name
+    parTags: parTags
+  }
+}
+
 resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscriptions@2021-08-01' = {
   name: '${apiManagement.name}-${varWebAppName}-subscription'
   parent: apiManagement
@@ -60,67 +68,6 @@ resource webAppApiMgmtKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview'
   }
 }
 
-resource webApp 'Microsoft.Web/sites@2020-06-01' = {
-  name: varWebAppName
-  location: parLocation
-  kind: 'app'
-  tags: parTags
-
-  identity: {
-    type: 'SystemAssigned'
-  }
-
-  properties: {
-    serverFarmId: appServicePlan.id
-
-    httpsOnly: true
-
-    siteConfig: {
-      ftpsState: 'Disabled'
-
-      alwaysOn: true
-      linuxFxVersion: 'DOTNETCORE|6.0'
-      netFrameworkVersion: 'v6.0'
-      minTlsVersion: '1.2'
-
-      appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appInsights.name}-instrumentationkey)'
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appInsights.name}-connectionstring)'
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'ASPNETCORE_ENVIRONMENT'
-          value: 'Production'
-        }
-        {
-          name: 'WEBSITE_RUN_FROM_PACKAGE'
-          value: '1'
-        }
-        {
-          name: 'apim-base-url'
-          value: apiManagement.properties.gatewayUrl
-        }
-        {
-          name: 'apim-subscription-key'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${apiManagement.name}-${varWebAppName}-apikey)'
-        }
-        {
-          name: 'geolocation-api-application-audience'
-          value: 'api://geolocation-lookup-api-${parEnvironment}'
-        }
-      ]
-    }
-  }
-}
-
 resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-preview' = {
   name: 'add'
   parent: keyVault
@@ -128,7 +75,7 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   properties: {
     accessPolicies: [
       {
-        objectId: webApp.identity.principalId
+        objectId: scopedPublicWebApp.outputs.outWebAppIdentityPrincipalId
         permissions: {
           certificates: []
           keys: []
@@ -152,7 +99,7 @@ module publicWebAppFrontDoor 'modules/frontDoor.bicep' = {
     parParentDnsName: parParentDnsName
     parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
-    parOriginHostName: webApp.properties.defaultHostName
+    parOriginHostName: scopedPublicWebApp.outputs.outWebAppDefaultHostName
     parTags: parTags
   }
 }
