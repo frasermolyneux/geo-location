@@ -5,9 +5,6 @@ param parLocation string
 param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
-param parConnectivitySubscriptionId string
-param parDnsResourceGroupName string
-param parParentDnsName string
 param parStrategicServicesSubscriptionId string
 param parApimResourceGroupName string
 param parApiManagementName string
@@ -17,8 +14,6 @@ param parTags object
 
 // Variables
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
-var varFrontDoorName = 'fd-webapp-geolocation-public-${parEnvironment}'
-var varFrontDoorDns = 'webapp-geolocation-public-${parEnvironment}'
 
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
@@ -32,7 +27,7 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 
 // Module Resources
 module webApp 'publicWebApp/webApp.bicep' = {
-  name: 'webApp'
+  name: 'publicWebApp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -77,17 +72,3 @@ module webAppKeyVaultPermissions './../modules/keyVaultAccessPolicy.bicep' = {
     parPrincipalId: webApp.outputs.outWebAppIdentityPrincipalId
   }
 }
-
-//module publicWebAppFrontDoor 'modules/frontDoor.bicep' = {
-//  name: 'publicWebAppFrontDoor'
-//
-//  params: {
-//    parFrontDoorName: varFrontDoorName
-//    parFrontDoorDns: varFrontDoorDns
-//    parParentDnsName: parParentDnsName
-//    parConnectivitySubscriptionId: parConnectivitySubscriptionId
-//    parDnsResourceGroupName: parDnsResourceGroupName
-//    parOriginHostName: webApp.outputs.outWebAppDefaultHostName
-//    parTags: parTags
-//  }
-//}

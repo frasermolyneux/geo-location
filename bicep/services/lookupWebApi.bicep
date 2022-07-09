@@ -5,8 +5,6 @@ param parLocation string
 param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
-param parConnectivitySubscriptionId string
-param parDnsResourceGroupName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
 param parApimResourceGroupName string
@@ -16,7 +14,6 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varFrontDoorName = 'fd-webapi-geolocation-lookup-${parEnvironment}'
 var varFrontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Existing Resources
@@ -34,8 +31,8 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 }
 
 // Module Resources
-module scopedLookupWebApi 'modules/scopedLookupWebApi.bicep' = {
-  name: 'scopedLookupWebApi'
+module webApp 'lookupWebApi/webApp.bicep' = {
+  name: 'lookupWebApi'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -57,7 +54,7 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   properties: {
     accessPolicies: [
       {
-        objectId: scopedLookupWebApi.outputs.outWebAppIdentityPrincipalId
+        objectId: webApp.outputs.outWebAppIdentityPrincipalId
         permissions: {
           certificates: []
           keys: []
@@ -72,21 +69,7 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   }
 }
 
-//module lookupWebApiFrontDoor 'modules/frontDoor.bicep' = {
-//  name: 'lookupWebApiFrontDoor'
-//
-//  params: {
-//    parFrontDoorName: varFrontDoorName
-//    parFrontDoorDns: varFrontDoorDns
-//    parParentDnsName: parParentDnsName
-//    parConnectivitySubscriptionId: parConnectivitySubscriptionId
-//    parDnsResourceGroupName: parDnsResourceGroupName
-//    parOriginHostName: scopedLookupWebApi.outputs.outWebAppDefaultHostName
-//    parTags: parTags
-//  }
-//}
-
-module apiManagementLookupApi 'modules/apiManagementLookupApi.bicep' = {
+module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
   name: 'apiManagementLookupApi'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
