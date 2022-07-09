@@ -72,19 +72,19 @@ resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@20
   }
 }
 
-module lookupWebApiFrontDoor 'modules/frontDoor.bicep' = {
-  name: 'lookupWebApiFrontDoor'
-
-  params: {
-    parFrontDoorName: varFrontDoorName
-    parFrontDoorDns: varFrontDoorDns
-    parParentDnsName: parParentDnsName
-    parConnectivitySubscriptionId: parConnectivitySubscriptionId
-    parDnsResourceGroupName: parDnsResourceGroupName
-    parOriginHostName: scopedLookupWebApi.outputs.outWebAppDefaultHostName
-    parTags: parTags
-  }
-}
+//module lookupWebApiFrontDoor 'modules/frontDoor.bicep' = {
+//  name: 'lookupWebApiFrontDoor'
+//
+//  params: {
+//    parFrontDoorName: varFrontDoorName
+//    parFrontDoorDns: varFrontDoorDns
+//    parParentDnsName: parParentDnsName
+//    parConnectivitySubscriptionId: parConnectivitySubscriptionId
+//    parDnsResourceGroupName: parDnsResourceGroupName
+//    parOriginHostName: scopedLookupWebApi.outputs.outWebAppDefaultHostName
+//    parTags: parTags
+//  }
+//}
 
 module apiManagementLookupApi 'modules/apiManagementLookupApi.bicep' = {
   name: 'apiManagementLookupApi'

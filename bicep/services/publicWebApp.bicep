@@ -31,8 +31,8 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 }
 
 // Module Resources
-module scopedPublicWebApp 'modules/scopedPublicWebApp.bicep' = {
-  name: 'scopedPublicWebApp'
+module webApp 'publicWebApp/webApp.bicep' = {
+  name: 'webApp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -57,49 +57,37 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
   }
 }
 
-resource webAppApiMgmtKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  name: '${parApiManagementName}-${varWebAppName}-apikey'
-  parent: keyVault
-  tags: parTags
-
-  properties: {
-    contentType: 'text/plain'
-    value: apiManagementSubscription.outputs.outApiManagementSubcriptionKey
-  }
-}
-
-resource webAppKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-preview' = {
-  name: 'add'
-  parent: keyVault
-
-  properties: {
-    accessPolicies: [
-      {
-        objectId: scopedPublicWebApp.outputs.outWebAppIdentityPrincipalId
-        permissions: {
-          certificates: []
-          keys: []
-          secrets: [
-            'get'
-          ]
-          storage: []
-        }
-        tenantId: tenant().tenantId
-      }
-    ]
-  }
-}
-
-module publicWebAppFrontDoor 'modules/frontDoor.bicep' = {
-  name: 'publicWebAppFrontDoor'
+module webAppApiMgmtKey './../modules/keyVaultSecret.bicep' = {
+  name: '${parApiManagementName}-publicwebapp-subscription'
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
   params: {
-    parFrontDoorName: varFrontDoorName
-    parFrontDoorDns: varFrontDoorDns
-    parParentDnsName: parParentDnsName
-    parConnectivitySubscriptionId: parConnectivitySubscriptionId
-    parDnsResourceGroupName: parDnsResourceGroupName
-    parOriginHostName: scopedPublicWebApp.outputs.outWebAppDefaultHostName
+    parKeyVaultName: parKeyVaultName
+    parSecretName: '${parApiManagementName}-${varWebAppName}-apikey'
+    parSecretValue: apiManagementSubscription.outputs.outApiManagementSubcriptionKey
     parTags: parTags
   }
 }
+
+module webAppKeyVaultPermissions './../modules/keyVaultAccessPolicy.bicep' = {
+  name: '${varWebAppName}-${keyVault.name}'
+
+  params: {
+    parKeyVaultName: parKeyVaultName
+    parPrincipalId: webApp.outputs.outWebAppIdentityPrincipalId
+  }
+}
+
+//module publicWebAppFrontDoor 'modules/frontDoor.bicep' = {
+//  name: 'publicWebAppFrontDoor'
+//
+//  params: {
+//    parFrontDoorName: varFrontDoorName
+//    parFrontDoorDns: varFrontDoorDns
+//    parParentDnsName: parParentDnsName
+//    parConnectivitySubscriptionId: parConnectivitySubscriptionId
+//    parDnsResourceGroupName: parDnsResourceGroupName
+//    parOriginHostName: webApp.outputs.outWebAppDefaultHostName
+//    parTags: parTags
+//  }
+//}
