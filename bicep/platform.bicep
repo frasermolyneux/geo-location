@@ -12,7 +12,6 @@ param parTags object
 var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
-var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
 
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varResourceGroupName
@@ -43,18 +42,6 @@ module logging 'platform/logging.bicep' = {
     parLoggingSubscriptionId: parLoggingSubscriptionId
     parLoggingResourceGroupName: parLoggingResourceGroupName
     parLoggingWorkspaceName: parLoggingWorkspaceName
-    parTags: parTags
-  }
-}
-
-module apiManagment 'platform/apiManagement.bicep' = {
-  name: 'apiManagement'
-  scope: resourceGroup(defaultResourceGroup.name)
-  params: {
-    parApimName: varApimName
-    parAppInsightsName: logging.outputs.outAppInsightsName
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
-    parLocation: parLocation
     parTags: parTags
   }
 }

@@ -7,6 +7,8 @@ param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
+param parApimResourceGroupName string
+param parApiManagementName string
 param parWebAppsResourceGroupName string
 param parAppServicePlanName string
 param parTags object
@@ -14,7 +16,6 @@ param parTags object
 // Variables
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
-var varApimName = 'apim-geolocation-${parEnvironment}-${parLocation}'
 
 module lookupWebApp 'services/lookupWebApi.bicep' = {
   name: 'lookupWebApp'
@@ -23,11 +24,12 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
-    parApiManagementName: varApimName
     parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
+    parApimResourceGroupName: parApimResourceGroupName
+    parApiManagementName: parApiManagementName
     parWebAppsResourceGroupName: parWebAppsResourceGroupName
     parAppServicePlanName: parAppServicePlanName
     parTags: parTags
@@ -41,11 +43,12 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
-    parApiManagementName: varApimName
     parConnectivitySubscriptionId: parConnectivitySubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
+    parApimResourceGroupName: parApimResourceGroupName
+    parApiManagementName: parApiManagementName
     parWebAppsResourceGroupName: parWebAppsResourceGroupName
     parAppServicePlanName: parAppServicePlanName
     parTags: parTags

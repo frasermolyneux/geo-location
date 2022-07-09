@@ -5,11 +5,12 @@ param parLocation string
 param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
-param parApiManagementName string
 param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
+param parApimResourceGroupName string
+param parApiManagementName string
 param parWebAppsResourceGroupName string
 param parAppServicePlanName string
 param parTags object
@@ -22,10 +23,6 @@ var varFrontDoorDns = 'webapp-geolocation-public-${parEnvironment}'
 // Existing Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
-}
-
-resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
-  name: parApiManagementName
 }
 
 // Module Resources
@@ -46,25 +43,24 @@ module scopedPublicWebApp 'modules/scopedPublicWebApp.bicep' = {
   }
 }
 
-resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscriptions@2021-08-01' = {
-  name: '${apiManagement.name}-${varWebAppName}-subscription'
-  parent: apiManagement
+module apiManagementSubscription 'modules/apimSubscription.bicep' = {
+  name: '${parApiManagementName}-${varWebAppName}-subscription'
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
-  properties: {
-    allowTracing: false
-    displayName: varWebAppName
-    scope: '/apis'
+  params: {
+    parApiManagementName: parApiManagementName
+    parWorkloadName: varWebAppName
   }
 }
 
 resource webAppApiMgmtKey 'Microsoft.KeyVault/vaults/secrets@2021-11-01-preview' = {
-  name: '${apiManagement.name}-${varWebAppName}-apikey'
+  name: '${parApiManagementName}-${varWebAppName}-apikey'
   parent: keyVault
   tags: parTags
 
   properties: {
     contentType: 'text/plain'
-    value: apiManagementSubscription.properties.primaryKey
+    value: apiManagementSubscription.outputs.outApiManagementSubcriptionKey
   }
 }
 
