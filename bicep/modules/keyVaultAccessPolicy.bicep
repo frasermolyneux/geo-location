@@ -10,7 +10,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
 }
 
 // Module Resources
-resource apiManagementKeyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-preview' = {
+resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-01-preview' = {
   name: 'add'
   parent: keyVault
 

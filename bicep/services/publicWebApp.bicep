@@ -25,6 +25,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
 }
 
+resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
+  name: parApiManagementName
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
+}
+
 // Module Resources
 module scopedPublicWebApp 'modules/scopedPublicWebApp.bicep' = {
   name: 'scopedPublicWebApp'
@@ -36,14 +41,13 @@ module scopedPublicWebApp 'modules/scopedPublicWebApp.bicep' = {
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
     parApiManagementName: parApiManagementName
+    parApiManagementGatewayUrl: apiManagement.properties.gatewayUrl
     parAppServicePlanName: parAppServicePlanName
-    parWorkloadSubscriptionId: subscription().id
-    parWorkloadResourceGroupName: resourceGroup().name
     parTags: parTags
   }
 }
 
-module apiManagementSubscription 'modules/apimSubscription.bicep' = {
+module apiManagementSubscription './../modules/apiManagementSubscription.bicep' = {
   name: '${parApiManagementName}-${varWebAppName}-subscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 

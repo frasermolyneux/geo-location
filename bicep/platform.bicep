@@ -31,7 +31,7 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   properties: {}
 }
 
-module keyVault 'platform/keyVault.bicep' = {
+module keyVault 'modules/keyVault.bicep' = {
   name: 'keyVault'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -41,7 +41,7 @@ module keyVault 'platform/keyVault.bicep' = {
   }
 }
 
-module apiManagementKeyVaultPermissions 'platform/apiManagementKeyVaultPermissions.bicep' = {
+module apiManagementKeyVaultPermissions 'modules/keyVaultAccessPolicy.bicep' = {
   name: '${apiManagement.name}-${keyVault.name}'
   scope: resourceGroup(defaultResourceGroup.name)
 
@@ -65,8 +65,8 @@ module logging 'platform/logging.bicep' = {
   }
 }
 
-module apiManagementLogger 'platform/apiManagementLogger.bicep' = {
-  name: '${apiManagement.name}-${keyVault.name}'
+module apiManagementLogger 'modules/apiManagementLogger.bicep' = {
+  name: '${apiManagement.name}-${varAppInsightsName}'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
   params: {
