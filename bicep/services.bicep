@@ -28,7 +28,7 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
-    parAppServicePlanResourceGroupName: parAppServicePlanResourceGroupName
+    parWebAppsResourceGroupName: parAppServicePlanResourceGroupName
     parAppServicePlanName: parAppServicePlanName
     parTags: parTags
   }
@@ -46,7 +46,7 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
-    parAppServicePlanResourceGroupName: parAppServicePlanResourceGroupName
+    parWebAppsResourceGroupName: parAppServicePlanResourceGroupName
     parAppServicePlanName: parAppServicePlanName
     parTags: parTags
   }
