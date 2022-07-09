@@ -74,23 +74,23 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           value: '1'
         }
         {
-          name: 'AzureAd:TenantId'
+          name: 'AzureAd__TenantId'
           value: tenant().tenantId
         }
         {
-          name: 'AzureAd:Instance'
+          name: 'AzureAd__Instance'
           value: environment().authentication.loginEndpoint
         }
         {
-          name: 'AzureAd:ClientId'
+          name: 'AzureAd__ClientId'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
         }
         {
-          name: 'AzureAd:ClientSecret'
+          name: 'AzureAd__ClientSecret'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientsecret)'
         }
         {
-          name: 'AzureAd:Audience'
+          name: 'AzureAd__Audience'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
         }
         {
