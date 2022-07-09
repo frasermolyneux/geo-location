@@ -86,7 +86,7 @@ stages:
               --template-file bicep/services.bicep `
               --parameters @params/services.prd.json
 
-  - job: DeployPrdServiceermissions
+  - job: DeployPrdServicePermissions
     dependsOn: [DeployPrdServicesBicep]
     steps:
       - task: AzureCLI@2
