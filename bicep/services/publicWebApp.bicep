@@ -24,7 +24,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
 }
 
-resource apiManagement 'Microsoft.ApiManagement/service@2021-08-01' existing = {
+resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
 }
 
