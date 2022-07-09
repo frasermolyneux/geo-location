@@ -48,7 +48,7 @@ module scopedPublicWebApp 'modules/scopedPublicWebApp.bicep' = {
 }
 
 module apiManagementSubscription './../modules/apiManagementSubscription.bicep' = {
-  name: '${parApiManagementName}-${varWebAppName}-subscription'
+  name: '${parApiManagementName}-publicwebapp-subscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
   params: {
