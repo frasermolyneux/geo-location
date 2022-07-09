@@ -56,4 +56,4 @@ resource appInsightsInstrumentationKeySecret 'Microsoft.KeyVault/vaults/secrets@
 
 output outAppInsightsId string = appInsights.id
 output outAppInsightsName string = appInsights.name
-output outAppInsightsConnectionString string = appInsights.properties.ConnectionString
+output outAppInsightsInstrumentationKeySecretName string = appInsightsInstrumentationKeySecret.name
