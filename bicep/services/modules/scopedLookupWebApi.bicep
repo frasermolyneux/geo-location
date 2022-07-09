@@ -94,11 +94,11 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-lookup-api-${parEnvironment}-clientid)'
         }
         {
-          name: 'maxmind-apikey'
+          name: 'maxmind_apikey'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=maxmind-apikey)'
         }
         {
-          name: 'maxmind-userid'
+          name: 'maxmind_userid'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=maxmind-userid)'
         }
       ]

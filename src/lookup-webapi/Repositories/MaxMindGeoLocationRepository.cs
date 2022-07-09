@@ -15,9 +15,9 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
         public async Task<GeoLocationDto> GetGeoLocation(string address)
         {
-            var userId = Convert.ToInt32(configuration["maxmind-userid"]);
+            var userId = Convert.ToInt32(configuration["maxmind_userid"]);
 
-            using (var reader = new WebServiceClient(userId, configuration["maxmind-apikey"]))
+            using (var reader = new WebServiceClient(userId, configuration["maxmind_apikey"]))
             {
                 var lookupResult = await reader.CityAsync(address);
 

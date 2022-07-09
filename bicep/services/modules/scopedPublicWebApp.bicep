@@ -80,15 +80,15 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
           value: '1'
         }
         {
-          name: 'apim-base-url'
+          name: 'apim_base_url'
           value: apiManagement.properties.gatewayUrl
         }
         {
-          name: 'apim-subscription-key'
+          name: 'apim_subscription_key'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${apiManagement.name}-${varWebAppName}-apikey)'
         }
         {
-          name: 'geolocation-api-application-audience'
+          name: 'geolocation_api_application_audience'
           value: 'api://geolocation-lookup-api-${parEnvironment}'
         }
       ]
