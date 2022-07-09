@@ -7,7 +7,7 @@ param parConnectivitySubscriptionId string
 param parDnsResourceGroupName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
-param parAppServicePlanResourceGroupName string
+param parWebAppsResourceGroupName string
 param parAppServicePlanName string
 param parTags object
 
@@ -28,7 +28,7 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
-    parWebAppsResourceGroupName: parAppServicePlanResourceGroupName
+    parWebAppsResourceGroupName: parWebAppsResourceGroupName
     parAppServicePlanName: parAppServicePlanName
     parTags: parTags
   }
@@ -46,7 +46,7 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parDnsResourceGroupName: parDnsResourceGroupName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
-    parWebAppsResourceGroupName: parAppServicePlanResourceGroupName
+    parWebAppsResourceGroupName: parWebAppsResourceGroupName
     parAppServicePlanName: parAppServicePlanName
     parTags: parTags
   }
