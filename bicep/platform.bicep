@@ -16,7 +16,7 @@ var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 
-// Existing Resources
+// Existing Ou-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
@@ -51,7 +51,7 @@ module apiManagementKeyVaultPermissions 'modules/keyVaultAccessPolicy.bicep' = {
   }
 }
 
-module logging 'platform/logging.bicep' = {
+module logging 'platform/appInsights.bicep' = {
   name: 'logging'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -71,9 +71,9 @@ module apiManagementLogger 'modules/apiManagementLogger.bicep' = {
 
   params: {
     parApiManagementName: parApiManagementName
-    parAppInsightsInstrumentationKeySecretName: logging.outputs.outAppInsightsInstrumentationKeySecretName
-    parKeyVaultUri: keyVault.outputs.outKeyVaultUri
+    parWorkloadSubscriptionId: subscription().id
+    parWorkloadResourceGroupName: defaultResourceGroup.name
     parAppInsightsName: logging.outputs.outAppInsightsName
-    parAppInsightsId: logging.outputs.outAppInsightsId
+    parKeyVaultName: keyVault.outputs.outKeyVaultName
   }
 }

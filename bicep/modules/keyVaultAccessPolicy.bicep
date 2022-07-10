@@ -4,7 +4,7 @@ targetScope = 'resourceGroup'
 param parKeyVaultName string
 param parPrincipalId string
 
-// Existing Resources
+// Existing In-Scope Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
 }

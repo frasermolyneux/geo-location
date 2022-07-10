@@ -13,7 +13,12 @@ param parTags object
 // Variables
 var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
 
-// Existing Resources
+// Existing In-Scope Resources
+resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
+  name: parAppServicePlanName
+}
+
+// Existing Out-Of-Scope Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
@@ -22,10 +27,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: parAppInsightsName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
-}
-
-resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
-  name: parAppServicePlanName
 }
 
 // Module Resources

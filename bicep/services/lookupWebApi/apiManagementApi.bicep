@@ -5,12 +5,25 @@ param parApiManagementName string
 param parFrontDoorDns string
 param parParentDnsName string
 param parEnvironment string
-param parKeyVaultUri string
+param parWorkloadSubscriptionId string
+param parWorkloadResourceGroupName string
+param parKeyVaultName string
 param parAppInsightsName string
 
-// Existing Resources
+// Existing In-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
+}
+
+// Existing Out-Of-Scope Resources
+resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
+  name: parKeyVaultName
+  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
+}
+
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: parAppInsightsName
+  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 }
 
 // Module Resources
@@ -50,7 +63,7 @@ resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021
   properties: {
     displayName: 'lookup-api-audience'
     keyVault: {
-      secretIdentifier: '${parKeyVaultUri}secrets/geolocation-lookup-api-${parEnvironment}-clientid'
+      secretIdentifier: '${keyVault.properties.vaultUri}secrets/geolocation-lookup-api-${parEnvironment}-clientid'
     }
     secret: true
   }
@@ -134,7 +147,7 @@ resource apiDiagnostics 'Microsoft.ApiManagement/service/apis/diagnostics@2021-0
 
     httpCorrelationProtocol: 'W3C'
     logClientIp: true
-    loggerId: resourceId('Microsoft.ApiManagement/service/loggers', apiManagement.name, parAppInsightsName)
+    loggerId: resourceId('Microsoft.ApiManagement/service/loggers', apiManagement.name, appInsights.name)
     operationNameFormat: 'Name'
 
     sampling: {

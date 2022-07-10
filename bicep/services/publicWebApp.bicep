@@ -15,12 +15,6 @@ param parTags object
 // Variables
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
 
-// Existing Resources
-resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
-  name: parApiManagementName
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
-}
-
 // Module Resources
 module webApp 'publicWebApp/webApp.bicep' = {
   name: 'publicWebApp'
@@ -31,9 +25,12 @@ module webApp 'publicWebApp/webApp.bicep' = {
     parEnvironment: parEnvironment
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
+    parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
+    parApiManagementResourceGroupName: parApimResourceGroupName
     parApiManagementName: parApiManagementName
-    parApiManagementGatewayUrl: apiManagement.properties.gatewayUrl
     parAppServicePlanName: parAppServicePlanName
+    parWorkloadSubscriptionId: subscription().id
+    parWorkloadResourceGroupName: resourceGroup().name
     parTags: parTags
   }
 }
@@ -57,13 +54,15 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
   }
 }
 
-module apiMgmtSubscriptionKeyVaultSecret './../modules/keyVaultSecret.bicep' = {
+module apiMgmtSubscriptionKeyVaultSecret './../modules/apiManagementSubscriptionKeyVaultSecret.bicep' = {
   name: 'publicWebAppApiMgmtSubscriptionKeyVaultSecret'
 
   params: {
     parKeyVaultName: parKeyVaultName
-    parSecretName: '${parApiManagementName}-${varWebAppName}-apikey'
-    parSecretValue: apiManagementSubscription.outputs.outApiManagementSubcriptionKey
+    parApiManagementSubscriptionName: apiManagementSubscription.outputs.outSubscriptionName
+    parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
+    parApiManagementResourceGroupName: parApimResourceGroupName
+    parApiManagementName: parApiManagementName
     parTags: parTags
   }
 }

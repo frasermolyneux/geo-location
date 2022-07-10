@@ -9,11 +9,12 @@ param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
 param parTags object
 
-// Existing Resources
+// Existing In-Scope Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
 }
 
+// Existing Out-Of-Scope Resources
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' existing = {
   name: parLoggingWorkspaceName
   scope: resourceGroup(parLoggingSubscriptionId, parLoggingResourceGroupName)
@@ -54,6 +55,7 @@ resource appInsightsInstrumentationKeySecret 'Microsoft.KeyVault/vaults/secrets@
   }
 }
 
+// Outputs
 output outAppInsightsId string = appInsights.id
 output outAppInsightsName string = appInsights.name
 output outAppInsightsInstrumentationKeySecretName string = appInsightsInstrumentationKeySecret.name

@@ -4,7 +4,7 @@ targetScope = 'resourceGroup'
 param parApiManagementName string
 param parWorkloadName string
 
-// Existing Resources
+// Existing In-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
 }
@@ -22,4 +22,4 @@ resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscription
 }
 
 // Outputs
-output outApiManagementSubcriptionKey string = apiManagementSubscription.properties.primaryKey
+output outSubscriptionName string = apiManagementSubscription.name

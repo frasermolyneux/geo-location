@@ -5,17 +5,31 @@ param parLocation string
 param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
+param parApiManagementSubscriptionId string
+param parApiManagementResourceGroupName string
 param parApiManagementName string
-param parApiManagementGatewayUrl string
 param parAppServicePlanName string
+param parWorkloadSubscriptionId string
+param parWorkloadResourceGroupName string
 param parTags object
 
 // Variables
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
 
-// Existing Resources
+// Existing In-Scope Resources
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
   name: parAppServicePlanName
+}
+
+// Existing Out-Of-Scope Resources
+resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
+  name: parKeyVaultName
+  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
+}
+
+resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
+  name: parApiManagementName
+  scope: resourceGroup(parApiManagementSubscriptionId, parApiManagementResourceGroupName)
 }
 
 // Module Resources
@@ -45,11 +59,11 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: '@Microsoft.KeyVault(VaultName=${parKeyVaultName};SecretName=${parAppInsightsName}-instrumentationkey)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${parAppInsightsName}-instrumentationkey)'
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${parKeyVaultName};SecretName=${parAppInsightsName}-connectionstring)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${parAppInsightsName}-connectionstring)'
         }
         {
           name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
@@ -65,11 +79,11 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'apim_base_url'
-          value: parApiManagementGatewayUrl
+          value: apiManagement.properties.gatewayUrl
         }
         {
           name: 'apim_subscription_key'
-          value: '@Microsoft.KeyVault(VaultName=${parKeyVaultName};SecretName=${parApiManagementName}-${varWebAppName}-apikey)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${apiManagement.name}-${varWebAppName}-apikey)'
         }
         {
           name: 'geolocation_api_application_audience'

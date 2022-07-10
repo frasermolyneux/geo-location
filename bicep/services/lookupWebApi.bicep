@@ -16,11 +16,6 @@ param parTags object
 // Variables
 var varFrontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
 
-// Existing Resources
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: parKeyVaultName
-}
-
 // Module Resources
 module webApp 'lookupWebApi/webApp.bicep' = {
   name: 'lookupWebApi'
@@ -56,7 +51,9 @@ module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
     parFrontDoorDns: varFrontDoorDns
     parParentDnsName: parParentDnsName
     parEnvironment: parEnvironment
-    parKeyVaultUri: keyVault.properties.vaultUri
+    parWorkloadSubscriptionId: subscription().id
+    parWorkloadResourceGroupName: resourceGroup().name
+    parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
   }
 }
