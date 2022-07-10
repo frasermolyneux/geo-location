@@ -5,11 +5,19 @@ param parLocation string
 param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
+
+param parConnectivitySubscriptionId string
+param parFrontDoorResourceGroupName string
+param parDnsResourceGroupName string
+param parFrontDoorName string
+param parParentDnsName string
+
 param parStrategicServicesSubscriptionId string
 param parApiManagementResourceGroupName string
 param parApiManagementName string
 param parWebAppsResourceGroupName string
 param parAppServicePlanName string
+
 param parTags object
 
 // Variables
@@ -63,6 +71,21 @@ module apiMgmtSubscriptionKeyVaultSecret './../modules/apiManagementSubscription
     parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
     parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
+    parTags: parTags
+  }
+}
+
+module frontDoorEndpoint 'publicWebApp/frontDoorEndpoint.bicep' = {
+  name: 'publicWebAppFrontDoorEndpoint'
+  scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
+
+  params: {
+    parFrontDoorName: parFrontDoorName
+    parParentDnsName: parParentDnsName
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parWorkloadName: webApp.name
+    parOriginHostName: webApp.outputs.outWebAppDefaultHostName
+
     parTags: parTags
   }
 }

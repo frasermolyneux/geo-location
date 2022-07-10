@@ -8,6 +8,18 @@
         "parEnvironment": {
             "value": "prd"
         },
+        "parConnectivitySubscriptionId": {
+            "value": "db34f572-8b71-40d6-8f99-f29a27612144"
+        },
+        "parFrontDoorResourceGroupName": {
+            "value": "rg-platform-frontdoor-prd-uksouth"
+        },
+        "parDnsResourceGroupName": {
+            "value": "rg-platform-dns-prd-uksouth"
+        },
+        "parFrontDoorName": {
+            "value": "fd-mx-platform-prd"
+        },
         "parParentDnsName": {
             "value": "molyneux.dev"
         },
