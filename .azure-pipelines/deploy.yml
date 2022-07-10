@@ -104,7 +104,7 @@ stages:
       projectName: lookup-webapi
       jobName: DeployLookupWebApi
       webAppName: 'webapi-geolocation-lookup-prd-uksouth'
-      webAppNameResourceGroup: 'rg-geolocation-prd-uksouth'
+      webAppNameResourceGroup: 'rg-platform-webapps-prd-uksouth'
       subscription: 'spn-ado-Personal-Public-geolocation-prd'
 
   - template: templates/deploy-web-app.yml
@@ -113,5 +113,5 @@ stages:
       projectName: public-webapp
       jobName: DeployPublicWebApp
       webAppName: 'webapp-geolocation-public-prd-uksouth'
-      webAppNameResourceGroup: 'rg-geolocation-prd-uksouth'
+      webAppNameResourceGroup: 'rg-platform-webapps-prd-uksouth'
       subscription: 'spn-ado-Personal-Public-geolocation-prd'

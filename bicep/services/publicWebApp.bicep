@@ -16,10 +16,6 @@ param parTags object
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
 
 // Existing Resources
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: parKeyVaultName
-}
-
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
@@ -42,8 +38,17 @@ module webApp 'publicWebApp/webApp.bicep' = {
   }
 }
 
+module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
+  name: 'publicWebAppKeyVaultAccessPolicy'
+
+  params: {
+    parKeyVaultName: parKeyVaultName
+    parPrincipalId: webApp.outputs.outWebAppIdentityPrincipalId
+  }
+}
+
 module apiManagementSubscription './../modules/apiManagementSubscription.bicep' = {
-  name: '${parApiManagementName}-publicwebapp-subscription'
+  name: 'publicWebAppApiManagementSubscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
   params: {
@@ -52,8 +57,8 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
   }
 }
 
-module webAppApiMgmtKey './../modules/keyVaultSecret.bicep' = {
-  name: '${parApiManagementName}-publicwebapp-subscription'
+module apiMgmtSubscriptionKeyVaultSecret './../modules/keyVaultSecret.bicep' = {
+  name: 'publicWebAppApiMgmtSubscriptionKeyVaultSecret'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
   params: {
@@ -61,14 +66,5 @@ module webAppApiMgmtKey './../modules/keyVaultSecret.bicep' = {
     parSecretName: '${parApiManagementName}-${varWebAppName}-apikey'
     parSecretValue: apiManagementSubscription.outputs.outApiManagementSubcriptionKey
     parTags: parTags
-  }
-}
-
-module webAppKeyVaultPermissions './../modules/keyVaultAccessPolicy.bicep' = {
-  name: '${varWebAppName}-${keyVault.name}'
-
-  params: {
-    parKeyVaultName: parKeyVaultName
-    parPrincipalId: webApp.outputs.outWebAppIdentityPrincipalId
   }
 }
