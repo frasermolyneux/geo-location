@@ -6,7 +6,7 @@ param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
 param parStrategicServicesSubscriptionId string
-param parApimResourceGroupName string
+param parApiManagementResourceGroupName string
 param parApiManagementName string
 param parWebAppsResourceGroupName string
 param parAppServicePlanName string
@@ -26,7 +26,7 @@ module webApp 'publicWebApp/webApp.bicep' = {
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
     parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
-    parApiManagementResourceGroupName: parApimResourceGroupName
+    parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
     parAppServicePlanName: parAppServicePlanName
     parWorkloadSubscriptionId: subscription().id
@@ -46,7 +46,7 @@ module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
 
 module apiManagementSubscription './../modules/apiManagementSubscription.bicep' = {
   name: 'publicWebAppApiManagementSubscription'
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
     parApiManagementName: parApiManagementName
@@ -61,7 +61,7 @@ module apiMgmtSubscriptionKeyVaultSecret './../modules/apiManagementSubscription
     parKeyVaultName: parKeyVaultName
     parApiManagementSubscriptionName: apiManagementSubscription.outputs.outSubscriptionName
     parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
-    parApiManagementResourceGroupName: parApimResourceGroupName
+    parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
     parTags: parTags
   }

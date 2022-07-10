@@ -7,7 +7,7 @@ param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
 param parStrategicServicesSubscriptionId string
-param parApimResourceGroupName string
+param parApiManagementResourceGroupName string
 param parApiManagementName string
 param parTags object
 
@@ -19,7 +19,7 @@ var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 // Existing Ou-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 }
 
 // Module Resources
@@ -67,7 +67,7 @@ module logging 'platform/appInsights.bicep' = {
 
 module apiManagementLogger 'modules/apiManagementLogger.bicep' = {
   name: '${apiManagement.name}-${varAppInsightsName}'
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
     parApiManagementName: parApiManagementName

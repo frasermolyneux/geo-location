@@ -5,7 +5,7 @@ param parLocation string
 param parEnvironment string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
-param parApimResourceGroupName string
+param parApiManagementResourceGroupName string
 param parApiManagementName string
 param parWebAppsResourceGroupName string
 param parAppServicePlanName string
@@ -24,7 +24,7 @@ module lookupWebApp 'services/lookupWebApi.bicep' = {
     parAppInsightsName: varAppInsightsName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
-    parApimResourceGroupName: parApimResourceGroupName
+    parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
     parWebAppsResourceGroupName: parWebAppsResourceGroupName
     parAppServicePlanName: parAppServicePlanName
@@ -40,7 +40,7 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
-    parApimResourceGroupName: parApimResourceGroupName
+    parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
     parWebAppsResourceGroupName: parWebAppsResourceGroupName
     parAppServicePlanName: parAppServicePlanName

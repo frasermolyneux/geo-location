@@ -7,7 +7,7 @@ param parKeyVaultName string
 param parAppInsightsName string
 param parParentDnsName string
 param parStrategicServicesSubscriptionId string
-param parApimResourceGroupName string
+param parApiManagementResourceGroupName string
 param parApiManagementName string
 param parWebAppsResourceGroupName string
 param parAppServicePlanName string
@@ -44,7 +44,7 @@ module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
 
 module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
   name: 'apiManagementLookupApi'
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
+  scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
     parApiManagementName: parApiManagementName
