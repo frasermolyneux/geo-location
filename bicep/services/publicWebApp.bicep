@@ -58,19 +58,10 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
 
   params: {
     parApiManagementName: parApiManagementName
+    parWorkloadSubscriptionId: subscription().subscriptionId
+    parWorkloadResourceGroupName: resourceGroup().name
     parWorkloadName: varWebAppName
-  }
-}
-
-module apiMgmtSubscriptionKeyVaultSecret './../modules/apiManagementSubscriptionKeyVaultSecret.bicep' = {
-  name: 'publicWebAppApiMgmtSubscriptionKeyVaultSecret'
-
-  params: {
     parKeyVaultName: parKeyVaultName
-    parApiManagementSubscriptionName: apiManagementSubscription.outputs.outSubscriptionName
-    parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
-    parApiManagementResourceGroupName: parApiManagementResourceGroupName
-    parApiManagementName: parApiManagementName
     parTags: parTags
   }
 }

@@ -2,7 +2,11 @@ targetScope = 'resourceGroup'
 
 // Parameters
 param parApiManagementName string
+param parWorkloadSubscriptionId string
+param parWorkloadResourceGroupName string
 param parWorkloadName string
+param parKeyVaultName string
+param parTags object
 
 // Existing In-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
@@ -18,6 +22,18 @@ resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscription
     allowTracing: false
     displayName: parWorkloadName
     scope: '/apis'
+  }
+}
+
+module keyVaultSecret './keyVaultSecret.bicep' = {
+  name: 'keyVaultSecret'
+  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
+
+  params: {
+    parKeyVaultName: parKeyVaultName
+    parSecretName: '${apiManagement.name}-${apiManagementSubscription.name}-apikey'
+    parSecretValue: apiManagementSubscription.properties.primaryKey
+    parTags: parTags
   }
 }
 
