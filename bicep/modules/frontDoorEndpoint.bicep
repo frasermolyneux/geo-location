@@ -115,3 +115,15 @@ resource frontDoorRoute 'Microsoft.Cdn/profiles/afdendpoints/routes@2021-06-01' 
     enabledState: 'Enabled'
   }
 }
+
+module dnsCNAME 'dnsCNAME.bicep' = {
+  name: 'dns-${parWorkloadName}.${parParentDnsName}'
+  scope: resourceGroup(parDnsResourceGroupName)
+
+  params: {
+    parDns: parWorkloadName
+    parParentDnsName: parParentDnsName
+    parCname: frontDoorEndpoint.properties.hostName
+    parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken
+  }
+}

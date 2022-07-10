@@ -22,6 +22,7 @@ param parTags object
 
 // Variables
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
+var varWorkloadName = 'webapp-geolocation-public-${parEnvironment}'
 
 // Module Resources
 module webApp 'publicWebApp/webApp.bicep' = {
@@ -66,7 +67,7 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
   }
 }
 
-module frontDoorEndpoint 'publicWebApp/frontDoorEndpoint.bicep' = {
+module frontDoorEndpoint './..//modules/frontDoorEndpoint.bicep' = {
   name: 'publicWebAppFrontDoorEndpoint'
   scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
 
@@ -74,7 +75,7 @@ module frontDoorEndpoint 'publicWebApp/frontDoorEndpoint.bicep' = {
     parFrontDoorName: parFrontDoorName
     parParentDnsName: parParentDnsName
     parDnsResourceGroupName: parDnsResourceGroupName
-    parWorkloadName: webApp.outputs.outWebAppName
+    parWorkloadName: varWorkloadName
     parOriginHostName: webApp.outputs.outWebAppDefaultHostName
 
     parTags: parTags

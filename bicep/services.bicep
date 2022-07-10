@@ -22,13 +22,17 @@ param parTags object
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 
-module lookupWebApp 'services/lookupWebApi.bicep' = {
-  name: 'lookupWebApp'
+module lookupWebApi 'services/lookupWebApi.bicep' = {
+  name: 'lookupWebApi'
   params: {
     parLocation: parLocation
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
+    parConnectivitySubscriptionId: parConnectivitySubscriptionId
+    parFrontDoorResourceGroupName: parFrontDoorResourceGroupName
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parFrontDoorName: parFrontDoorName
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
     parApiManagementResourceGroupName: parApiManagementResourceGroupName

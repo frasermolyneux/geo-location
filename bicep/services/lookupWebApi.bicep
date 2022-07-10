@@ -5,7 +5,13 @@ param parLocation string
 param parEnvironment string
 param parKeyVaultName string
 param parAppInsightsName string
+
+param parConnectivitySubscriptionId string
+param parFrontDoorResourceGroupName string
+param parDnsResourceGroupName string
+param parFrontDoorName string
 param parParentDnsName string
+
 param parStrategicServicesSubscriptionId string
 param parApiManagementResourceGroupName string
 param parApiManagementName string
@@ -14,7 +20,7 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varFrontDoorDns = 'webapi-geolocation-lookup-${parEnvironment}'
+var varWorkloadName = 'webapp-geolocation-lookup-${parEnvironment}'
 
 // Module Resources
 module webApp 'lookupWebApi/webApp.bicep' = {
@@ -48,12 +54,27 @@ module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
 
   params: {
     parApiManagementName: parApiManagementName
-    parFrontDoorDns: varFrontDoorDns
+    parFrontDoorDns: varWorkloadName
     parParentDnsName: parParentDnsName
     parEnvironment: parEnvironment
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
+  }
+}
+
+module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
+  name: 'lookupWebApiFrontDoorEndpoint'
+  scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
+
+  params: {
+    parFrontDoorName: parFrontDoorName
+    parParentDnsName: parParentDnsName
+    parDnsResourceGroupName: parDnsResourceGroupName
+    parWorkloadName: varWorkloadName
+    parOriginHostName: webApp.outputs.outWebAppDefaultHostName
+
+    parTags: parTags
   }
 }
