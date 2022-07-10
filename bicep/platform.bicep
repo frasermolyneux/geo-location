@@ -16,7 +16,7 @@ var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 
-// Existing Ou-Of-Scope Resources
+// Existing Out-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
