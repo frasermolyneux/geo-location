@@ -71,7 +71,7 @@ module apiManagementLogger 'modules/apiManagementLogger.bicep' = {
 
   params: {
     parApiManagementName: parApiManagementName
-    parWorkloadSubscriptionId: subscription().id
+    parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: defaultResourceGroup.name
     parAppInsightsName: logging.outputs.outAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName

@@ -27,7 +27,7 @@ module webApp 'lookupWebApi/webApp.bicep' = {
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
     parAppServicePlanName: parAppServicePlanName
-    parWorkloadSubscriptionId: subscription().id
+    parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
     parTags: parTags
   }
@@ -51,7 +51,7 @@ module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
     parFrontDoorDns: varFrontDoorDns
     parParentDnsName: parParentDnsName
     parEnvironment: parEnvironment
-    parWorkloadSubscriptionId: subscription().id
+    parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
