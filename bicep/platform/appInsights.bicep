@@ -54,3 +54,6 @@ resource appInsightsInstrumentationKeySecret 'Microsoft.KeyVault/vaults/secrets@
     value: appInsights.properties.InstrumentationKey
   }
 }
+
+// Outputs
+output outAppInsightsName string = appInsights.name

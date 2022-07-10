@@ -33,3 +33,6 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
     tenantId: tenant().tenantId
   }
 }
+
+// Outputs
+output outKeyVaultName string = keyVault.name
