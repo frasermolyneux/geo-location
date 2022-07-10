@@ -59,7 +59,6 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
 
 module apiMgmtSubscriptionKeyVaultSecret './../modules/keyVaultSecret.bicep' = {
   name: 'publicWebAppApiMgmtSubscriptionKeyVaultSecret'
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApimResourceGroupName)
 
   params: {
     parKeyVaultName: parKeyVaultName
