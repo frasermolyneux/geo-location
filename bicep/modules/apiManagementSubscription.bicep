@@ -11,7 +11,7 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 
 // Module Resources
 resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscriptions@2021-08-01' = {
-  name: '${apiManagement.name}-${parWorkloadName}-subscription'
+  name: '${parWorkloadName}-subscription'
   parent: apiManagement
 
   properties: {
@@ -22,4 +22,4 @@ resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscription
 }
 
 // Outputs
-output outSubscriptionName string = apiManagementSubscription.properties.displayName
+output outSubscriptionName string = apiManagementSubscription.name
