@@ -11,7 +11,7 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
+var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
 
 // Existing Resources
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
