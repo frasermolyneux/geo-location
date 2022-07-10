@@ -20,7 +20,7 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varWorkloadName = 'webapp-geolocation-lookup-${parEnvironment}'
+var varWorkloadName = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Module Resources
 module webApp 'lookupWebApi/webApp.bicep' = {
