@@ -92,7 +92,7 @@ stages:
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
         inputs:
-          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"prd" "uksouth"'
@@ -105,7 +105,7 @@ stages:
       jobName: DeployLookupWebApi
       webAppName: 'webapi-geolocation-lookup-prd-uksouth'
       webAppNameResourceGroup: 'rg-platform-webapps-prd-uksouth'
-      subscription: 'spn-ado-Personal-Public-geolocation-prd'
+      subscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
 
   - template: templates/deploy-web-app.yml
     parameters:
@@ -114,4 +114,4 @@ stages:
       jobName: DeployPublicWebApp
       webAppName: 'webapp-geolocation-public-prd-uksouth'
       webAppNameResourceGroup: 'rg-platform-webapps-prd-uksouth'
-      subscription: 'spn-ado-Personal-Public-geolocation-prd'
+      subscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
