@@ -22,4 +22,4 @@ resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscription
 }
 
 // Outputs
-output outSubscriptionName string = apiManagementSubscription.name
+output outSubscriptionName string = apiManagementSubscription.properties.displayName
