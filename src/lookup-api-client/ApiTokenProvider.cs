@@ -37,7 +37,7 @@ public class ApiTokenProvider : IApiTokenProvider
 
         try
         {
-            accessToken = await tokenCredential.GetTokenAsync(new TokenRequestContext(new[] { $"{ApiApplicationAudience}" }));
+            accessToken = await tokenCredential.GetTokenAsync(new TokenRequestContext(new[] { $"{ApiApplicationAudience}/.default" }));
             memoryCache.Set("geolocation-api-access-token", accessToken);
         }
         catch (Exception ex)
