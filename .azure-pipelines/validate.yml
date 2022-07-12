@@ -32,6 +32,11 @@ stages:
       jobName: 'BuildLookupApiClient'
       projectName: 'lookup-api-client'
 
+  - template: templates/build-net-library.yml
+    parameters: 
+      jobName: 'BuildLookupApiAbstractions'
+      projectName: 'lookup-api-abstractions'
+
 - stage: ValidateBicep
   jobs: 
   - job: LintCode

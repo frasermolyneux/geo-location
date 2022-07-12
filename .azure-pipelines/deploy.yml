@@ -32,6 +32,13 @@ stages:
       publishToNuGet: true
       MajorMinorVersion: '1.0'
 
+  - template: templates/build-net-library.yml
+    parameters: 
+      jobName: 'PublishLookupApiAbstractions'
+      projectName: 'lookup-api-abstractions'
+      publishToNuGet: true
+      MajorMinorVersion: '1.0'
+
 - stage: DeployPrdPlatform
   jobs:
   - job: DeployPrdPlatformBicep

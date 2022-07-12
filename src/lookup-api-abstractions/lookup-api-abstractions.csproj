@@ -5,6 +5,14 @@
 		<RootNamespace>MX.GeoLocation.LookupApi.Abstractions</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<Authors>Fraser Molyneux</Authors>
+		<Product>GeoLocation Client Abstractions</Product>
+		<Description>This package provides an abstraction layer for interfaces and models for the GeoLocation service.</Description>
+		<Copyright>GNUv3</Copyright>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
+		<RepositoryType>Git</RepositoryType>
 	</PropertyGroup>
 
 	<ItemGroup>
