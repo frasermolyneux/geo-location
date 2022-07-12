@@ -23,11 +23,11 @@ public class ApiTokenProvider : IApiTokenProvider
         this.configuration = configuration;
     }
 
-    private string ApiApplicationAudience => configuration["geolocation-api-application-audience"];
+    private string ApiApplicationAudience => configuration["geolocation_api_application_audience"];
 
     public async Task<string> GetAccessToken()
     {
-        if (memoryCache.TryGetValue("servers-api-access-token", out AccessToken accessToken))
+        if (memoryCache.TryGetValue("geolocation-api-access-token", out AccessToken accessToken))
         {
             if (DateTime.UtcNow < accessToken.ExpiresOn)
                 return accessToken.Token;
