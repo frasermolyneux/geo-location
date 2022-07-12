@@ -70,7 +70,7 @@ resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021
 }
 
 resource api 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
-  name: 'api'
+  name: 'geolocation-api'
   parent: apiManagement
 
   properties: {

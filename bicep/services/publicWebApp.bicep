@@ -64,6 +64,7 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
     parWorkloadResourceGroupName: resourceGroup().name
     parWorkloadName: varWebAppName
     parKeyVaultName: parKeyVaultName
+    parSubscriptionScope: '/apis/geolocation-api'
     parTags: parTags
   }
 }
