@@ -67,7 +67,7 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
   }
 }
 
-module frontDoorEndpoint './..//modules/frontDoorEndpoint.bicep' = {
+module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
   name: 'publicWebAppFrontDoorEndpoint'
   scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
 
