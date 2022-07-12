@@ -10,6 +10,7 @@ param parConnectivitySubscriptionId string
 param parFrontDoorResourceGroupName string
 param parDnsResourceGroupName string
 param parFrontDoorName string
+param parPublicWebAppDnsPrefix string
 param parParentDnsName string
 
 param parStrategicServicesSubscriptionId string
@@ -77,7 +78,7 @@ module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
     parDnsResourceGroupName: parDnsResourceGroupName
     parWorkloadName: varWorkloadName
     parOriginHostName: webApp.outputs.outWebAppDefaultHostName
-    parDnsZoneHostnamePrefix: '@'
+    parDnsZoneHostnamePrefix: '${parPublicWebAppDnsPrefix}.${parParentDnsName}'
     parCustomHostname: parParentDnsName
     parTags: parTags
   }

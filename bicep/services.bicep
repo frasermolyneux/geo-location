@@ -8,6 +8,7 @@ param parConnectivitySubscriptionId string
 param parFrontDoorResourceGroupName string
 param parDnsResourceGroupName string
 param parFrontDoorName string
+param parPublicWebAppDnsPrefix string
 param parParentDnsName string
 
 param parStrategicServicesSubscriptionId string
@@ -54,6 +55,7 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parFrontDoorResourceGroupName: parFrontDoorResourceGroupName
     parDnsResourceGroupName: parDnsResourceGroupName
     parFrontDoorName: parFrontDoorName
+    parPublicWebAppDnsPrefix: parPublicWebAppDnsPrefix
     parParentDnsName: parParentDnsName
     parStrategicServicesSubscriptionId: parStrategicServicesSubscriptionId
     parApiManagementResourceGroupName: parApiManagementResourceGroupName
