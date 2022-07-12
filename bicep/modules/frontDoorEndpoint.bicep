@@ -6,6 +6,8 @@ param parParentDnsName string
 param parDnsResourceGroupName string
 param parWorkloadName string
 param parOriginHostName string
+param parDnsZoneHostnamePrefix string
+param parCustomHostname string
 
 param parTags object
 
@@ -75,7 +77,7 @@ resource frontDoorCustomDomain 'Microsoft.Cdn/profiles/customdomains@2021-06-01'
   name: '${parWorkloadName}-custom-domain'
 
   properties: {
-    hostName: '${parWorkloadName}.${parParentDnsName}'
+    hostName: parCustomHostname
     tlsSettings: {
       certificateType: 'ManagedCertificate'
       minimumTlsVersion: 'TLS12'
@@ -121,7 +123,7 @@ module dnsCNAME 'dnsCNAME.bicep' = {
   scope: resourceGroup(parDnsResourceGroupName)
 
   params: {
-    parDns: parWorkloadName
+    parDns: parDnsZoneHostnamePrefix
     parParentDnsName: parParentDnsName
     parCname: frontDoorEndpoint.properties.hostName
     parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken

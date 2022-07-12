@@ -74,7 +74,8 @@ module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
     parDnsResourceGroupName: parDnsResourceGroupName
     parWorkloadName: varWorkloadName
     parOriginHostName: webApp.outputs.outWebAppDefaultHostName
-
+    parDnsZoneHostnamePrefix: varWorkloadName
+    parCustomHostname: '${varWorkloadName}.${parParentDnsName}'
     parTags: parTags
   }
 }
