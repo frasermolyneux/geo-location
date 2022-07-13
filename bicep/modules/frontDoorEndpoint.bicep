@@ -127,5 +127,6 @@ module dnsCNAME 'dnsCNAME.bicep' = {
     parParentDnsName: parParentDnsName
     parCname: frontDoorEndpoint.properties.hostName
     parCnameValidationToken: frontDoorCustomDomain.properties.validationProperties.validationToken
+    parTags: parTags
   }
 }
