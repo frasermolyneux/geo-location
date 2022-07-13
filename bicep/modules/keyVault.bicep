@@ -13,7 +13,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
 
   properties: {
     accessPolicies: []
-    createMode: 'recover'
+    createMode: 'default'
 
     enablePurgeProtection: true
     enableRbacAuthorization: false
