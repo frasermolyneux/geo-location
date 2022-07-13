@@ -51,8 +51,8 @@ module apiManagementKeyVaultPermissions 'modules/keyVaultAccessPolicy.bicep' = {
   }
 }
 
-module logging 'platform/appInsights.bicep' = {
-  name: 'logging'
+module appInsights 'modules/appInsights.bicep' = {
+  name: 'appInsights'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
     parAppInsightsName: varAppInsightsName
@@ -73,7 +73,7 @@ module apiManagementLogger 'modules/apiManagementLogger.bicep' = {
     parApiManagementName: parApiManagementName
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: defaultResourceGroup.name
-    parAppInsightsName: logging.outputs.outAppInsightsName
+    parAppInsightsName: appInsights.outputs.outAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName
   }
 }
