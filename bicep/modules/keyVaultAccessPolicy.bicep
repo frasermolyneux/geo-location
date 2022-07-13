@@ -4,6 +4,10 @@ targetScope = 'resourceGroup'
 param parKeyVaultName string
 param parPrincipalId string
 
+param parSecretsPermissions array = [
+  'get'
+]
+
 // Existing In-Scope Resources
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
@@ -21,9 +25,7 @@ resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2021-11-
         permissions: {
           certificates: []
           keys: []
-          secrets: [
-            'get'
-          ]
+          secrets: parSecretsPermissions
           storage: []
         }
         tenantId: tenant().tenantId

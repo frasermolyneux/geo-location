@@ -48,6 +48,7 @@ module apiManagementKeyVaultPermissions 'modules/keyVaultAccessPolicy.bicep' = {
   params: {
     parKeyVaultName: keyVault.outputs.outKeyVaultName
     parPrincipalId: apiManagement.identity.principalId
+    parSecretsPermissions: [ 'get' ]
   }
 }
 
