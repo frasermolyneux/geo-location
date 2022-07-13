@@ -28,7 +28,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' = {
       name: 'standard'
     }
 
-    softDeleteRetentionInDays: 30
+    softDeleteRetentionInDays: 90
 
     tenantId: tenant().tenantId
   }
