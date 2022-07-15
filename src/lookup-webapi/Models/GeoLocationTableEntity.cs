@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace MX.GeoLocation.LookupWebApi.Models
 {
-    public class GeoLocationTableEntity : GeoLocationDto, ITableEntity
+    public class GeoLocationTableEntity : ITableEntity
     {
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable. // Required for Table Client
         public GeoLocationTableEntity()
@@ -47,23 +47,62 @@ namespace MX.GeoLocation.LookupWebApi.Models
             TraitsSerialised = JsonConvert.SerializeObject(geoLocationDto.Traits);
         }
 
-        [IgnoreDataMember]
-        public new Dictionary<string, string> Traits
-        {
-            get
-            {
-                if (TraitsSerialised != null)
-                    return JsonConvert.DeserializeObject<Dictionary<string, string>>(TraitsSerialised) ?? new Dictionary<string, string>();
-                return new Dictionary<string, string>();
-            }
-            private set { }
-        }
-
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
 
+        public string? Address { get; set; }
+        public string? TranslatedAddress { get; set; }
+        public string? ContinentCode { get; set; }
+        public string? ContinentName { get; set; }
+        public string? CountryCode { get; set; }
+        public string? CountryName { get; set; }
+        public bool IsEuropeanUnion { get; set; }
+        public string? CityName { get; set; }
+        public string? PostalCode { get; set; }
+        public string? RegisteredCountry { get; set; }
+        public string? RepresentedCountry { get; set; }
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
+        public int? AccuracyRadius { get; set; }
+        public string? Timezone { get; set; }
+
         public string? TraitsSerialised { get; set; }
+
+        [IgnoreDataMember]
+        public Dictionary<string, string?> Traits
+        {
+            get
+            {
+                if (TraitsSerialised != null)
+                    return JsonConvert.DeserializeObject<Dictionary<string, string?>>(TraitsSerialised) ?? new Dictionary<string, string?>();
+                return new Dictionary<string, string?>();
+            }
+            private set { }
+        }
+
+        public GeoLocationDto GeoLocationDto()
+        {
+            return new GeoLocationDto()
+            {
+                Address = Address,
+                TranslatedAddress = TranslatedAddress,
+                ContinentCode = ContinentCode,
+                ContinentName = ContinentName,
+                CountryCode = CountryCode,
+                CountryName = CountryName,
+                IsEuropeanUnion = IsEuropeanUnion,
+                CityName = CityName,
+                PostalCode = PostalCode,
+                RegisteredCountry = RegisteredCountry,
+                RepresentedCountry = RepresentedCountry,
+                Latitude = Latitude,
+                Longitude = Longitude,
+                AccuracyRadius = AccuracyRadius,
+                Timezone = Timezone,
+                Traits = Traits
+            };
+        }
     }
 }

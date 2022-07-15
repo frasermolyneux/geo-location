@@ -21,7 +21,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             try
             {
                 var entry = await tableClient.GetEntityAsync<GeoLocationTableEntity>("addresses", address);
-                return entry;
+                return entry.Value.GeoLocationDto();
             }
             catch (RequestFailedException ex)
             {
