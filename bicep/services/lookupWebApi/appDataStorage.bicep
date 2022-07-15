@@ -16,6 +16,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
   name: 'salkupappdata${parEnvironment}'
   location: parLocation
   kind: 'StorageV2'
+  tags: parTags
 
   sku: {
     name: 'Standard_LRS'
