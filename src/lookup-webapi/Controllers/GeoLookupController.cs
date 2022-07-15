@@ -21,13 +21,16 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
     [Authorize(Roles = "LookupApiUser")]
     public class GeoLookupController : Controller, IGeoLookupApi
     {
+        private readonly ITableStorageGeoLocationRepository tableStorageGeoLocationRepository;
         private readonly IMaxMindGeoLocationRepository maxMindGeoLocationRepository;
         private readonly TelemetryClient telemetryClient;
 
         public GeoLookupController(
+            ITableStorageGeoLocationRepository tableStorageGeoLocationRepository,
             IMaxMindGeoLocationRepository maxMindGeoLocationRepository,
             TelemetryClient telemetryClient)
         {
+            this.tableStorageGeoLocationRepository = tableStorageGeoLocationRepository;
             this.maxMindGeoLocationRepository = maxMindGeoLocationRepository ?? throw new ArgumentNullException(nameof(maxMindGeoLocationRepository));
             this.telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }
@@ -56,9 +59,20 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
                 {
-                    var geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
+                    var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
+                    if (geoLocationDto != null)
+                        return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, geoLocationDto);
+
+                    geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
                     geoLocationDto.Address = hostname;
+
+                    await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
+
                     return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, geoLocationDto);
+                }
+                else
+                {
+                    return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.InternalServerError);
                 }
             }
             catch (AddressNotFoundException ex)
@@ -80,8 +94,6 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 telemetryClient.StopOperation(operation);
             }
-
-            return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.FailedDependency);
         }
 
         [HttpPost]

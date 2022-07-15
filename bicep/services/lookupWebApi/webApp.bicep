@@ -3,11 +3,16 @@ targetScope = 'resourceGroup'
 // Parameters
 param parLocation string
 param parEnvironment string
+
 param parKeyVaultName string
 param parAppInsightsName string
+param parAppDataStorageAccountName string
+
 param parAppServicePlanName string
+
 param parWorkloadSubscriptionId string
 param parWorkloadResourceGroupName string
+
 param parTags object
 
 // Variables
@@ -29,43 +34,12 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 }
 
-// Module Resources
-resource appDataStorageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
-  name: 'salkupappdata${parEnvironment}'
-  location: parLocation
-  kind: 'StorageV2'
-
-  sku: {
-    name: 'Standard_LRS'
-  }
-}
-
-resource appDataTableServices 'Microsoft.Storage/storageAccounts/tableServices@2021-09-01' = {
-  name: 'default'
-  parent: appDataStorageAccount
-
-  properties: {}
-}
-
-resource geoLocationsTable 'Microsoft.Storage/storageAccounts/tableServices/tables@2021-09-01' = {
-  name: 'geolocations'
-  parent: appDataTableServices
-
-  properties: {}
-}
-
-module appDataStorageConnectionSecret './../../modules/keyVaultSecret.bicep' = {
-  name: '${appDataStorageAccount.name}-connectionstring'
+resource appDataStorageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' existing = {
+  name: parAppDataStorageAccountName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
-
-  params: {
-    parKeyVaultName: parKeyVaultName
-    parSecretName: '${appDataStorageAccount.name}-connectionstring'
-    parSecretValue: 'DefaultEndpointsProtocol=https;AccountName=${appDataStorageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${listKeys(appDataStorageAccount.id, appDataStorageAccount.apiVersion).keys[0].value}'
-    parTags: parTags
-  }
 }
 
+// Module Resources
 resource webApp 'Microsoft.Web/sites@2020-06-01' = {
   name: varWebAppName
   location: parLocation
@@ -140,7 +114,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'appdata_storage_connectionstring'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appDataStorageConnectionSecret.name})'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appDataStorageAccount.name}-connectionstring)'
         }
       ]
     }

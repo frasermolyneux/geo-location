@@ -23,6 +23,17 @@ param parTags object
 var varWorkloadName = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Module Resources
+module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
+  name: 'lookupWebApiAppDataStorage'
+
+  params: {
+    parLocation: parLocation
+    parEnvironment: parEnvironment
+    parKeyVaultName: parKeyVaultName
+    parTags: parTags
+  }
+}
+
 module webApp 'lookupWebApi/webApp.bicep' = {
   name: 'lookupWebApi'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
@@ -32,6 +43,7 @@ module webApp 'lookupWebApi/webApp.bicep' = {
     parEnvironment: parEnvironment
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
+    parAppDataStorageAccountName: appDataStorage.outputs.outStorageAccountName
     parAppServicePlanName: parAppServicePlanName
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
