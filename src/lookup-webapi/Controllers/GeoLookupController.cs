@@ -2,8 +2,6 @@
 
 using MaxMind.GeoIP2.Exceptions;
 
-using Microsoft.ApplicationInsights;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;
@@ -23,16 +21,13 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
     {
         private readonly ITableStorageGeoLocationRepository tableStorageGeoLocationRepository;
         private readonly IMaxMindGeoLocationRepository maxMindGeoLocationRepository;
-        private readonly TelemetryClient telemetryClient;
 
         public GeoLookupController(
             ITableStorageGeoLocationRepository tableStorageGeoLocationRepository,
-            IMaxMindGeoLocationRepository maxMindGeoLocationRepository,
-            TelemetryClient telemetryClient)
+            IMaxMindGeoLocationRepository maxMindGeoLocationRepository)
         {
             this.tableStorageGeoLocationRepository = tableStorageGeoLocationRepository;
             this.maxMindGeoLocationRepository = maxMindGeoLocationRepository ?? throw new ArgumentNullException(nameof(maxMindGeoLocationRepository));
-            this.telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }
 
         [HttpGet]
@@ -51,15 +46,12 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
         async Task<ApiResponseDto<GeoLocationDto>> IGeoLookupApi.GetGeoLocation(string hostname)
         {
-            var operation = telemetryClient.StartOperation<DependencyTelemetry>("MaxMindQuery");
-            operation.Telemetry.Type = $"HTTP";
-            operation.Telemetry.Target = $"geoip.maxmind.com";
-
             try
             {
                 if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
                 {
                     var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
+
                     if (geoLocationDto != null)
                         return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, geoLocationDto);
 
@@ -82,17 +74,6 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             catch (GeoIP2Exception ex)
             {
                 return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.BadRequest, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                operation.Telemetry.Success = false;
-                operation.Telemetry.ResultCode = ex.Message;
-                telemetryClient.TrackException(ex);
-                throw;
-            }
-            finally
-            {
-                telemetryClient.StopOperation(operation);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿
+using Azure;
 using Azure.Data.Tables;
 
 using MX.GeoLocation.LookupApi.Abstractions.Models;
@@ -15,10 +16,20 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             tableClient = new TableClient(configuration["appdata_storage_connectionstring"], "geolocations");
         }
 
-        public async Task<GeoLocationDto> GetGeoLocation(string address)
+        public async Task<GeoLocationDto?> GetGeoLocation(string address)
         {
-            var entry = await tableClient.GetEntityAsync<GeoLocationTableEntity>("addresses", address);
-            return entry;
+            try
+            {
+                var entry = await tableClient.GetEntityAsync<GeoLocationTableEntity>("addresses", address);
+                return entry;
+            }
+            catch (RequestFailedException ex)
+            {
+                if (ex.ErrorCode != "ResourceNotFound")
+                    throw;
+            }
+
+            return null;
         }
 
         public async Task StoreGeoLocation(GeoLocationDto geoLocationDto)
