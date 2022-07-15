@@ -3,6 +3,8 @@ using Azure.Data.Tables;
 
 using MX.GeoLocation.LookupApi.Abstractions.Models;
 
+using Newtonsoft.Json;
+
 namespace MX.GeoLocation.LookupWebApi.Models
 {
     public class GeoLocationTableEntity : GeoLocationDto, ITableEntity
@@ -39,7 +41,17 @@ namespace MX.GeoLocation.LookupWebApi.Models
             Longitude = geoLocationDto.Longitude;
             AccuracyRadius = geoLocationDto.AccuracyRadius;
             Timezone = geoLocationDto.Timezone;
-            Traits = geoLocationDto.Traits;
+
+            TraitsSerialised = JsonConvert.SerializeObject(geoLocationDto.Traits);
+        }
+
+        public new Dictionary<string, string> Traits
+        {
+            get
+            {
+                return JsonConvert.DeserializeObject<Dictionary<string, string>>(TraitsSerialised) ?? new Dictionary<string, string>();
+            }
+            private set { } // Private set will prevent persistence to table storage
         }
 
         public string PartitionKey { get; set; }
@@ -47,6 +59,6 @@ namespace MX.GeoLocation.LookupWebApi.Models
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
 
-
+        public string TraitsSerialised { get; set; }
     }
 }
