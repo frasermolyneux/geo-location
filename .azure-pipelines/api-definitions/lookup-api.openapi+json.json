@@ -5,7 +5,7 @@
         "version": "v1"
     },
     "paths": {
-        "/geolocation/lookup/{hostname}": {
+        "/lookup/{hostname}": {
             "get": {
                 "tags": [
                     "GeoLookup"
@@ -47,7 +47,7 @@
                 }
             }
         },
-        "/geolocation/lookup": {
+        "/lookup": {
             "post": {
                 "tags": [
                     "GeoLookup"

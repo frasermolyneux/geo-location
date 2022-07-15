@@ -79,7 +79,7 @@ resource api 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
     type: 'http'
 
     displayName: 'GeoLocation Lookup API'
-    path: ''
+    path: 'geolocation'
 
     protocols: [
       'https'

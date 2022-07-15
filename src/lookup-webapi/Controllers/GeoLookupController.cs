@@ -31,7 +31,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         }
 
         [HttpGet]
-        [Route("geolocation/lookup/{hostname}")]
+        [Route("lookup/{hostname}")]
         public async Task<IActionResult> GetGeoLocation(string hostname)
         {
             if (!ValidateHostname(hostname))
@@ -78,7 +78,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         }
 
         [HttpPost]
-        [Route("geolocation/lookup")]
+        [Route("lookup")]
         public async Task<IActionResult> GetGeoLocations()
         {
             var requestBody = await new StreamReader(Request.Body).ReadToEndAsync();
@@ -107,7 +107,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         }
 
         [HttpDelete]
-        [Route("geolocation/lookup/{hostname}")]
+        [Route("lookup/{hostname}")]
         public async Task<IActionResult> DeleteMetadata(string hostname)
         {
             var response = await ((IGeoLookupApi)this).DeleteMetadata(hostname);
