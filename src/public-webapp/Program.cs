@@ -13,8 +13,8 @@ builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddControllersWithViews();
 builder.Services.AddGeoLocationApiClient(options =>
 {
-    options.ApimBaseUrl = builder.Configuration["apim_base_url"];
-    options.ApimSubscriptionKey = builder.Configuration["apim_subscription_key"];
+    options.BaseUrl = builder.Configuration["apim_base_url"];
+    options.ApiKey = builder.Configuration["apim_subscription_key"];
     options.ApiPathPrefix = builder.Configuration["apim_geolocation_path_prefix"] ?? "geolocation";
 });
 

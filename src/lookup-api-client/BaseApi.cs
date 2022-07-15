@@ -13,11 +13,17 @@ namespace MX.GeoLocation.GeoLocationApi.Client
 
         public BaseApi(ILogger logger, IOptions<GeoLocationApiClientOptions> options, IApiTokenProvider serversApiTokenProvider)
         {
-            _apimSubscriptionKey = options.Value.ApimSubscriptionKey;
+            if (string.IsNullOrWhiteSpace(options.Value.BaseUrl))
+                throw new ArgumentNullException(nameof(options.Value.BaseUrl));
+
+            if (string.IsNullOrWhiteSpace(options.Value.ApiKey))
+                throw new ArgumentNullException(nameof(options.Value.ApiKey));
+
+            _apimSubscriptionKey = options.Value.ApiKey;
 
             RestClient = string.IsNullOrWhiteSpace(options.Value.ApiPathPrefix)
-                ? new RestClient($"{options.Value.ApimBaseUrl}")
-                : new RestClient($"{options.Value.ApimBaseUrl}/{options.Value.ApiPathPrefix}");
+                ? new RestClient($"{options.Value.BaseUrl}")
+                : new RestClient($"{options.Value.BaseUrl}/{options.Value.ApiPathPrefix}");
 
             Logger = logger;
             ServersApiTokenProvider = serversApiTokenProvider;

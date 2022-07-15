@@ -2,8 +2,8 @@
 {
     public class GeoLocationApiClientOptions
     {
-        public string ApimBaseUrl { get; set; } = string.Empty;
-        public string ApimSubscriptionKey { get; set; } = string.Empty;
+        public string BaseUrl { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
         public string ApiPathPrefix { get; set; } = "geolocation";
     }
 }
