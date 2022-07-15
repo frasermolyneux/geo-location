@@ -1,4 +1,6 @@
-﻿using Azure;
+﻿using System.Runtime.Serialization;
+
+using Azure;
 using Azure.Data.Tables;
 
 using MX.GeoLocation.LookupApi.Abstractions.Models;
@@ -45,6 +47,7 @@ namespace MX.GeoLocation.LookupWebApi.Models
             TraitsSerialised = JsonConvert.SerializeObject(geoLocationDto.Traits);
         }
 
+        [IgnoreDataMember]
         public new Dictionary<string, string> Traits
         {
             get
@@ -53,7 +56,7 @@ namespace MX.GeoLocation.LookupWebApi.Models
                     return JsonConvert.DeserializeObject<Dictionary<string, string>>(TraitsSerialised) ?? new Dictionary<string, string>();
                 return new Dictionary<string, string>();
             }
-            private set { } // Private set will prevent persistence to table storage
+            private set { }
         }
 
         public string PartitionKey { get; set; }
