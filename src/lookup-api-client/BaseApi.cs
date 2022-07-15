@@ -15,7 +15,10 @@ namespace MX.GeoLocation.GeoLocationApi.Client
         {
             _apimSubscriptionKey = options.Value.ApimSubscriptionKey;
 
-            RestClient = new RestClient($"{options.Value.ApimBaseUrl}/{options.Value.ApiPathPrefix}");
+            RestClient = string.IsNullOrWhiteSpace(options.Value.ApiPathPrefix)
+                ? new RestClient($"{options.Value.ApimBaseUrl}")
+                : new RestClient($"{options.Value.ApimBaseUrl}/{options.Value.ApiPathPrefix}");
+
             Logger = logger;
             ServersApiTokenProvider = serversApiTokenProvider;
         }

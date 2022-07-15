@@ -15,6 +15,7 @@ builder.Services.AddGeoLocationApiClient(options =>
 {
     options.ApimBaseUrl = builder.Configuration["apim_base_url"];
     options.ApimSubscriptionKey = builder.Configuration["apim_subscription_key"];
+    options.ApiPathPrefix = builder.Configuration["apim_geolocation_path_prefix"] ?? "geolocation";
 });
 
 builder.Services.AddHttpContextAccessor();
