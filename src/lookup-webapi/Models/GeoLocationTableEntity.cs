@@ -49,7 +49,9 @@ namespace MX.GeoLocation.LookupWebApi.Models
         {
             get
             {
-                return JsonConvert.DeserializeObject<Dictionary<string, string>>(TraitsSerialised) ?? new Dictionary<string, string>();
+                if (TraitsSerialised != null)
+                    return JsonConvert.DeserializeObject<Dictionary<string, string>>(TraitsSerialised) ?? new Dictionary<string, string>();
+                return new Dictionary<string, string>();
             }
             private set { } // Private set will prevent persistence to table storage
         }
@@ -59,6 +61,6 @@ namespace MX.GeoLocation.LookupWebApi.Models
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
 
-        public string TraitsSerialised { get; set; }
+        public string? TraitsSerialised { get; set; }
     }
 }
