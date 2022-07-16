@@ -22,6 +22,11 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
 }
 
 // Existing Out-Of-Scope Resources
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: parAppInsightsName
+  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
+}
+
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
@@ -59,11 +64,11 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${parAppInsightsName}-instrumentationkey)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appInsights.name}-instrumentationkey)'
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${parAppInsightsName}-connectionstring)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appInsights.name}-connectionstring)'
         }
         {
           name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
