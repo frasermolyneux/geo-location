@@ -1,6 +1,7 @@
 targetScope = 'resourceGroup'
 
 // Parameters
+param parDeploymentPrefix string
 param parLocation string
 param parEnvironment string
 param parKeyVaultName string
@@ -37,8 +38,8 @@ resource geoLocationsTable 'Microsoft.Storage/storageAccounts/tableServices/tabl
   properties: {}
 }
 
-module appDataStorageConnectionSecret './../../modules/keyVaultSecret.bicep' = {
-  name: '${storageAccount.name}-connectionstring'
+module keyVaultSecret './../../modules/keyVaultSecret.bicep' = {
+  name: '${parDeploymentPrefix}-${storageAccount.name}-keyVaultSecret'
 
   params: {
     parKeyVaultName: parKeyVaultName

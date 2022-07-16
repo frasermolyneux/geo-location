@@ -21,13 +21,15 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
+var varDeploymentPrefix = 'lookupApi' //Prevent deployment naming conflicts
 var varWorkloadName = 'webapi-geolocation-lookup-${parEnvironment}'
 
 // Module Resources
 module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
-  name: 'lookupWebApiAppDataStorage'
+  name: '${varDeploymentPrefix}-appDataStorage'
 
   params: {
+    parDeploymentPrefix: varDeploymentPrefix
     parLocation: parLocation
     parEnvironment: parEnvironment
     parKeyVaultName: parKeyVaultName
@@ -36,7 +38,7 @@ module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
 }
 
 module webApp 'lookupWebApi/webApp.bicep' = {
-  name: 'lookupWebApi'
+  name: '${varDeploymentPrefix}-webApp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -52,8 +54,8 @@ module webApp 'lookupWebApi/webApp.bicep' = {
   }
 }
 
-module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
-  name: 'lookupWebApiKeyVaultAccessPolicy'
+module keyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
+  name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
 
   params: {
     parKeyVaultName: parKeyVaultName
@@ -61,8 +63,8 @@ module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
   }
 }
 
-module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
-  name: 'apiManagementLookupApi'
+module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
+  name: '${varDeploymentPrefix}-apiManagementApi'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
@@ -78,10 +80,11 @@ module apiManagementLookupApi 'lookupWebApi/apiManagementApi.bicep' = {
 }
 
 module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
-  name: 'lookupWebApiFrontDoorEndpoint'
+  name: '${varDeploymentPrefix}-frontDoorEndpoint'
   scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
 
   params: {
+    parDeploymentPrefix: varDeploymentPrefix
     parFrontDoorName: parFrontDoorName
     parParentDnsName: parParentDnsName
     parDnsResourceGroupName: parDnsResourceGroupName

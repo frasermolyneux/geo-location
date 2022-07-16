@@ -1,11 +1,13 @@
 targetScope = 'resourceGroup'
 
 // Parameters
+param parDeploymentPrefix string
 param parApiManagementName string
 param parWorkloadSubscriptionId string
 param parWorkloadResourceGroupName string
 param parWorkloadName string
 param parKeyVaultName string
+param parSubscriptionScopeIdentifier string
 param parSubscriptionScope string
 param parTags object
 
@@ -16,7 +18,7 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 
 // Module Resources
 resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscriptions@2021-08-01' = {
-  name: '${parWorkloadName}-subscription'
+  name: '${parWorkloadName}-${parSubscriptionScopeIdentifier}-subscription'
   parent: apiManagement
 
   properties: {
@@ -27,7 +29,7 @@ resource apiManagementSubscription 'Microsoft.ApiManagement/service/subscription
 }
 
 module keyVaultSecret 'keyVaultSecret.bicep' = {
-  name: 'keyVaultSecret'
+  name: '${parDeploymentPrefix}-${parSubscriptionScopeIdentifier}-keyVaultSecret'
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 
   params: {

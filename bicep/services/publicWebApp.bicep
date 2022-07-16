@@ -22,12 +22,13 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
+var varDeploymentPrefix = 'publicWebApp' //Prevent deployment naming conflicts
 var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
 var varWorkloadName = 'webapp-geolocation-public-${parEnvironment}'
 
 // Module Resources
 module webApp 'publicWebApp/webApp.bicep' = {
-  name: 'publicWebApp'
+  name: '${varDeploymentPrefix}-webApp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -45,8 +46,8 @@ module webApp 'publicWebApp/webApp.bicep' = {
   }
 }
 
-module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
-  name: 'publicWebAppKeyVaultAccessPolicy'
+module keyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
+  name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
 
   params: {
     parKeyVaultName: parKeyVaultName
@@ -55,25 +56,28 @@ module webAppKeyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
 }
 
 module apiManagementSubscription './../modules/apiManagementSubscription.bicep' = {
-  name: 'publicWebAppApiManagementSubscription'
+  name: '${varDeploymentPrefix}-apiManagementSubscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
+    parDeploymentPrefix: varDeploymentPrefix
     parApiManagementName: parApiManagementName
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
     parWorkloadName: varWebAppName
     parKeyVaultName: parKeyVaultName
+    parSubscriptionScopeIdentifier: 'geolocation'
     parSubscriptionScope: '/apis/geolocation-api'
     parTags: parTags
   }
 }
 
 module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
-  name: 'publicWebAppFrontDoorEndpoint'
+  name: '${varDeploymentPrefix}-frontDoorEndpoint'
   scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
 
   params: {
+    parDeploymentPrefix: varDeploymentPrefix
     parFrontDoorName: parFrontDoorName
     parParentDnsName: parParentDnsName
     parDnsResourceGroupName: parDnsResourceGroupName

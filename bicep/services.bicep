@@ -20,11 +20,12 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
+var varDeploymentPrefix = 'geolocationServices' //Prevent deployment naming conflicts
 var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
 
 module lookupWebApi 'services/lookupWebApi.bicep' = {
-  name: 'lookupWebApi'
+  name: '${varDeploymentPrefix}-lookupWebApi'
   params: {
     parLocation: parLocation
     parEnvironment: parEnvironment
@@ -45,7 +46,7 @@ module lookupWebApi 'services/lookupWebApi.bicep' = {
 }
 
 module publicWebApp 'services/publicWebApp.bicep' = {
-  name: 'publicWebApp'
+  name: '${varDeploymentPrefix}-publicWebApp'
   params: {
     parLocation: parLocation
     parEnvironment: parEnvironment
