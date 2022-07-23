@@ -8,6 +8,9 @@ parameters:
 - name: scanPath
   type: string
   default: '**/*.csproj'
+- name: suppressionFilePath
+  type: string
+  default: './.azure-pipelines/dependency-suppression.xml'
 - name: failOnCVSS
   type: number
   default: 4
@@ -26,7 +29,7 @@ jobs:
       scanPath: ${{ parameters.scanPath }}
       format: HTML,JUNIT
       failOnCVSS: ${{ parameters.failOnCVSS }}
-      suppressionPath: './azure-pipelines/dependency-suppression.xml'
+      suppressionPath: '${{ parameters.suppressionFilePath }}'
 
   - task: PublishTestResults@2
     displayName: Publish Dependency Check Results
