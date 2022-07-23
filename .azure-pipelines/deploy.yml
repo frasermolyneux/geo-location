@@ -6,7 +6,10 @@ resources:
   pipelines:
   - pipeline: geo-location.Validate
     source: geo-location.Validate
-    trigger: true
+    trigger:
+      branches:
+        include:
+        - main
 
 stages: 
 - stage: Build
@@ -41,19 +44,25 @@ stages:
 
 - stage: DeployPrdPlatform
   jobs:
-  - job: DeployPrdPlatformBicep
-    steps:
-      - task: AzureCLI@2
-        displayName: DeployPrdPlatformBicep
-        inputs:
-          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
-          scriptType: 'pscore'
-          scriptLocation: 'inlineScript'
-          inlineScript: |
-            az deployment sub create `
-              --template-file bicep/platform.bicep `
-              --location 'uksouth' `
-              --parameters @params/platform.prd.json
+
+  - deployment: DeployPrdPlatformBicep
+    environment: 'geolocation-prd'
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AzureCLI@2
+              displayName: DeployPrdPlatformBicep
+              inputs:
+                azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  az deployment sub create `
+                    --template-file bicep/platform.bicep `
+                    --location 'uksouth' `
+                    --parameters @params/platform.prd.json
 
   - job: DeployPrdPlatformPermissions
     dependsOn: [DeployPrdPlatformBicep]
@@ -89,19 +98,25 @@ stages:
 
 - stage: DeployPrdServices
   jobs:
-  - job: DeployPrdServicesBicep
-    steps:
-      - task: AzureCLI@2
-        displayName: DeployPrdServicesBicep
-        inputs:
-          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
-          scriptType: 'pscore'
-          scriptLocation: 'inlineScript'
-          inlineScript: |
-            az deployment group create `
-              --resource-group 'rg-geolocation-prd-uksouth' `
-              --template-file bicep/services.bicep `
-              --parameters @params/services.prd.json
+
+  - deployment: DeployPrdServicesBicep
+    environment: 'geolocation-prd'
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: AzureCLI@2
+              displayName: DeployPrdServicesBicep
+              inputs:
+                azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  az deployment group create `
+                    --resource-group 'rg-geolocation-prd-uksouth' `
+                    --template-file bicep/services.bicep `
+                    --parameters @params/services.prd.json
 
   - job: DeployPrdServicePermissions
     dependsOn: [DeployPrdServicesBicep]
