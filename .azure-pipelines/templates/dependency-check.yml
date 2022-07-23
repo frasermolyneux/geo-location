@@ -9,7 +9,7 @@ parameters:
   type: string
   default: '**/*.csproj'
 - name: failOnCVSS
-  type: integer
+  type: number
   default: 4
 
 jobs:
