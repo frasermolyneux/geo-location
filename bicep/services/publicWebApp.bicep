@@ -94,7 +94,7 @@ module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
   }
 }
 
-resource webTest 'Microsoft.Insights/webtests@2020-10-05-preview' = {
+resource webTest 'Microsoft.Insights/webtests@2022-06-15' = {
   name: '${varDeploymentPrefix}-webTest'
   location: parLocation
   tags: union(parTags, {
