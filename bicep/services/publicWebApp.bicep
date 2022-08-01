@@ -51,7 +51,7 @@ module webApp 'publicWebApp/webApp.bicep' = {
   }
 }
 
-module keyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
+module keyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
 
   params: {
@@ -60,7 +60,7 @@ module keyVaultAccessPolicy './../modules/keyVaultAccessPolicy.bicep' = {
   }
 }
 
-module apiManagementSubscription './../modules/apiManagementSubscription.bicep' = {
+module apiManagementSubscription 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/apimanagementsubscription:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-apiManagementSubscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
@@ -77,7 +77,7 @@ module apiManagementSubscription './../modules/apiManagementSubscription.bicep' 
   }
 }
 
-module frontDoorEndpoint './../modules/frontDoorEndpoint.bicep' = {
+module frontDoorEndpoint 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/frontdoorendpoint:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-frontDoorEndpoint'
   scope: resourceGroup(parConnectivitySubscriptionId, parFrontDoorResourceGroupName)
 

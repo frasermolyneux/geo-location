@@ -38,7 +38,7 @@ resource geoLocationsTable 'Microsoft.Storage/storageAccounts/tableServices/tabl
   properties: {}
 }
 
-module keyVaultSecret './../../modules/keyVaultSecret.bicep' = {
+module keyVaultSecret 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultsecret:V2022.08.01.6369' = {
   name: '${parDeploymentPrefix}-${storageAccount.name}-keyVaultSecret'
 
   params: {
