@@ -3,12 +3,17 @@ targetScope = 'subscription'
 // Parameters
 param parLocation string
 param parEnvironment string
+
 param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
+
 param parStrategicServicesSubscriptionId string
 param parApiManagementResourceGroupName string
 param parApiManagementName string
+
+param parKeyVaultCreateMode string = 'recover'
+
 param parTags object
 
 // Variables
@@ -38,6 +43,9 @@ module keyVault 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvault:V2
   params: {
     parKeyVaultName: varKeyVaultName
     parLocation: parLocation
+
+    parKeyVaultCreateMode: parKeyVaultCreateMode
+
     parTags: parTags
   }
 }

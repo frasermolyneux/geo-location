@@ -67,10 +67,13 @@ stages:
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
                 inlineScript: |
+                  if ($null -eq (az keyvault show --name 'kv-geoloc-prd-uksouth')) { $keyVaultCreateMode = 'default' } else { $keyVaultCreateMode = 'recover' }
+
                   az deployment sub create `
                     --template-file bicep/platform.bicep `
                     --location 'uksouth' `
-                    --parameters @params/platform.prd.json
+                    --parameters @params/platform.prd.json `
+                      parKeyVaultCreateMode=$keyVaultCreateMode
 
   - job: DeployPrdPlatformPermissions
     dependsOn: [DeployPrdPlatformBicep]
