@@ -50,11 +50,13 @@ stages:
 
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
+      dependsOn: [BuildLookupApiClient]
       jobName: 'PublishLookupApiClient'
       projectName: 'lookup-api-client'
 
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
+      dependsOn: [BuildLookupApiAbstractions]
       jobName: 'PublishLookupApiAbstractions'
       projectName: 'lookup-api-abstractions'
 
