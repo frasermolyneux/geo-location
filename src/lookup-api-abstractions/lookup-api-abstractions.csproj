@@ -13,6 +13,7 @@
 		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
 		<RepositoryType>Git</RepositoryType>
+		<PackageId>MX.GeoLocation.LookupApi.Abstractions</PackageId>
 	</PropertyGroup>
 
 	<ItemGroup>

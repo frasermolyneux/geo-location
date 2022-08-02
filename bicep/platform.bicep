@@ -3,12 +3,17 @@ targetScope = 'subscription'
 // Parameters
 param parLocation string
 param parEnvironment string
+
 param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
 param parLoggingWorkspaceName string
+
 param parStrategicServicesSubscriptionId string
 param parApiManagementResourceGroupName string
 param parApiManagementName string
+
+param parKeyVaultCreateMode string = 'recover'
+
 param parTags object
 
 // Variables
@@ -32,17 +37,20 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   properties: {}
 }
 
-module keyVault 'modules/keyVault.bicep' = {
+module keyVault 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvault:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-keyVault'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
     parKeyVaultName: varKeyVaultName
     parLocation: parLocation
+
+    parKeyVaultCreateMode: parKeyVaultCreateMode
+
     parTags: parTags
   }
 }
 
-module keyVaultAccessPolicy 'modules/keyVaultAccessPolicy.bicep' = {
+module keyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
   scope: resourceGroup(defaultResourceGroup.name)
 
@@ -53,7 +61,7 @@ module keyVaultAccessPolicy 'modules/keyVaultAccessPolicy.bicep' = {
   }
 }
 
-module appInsights 'modules/appInsights.bicep' = {
+module appInsights 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/appinsights:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-appInsights'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -67,7 +75,7 @@ module appInsights 'modules/appInsights.bicep' = {
   }
 }
 
-module apiManagementLogger 'modules/apiManagementLogger.bicep' = {
+module apiManagementLogger 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/apimanagementlogger:V2022.08.01.6369' = {
   name: '${varDeploymentPrefix}-apiManagementLogger'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 

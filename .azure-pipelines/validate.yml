@@ -24,34 +24,41 @@ schedules:
       include:
       - main
 
+resources:
+  repositories:
+    - repository: ado-pipeline-templates
+      type: github
+      name: frasermolyneux/ado-pipeline-templates
+      endpoint: github.com_frasermolyneux
+
 pool: 'Dedicated'
 
 stages: 
 - stage: Build
   jobs:
-  - template: templates/dependency-check.yml
+  - template: jobs/dependency-check.yml@ado-pipeline-templates
     parameters: 
       jobName: 'DependencyCheck'
       failOnCVSS: 4
 
-  - template: templates/build-web-app.yml
+  - template: jobs/build-web-app.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildPublicWebApp'
       projectName: 'public-webapp'
 
-  - template: templates/build-web-app.yml
+  - template: jobs/build-web-app.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildLookupWebApi'
       projectName: 'lookup-webapi'
 
 - stage: Packages
   jobs:
-  - template: templates/build-net-library.yml
+  - template: jobs/build-net-library.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildLookupApiClient'
       projectName: 'lookup-api-client'
 
-  - template: templates/build-net-library.yml
+  - template: jobs/build-net-library.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildLookupApiAbstractions'
       projectName: 'lookup-api-abstractions'
@@ -61,11 +68,20 @@ stages:
   - job: LintCode
     displayName: Lint Code
     steps:
-      - script: |
-          az bicep build --file bicep/platform.bicep
-          az bicep build --file bicep/services.bicep
+      - task: AzureCLI@2
         name: LintBicepCode
         displayName: Run Bicep Linter
+        inputs:
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            $files = Get-ChildItem '$(Build.sourcesDirectory)/bicep/*.bicep'
+
+            foreach ($file in $files) {
+              Write-Host "Running az bicep build for '$($file.FullName)'"
+              az bicep build --file $file.FullName --stdout
+            }
 
   - deployment: ValidateBicepCode
     dependsOn: [LintCode]
@@ -75,6 +91,8 @@ stages:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - task: AzureCLI@2
               name: RunPreflightValidation
               inputs:

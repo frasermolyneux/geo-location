@@ -4,6 +4,11 @@ pr: none
 pool: 'Dedicated'
 
 resources:
+  repositories:
+    - repository: ado-pipeline-templates
+      type: github
+      name: frasermolyneux/ado-pipeline-templates
+      endpoint: github.com_frasermolyneux
   pipelines:
   - pipeline: geo-location.Validate
     source: geo-location.Validate
@@ -15,13 +20,13 @@ resources:
 stages: 
 - stage: Build
   jobs:
-  - template: templates/build-web-app.yml
+  - template: jobs/build-web-app.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildPublicWebApp'
       projectName: 'public-webapp'
       publishArtifact: true
 
-  - template: templates/build-web-app.yml
+  - template: jobs/build-web-app.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildLookupWebApi'
       projectName: 'lookup-webapi'
@@ -29,19 +34,37 @@ stages:
 
 - stage: Packages
   jobs:
-  - template: templates/build-net-library.yml
+  - template: jobs/build-net-library.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'BuildLookupApiClient'
+      projectName: 'lookup-api-client'
+      majorMinorVersion: '1.0'
+      publishArtifact: true
+
+  - template: jobs/build-net-library.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'BuildLookupApiAbstractions'
+      projectName: 'lookup-api-abstractions'
+      majorMinorVersion: '1.0'
+      publishArtifact: true
+
+- stage: DeployPackages
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+
+  jobs:
+  - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
       jobName: 'PublishLookupApiClient'
       projectName: 'lookup-api-client'
-      publishToNuGet: true
-      MajorMinorVersion: '1.0'
+      majorMinorVersion: '1.0'
+      packageName: 'MX.GeoLocation.GeoLocationApi.Client'
 
-  - template: templates/build-net-library.yml
+  - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
       jobName: 'PublishLookupApiAbstractions'
       projectName: 'lookup-api-abstractions'
-      publishToNuGet: true
-      MajorMinorVersion: '1.0'
+      majorMinorVersion: '1.0'
+      packageName: 'MX.GeoLocation.LookupApi.Abstractions'
 
 - stage: DeployPrdPlatform
   jobs:
@@ -53,6 +76,8 @@ stages:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - task: AzureCLI@2
               displayName: DeployPrdPlatformBicep
               inputs:
@@ -60,10 +85,13 @@ stages:
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
                 inlineScript: |
+                  if ($null -eq (az keyvault show --name 'kv-geoloc-prd-uksouth')) { $keyVaultCreateMode = 'default' } else { $keyVaultCreateMode = 'recover' }
+
                   az deployment sub create `
                     --template-file bicep/platform.bicep `
                     --location 'uksouth' `
-                    --parameters @params/platform.prd.json
+                    --parameters @params/platform.prd.json `
+                      parKeyVaultCreateMode=$keyVaultCreateMode
 
   - job: DeployPrdPlatformPermissions
     dependsOn: [DeployPrdPlatformBicep]
@@ -107,6 +135,8 @@ stages:
       runOnce:
         deploy:
           steps:
+            - checkout: self
+
             - task: AzureCLI@2
               displayName: DeployPrdServicesBicep
               inputs:
@@ -131,18 +161,20 @@ stages:
           arguments: '"prd" "uksouth"'
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetPublicWebAppPermissions.ps1'
 
-  - template: templates/deploy-web-app.yml
+  - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
       dependsOn: ['DeployPrdServicesBicep']
+      environment: 'platform-webapps-prd-uksouth'
       projectName: lookup-webapi
       jobName: DeployLookupWebApi
       webAppName: 'webapi-geolocation-lookup-prd-uksouth'
       webAppNameResourceGroup: 'rg-platform-webapps-prd-uksouth'
       subscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
 
-  - template: templates/deploy-web-app.yml
+  - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
       dependsOn: ['DeployPrdServicesBicep']
+      environment: 'platform-webapps-prd-uksouth'
       projectName: public-webapp
       jobName: DeployPublicWebApp
       webAppName: 'webapp-geolocation-public-prd-uksouth'
