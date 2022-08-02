@@ -48,17 +48,25 @@ stages:
       majorMinorVersion: '1.0'
       publishArtifact: true
 
+- stage: DeployPackages
+  #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+
+  jobs:
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
       dependsOn: [BuildLookupApiClient]
       jobName: 'PublishLookupApiClient'
       projectName: 'lookup-api-client'
+      majorMinorVersion: '1.0'
+      packageName: 'MX.GeoLocation.GeoLocationApi.Client'
 
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
       dependsOn: [BuildLookupApiAbstractions]
       jobName: 'PublishLookupApiAbstractions'
       projectName: 'lookup-api-abstractions'
+      majorMinorVersion: '1.0'
+      packageName: 'MX.GeoLocation.LookupApi.Abstractions'
 
 - stage: DeployPrdPlatform
   jobs:
