@@ -41,7 +41,7 @@ stages:
       jobName: 'DependencyCheck'
       failOnCVSS: 4
 
-  - template: jobs/build-netcore-projects.yml@ado-pipeline-templates
+  - template: jobs/build-net-core-projects.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildNetCoreProjects'
 
