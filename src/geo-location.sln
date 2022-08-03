@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "public-webapp.Tests", "publ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lookup-webapi.Tests", "lookup-webapi.Tests\lookup-webapi.Tests.csproj", "{AFCE627B-E0FF-4B72-82CD-F4247D8BC941}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lookup-api-client.Tests", "lookup-api-client.Tests\lookup-api-client.Tests.csproj", "{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{AFCE627B-E0FF-4B72-82CD-F4247D8BC941}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFCE627B-E0FF-4B72-82CD-F4247D8BC941}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFCE627B-E0FF-4B72-82CD-F4247D8BC941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -64,6 +70,7 @@ Global
 		{7FFB3595-64C3-4FDE-A8C2-64B63810BDD8} = {03B353B9-B704-47D2-A48C-355B8AFF3C1B}
 		{BD4B99CF-DB98-46A2-9A2B-5EE829448CEB} = {8C26D55E-52AD-4B45-B128-B8B2834C81C4}
 		{AFCE627B-E0FF-4B72-82CD-F4247D8BC941} = {8C26D55E-52AD-4B45-B128-B8B2834C81C4}
+		{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8} = {8C26D55E-52AD-4B45-B128-B8B2834C81C4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {12D55527-E526-43CA-B604-25A011BE015C}
