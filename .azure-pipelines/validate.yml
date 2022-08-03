@@ -44,6 +44,8 @@ stages:
   - template: jobs/build-net-core-projects.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BuildNetCoreProjects'
+      toolsManifestPath: '$(Build.SourcesDirectory)/.config/dotnet-tools.json'
+      useCobertura: true
 
 - stage: ValidateBicep
   jobs: 
