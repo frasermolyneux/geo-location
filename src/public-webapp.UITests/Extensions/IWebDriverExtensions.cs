@@ -6,7 +6,7 @@ namespace MX.GeoLocation.PublicWebApp.UITests.Extensions
 {
     public static class IWebDriverExtensions
     {
-        public static IWebElement FindElementWithWait(this IWebDriver driver, By identifier, int maxAttempts = 10, int delayMs = 1000)
+        public static IWebElement FindElementWithWait(this IWebDriver driver, By identifier, int maxAttempts = 3, int delayMs = 1000)
         {
             int attempts = 0;
             while (true)
@@ -29,7 +29,7 @@ namespace MX.GeoLocation.PublicWebApp.UITests.Extensions
             return driver.FindElement(identifier);
         }
 
-        public static ReadOnlyCollection<IWebElement> FindElementsWithWait(this IWebDriver driver, By identifier, int maxAttempts = 10, int delayMs = 1000)
+        public static ReadOnlyCollection<IWebElement> FindElementsWithWait(this IWebDriver driver, By identifier, int maxAttempts = 3, int delayMs = 1000)
         {
             int attempts = 0;
             while (true)

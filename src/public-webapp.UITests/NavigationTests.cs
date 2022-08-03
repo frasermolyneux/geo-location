@@ -60,6 +60,9 @@ namespace MX.GeoLocation.PublicWebApp.UITests
                 // The site name is stored in the SITE_URL environment variable to make 
                 // the tests more flexible.
                 string url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://localhost:7201";
+
+                Console.WriteLine($"Using site URL: '{url}'");
+
                 driver.Navigate().GoToUrl(url + "/");
 
                 homePage = new HomePage(driver);
