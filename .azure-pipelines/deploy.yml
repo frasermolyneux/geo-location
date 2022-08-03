@@ -188,7 +188,8 @@ stages:
     displayName: 'Run UI Tests'
 
     variables:
-    - SITE_URL: 'https://www.geo-location.net'
+    - name: SITE_URL
+      value: 'https://www.geo-location.net'
 
     steps: 
     - task: UseDotNet@2
