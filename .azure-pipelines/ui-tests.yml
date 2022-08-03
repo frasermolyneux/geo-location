@@ -1,0 +1,51 @@
+trigger: none
+pr: none
+
+pool: 'Dedicated'
+
+resources:
+  repositories:
+    - repository: ado-pipeline-templates
+      type: github
+      name: frasermolyneux/ado-pipeline-templates
+      endpoint: github.com_frasermolyneux
+  pipelines:
+  - pipeline: geo-location.Validate
+    source: geo-location.Validate
+    trigger:
+      branches:
+        include:
+        - main
+
+stages: 
+- stage: UI Tests
+  jobs:
+
+  - job: RunUITests
+    displayName: 'Run UI Tests'
+
+    variables:
+    - name: SITE_URL
+      value: 'https://www.geo-location.net'
+
+    steps: 
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK 6.x'
+      inputs:
+        version: '6.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build the project - Release'
+      inputs:
+        command: 'build'
+        arguments: '--configuration Release'
+        projects: '$(System.DefaultWorkingDirectory)/**/*.UITests.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run UI Tests'
+      inputs:
+        command: 'test'
+        arguments: '--no-build --configuration Release'
+        publishTestResults: true
+        projects: '$(System.DefaultWorkingDirectory)/**/*.UITests.csproj'
+    
