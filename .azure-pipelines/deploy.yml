@@ -49,10 +49,10 @@ stages:
       publishArtifact: true
 
 - stage: DeployPackages
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
   jobs:
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     parameters: 
       jobName: 'PublishLookupApiClient'
       projectName: 'lookup-api-client'
@@ -60,7 +60,6 @@ stages:
       packageName: 'MX.GeoLocation.GeoLocationApi.Client'
 
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
     parameters: 
       jobName: 'PublishLookupApiAbstractions'
       projectName: 'lookup-api-abstractions'
@@ -68,6 +67,11 @@ stages:
       packageName: 'MX.GeoLocation.LookupApi.Abstractions'
 
 - stage: DeployPrdPlatform
+  condition: |
+    or(
+      in(dependencies.build.result, 'Succeeded', 'SucceededWithIssues', 'Skipped'),
+      in(dependencies.test.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+    )
   jobs:
 
   - deployment: DeployPrdPlatformBicep
