@@ -131,6 +131,11 @@ stages:
 
 
 - stage: DeployPrdServices
+  condition: |
+    or(
+      in(dependencies.build.result, 'Succeeded', 'SucceededWithIssues', 'Skipped'),
+      in(dependencies.test.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+    )
   jobs:
 
   - deployment: DeployPrdServicesBicep
@@ -187,6 +192,11 @@ stages:
       subscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
 
 - stage: PostDeploymentTests
+  condition: |
+    or(
+      in(dependencies.build.result, 'Succeeded', 'SucceededWithIssues', 'Skipped'),
+      in(dependencies.test.result, 'Succeeded', 'SucceededWithIssues', 'Skipped')
+    )
   jobs:
 
   - job: RunUITests
