@@ -18,7 +18,7 @@ resources:
         - main
 
 stages: 
-- stage: UI Tests
+- stage: UITests
   jobs:
 
   - job: RunUITests
