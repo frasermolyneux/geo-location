@@ -41,27 +41,11 @@ stages:
       jobName: 'DependencyCheck'
       failOnCVSS: 4
 
-  - template: jobs/build-web-app.yml@ado-pipeline-templates
+  - template: jobs/build-net-core-projects.yml@ado-pipeline-templates
     parameters: 
-      jobName: 'BuildPublicWebApp'
-      projectName: 'public-webapp'
-
-  - template: jobs/build-web-app.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupWebApi'
-      projectName: 'lookup-webapi'
-
-- stage: Packages
-  jobs:
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiClient'
-      projectName: 'lookup-api-client'
-
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiAbstractions'
-      projectName: 'lookup-api-abstractions'
+      jobName: 'BuildNetCoreProjects'
+      toolsManifestPath: '$(Build.SourcesDirectory)/.config/dotnet-tools.json'
+      useCobertura: true
 
 - stage: ValidateBicep
   jobs: 
