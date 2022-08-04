@@ -6,7 +6,8 @@ parameters:
 - name: environment
   type: string
 
-- stage: Deploy${{ parameters.environmentFriendlyName }}
+stages:
+  stage: Deploy${{ parameters.environmentFriendlyName }}
   jobs:
 
   - deployment: Deploy${{ parameters.environmentFriendlyName }}PlatformBicep
