@@ -62,4 +62,4 @@ stages:
 - template: templates/execute-ui-tests.yml
   parameters:
     environmentFriendlyName: 'Prd'
-    siteUrl: 'https://geo-location.net'
+    siteUrl: 'https://www.geo-location.net'
