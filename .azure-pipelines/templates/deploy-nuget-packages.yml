@@ -1,5 +1,5 @@
 stages:
-  stage: DeployPackages
+- stage: DeployPackages
   jobs:
   - template: jobs/build-net-library.yml@ado-pipeline-templates
     parameters: 

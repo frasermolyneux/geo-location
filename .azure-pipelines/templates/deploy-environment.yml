@@ -7,7 +7,7 @@ parameters:
   type: string
 
 stages:
-  stage: Deploy${{ parameters.environmentFriendlyName }}
+- stage: Deploy${{ parameters.environmentFriendlyName }}
   jobs:
 
   - deployment: Deploy${{ parameters.environmentFriendlyName }}PlatformBicep
