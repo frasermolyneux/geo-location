@@ -10,6 +10,8 @@ trigger:
     - feature/*
     - dependabot/*
 
+pr: none
+
 schedules:
   - cron: "0 3 * * 0"
     displayName: Weekly Build
