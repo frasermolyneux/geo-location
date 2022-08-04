@@ -15,7 +15,7 @@ stages:
       value: '${{ parameters.siteUrl }}'
 
     steps: 
-    - pwsh: Invoke-WebRequest -Uri ${{ parameters.siteUrl }}
+    - pwsh: Invoke-WebRequest -Uri ${{ parameters.siteUrl }} -MaximumRetryCount 10 -RetryIntervalSec 5
 
     - task: UseDotNet@2
       displayName: 'Use .NET SDK 6.x'
