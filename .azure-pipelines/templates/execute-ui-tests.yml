@@ -1,32 +1,17 @@
-trigger: none
-pr: none
+parameters:
+- name: environmentFriendlyName
+  type: string
+- name: siteUrl
+  type: string
 
-pool: 'Dedicated'
-
-resources:
-  repositories:
-    - repository: ado-pipeline-templates
-      type: github
-      name: frasermolyneux/ado-pipeline-templates
-      endpoint: github.com_frasermolyneux
-  pipelines:
-  - pipeline: geo-location.Validate
-    source: geo-location.Validate
-    trigger:
-      branches:
-        include:
-        - main
-
-stages: 
-- stage: UITests
+- stage: ExecuteUITestsFor${{ parameters.environmentFriendlyName }}
   jobs:
-
   - job: RunUITests
     displayName: 'Run UI Tests'
 
     variables:
     - name: SITE_URL
-      value: 'https://www.geo-location.net'
+      value: '${{ parameters.siteUrl }}'
 
     steps: 
     - task: UseDotNet@2

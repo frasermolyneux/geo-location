@@ -1,4 +1,7 @@
-pool: 'Dedicated'
+pr:
+  branches:
+    include:
+    - '*'
 
 resources:
   repositories:
@@ -6,16 +9,11 @@ resources:
       type: github
       name: frasermolyneux/ado-pipeline-templates
       endpoint: github.com_frasermolyneux
-  pipelines:
-  - pipeline: geo-location.Validate
-    source: geo-location.Validate
-    trigger:
-      branches:
-        include:
-        - main
+
+pool: 'Dedicated'
 
 stages: 
-- stage: Build
+- stage: Validation
   jobs:
   - template: jobs/dependency-check.yml@ado-pipeline-templates
     parameters: 
@@ -39,7 +37,7 @@ stages:
       jobName: 'BuildLookupWebApi'
       projectName: 'lookup-webapi'
       publishArtifact: true
-
+      
   - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BicepLintCode'
@@ -63,5 +61,3 @@ stages:
   parameters:
     environmentFriendlyName: 'Prd'
     siteUrl: 'https://geo-location.net'
-
-- template: templates/deploy-nuget-packages.yml
