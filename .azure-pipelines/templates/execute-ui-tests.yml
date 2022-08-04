@@ -5,7 +5,7 @@ parameters:
   type: string
 
 stages:
-- stage: ExecuteUITestsFor${{ parameters.environmentFriendlyName }}
+- stage: RunUITestsAgainst${{ parameters.environmentFriendlyName }}
   jobs:
   - job: RunUITests
     displayName: 'Run UI Tests'

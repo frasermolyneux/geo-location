@@ -43,15 +43,29 @@ stages:
       projectName: 'lookup-webapi'
       publishArtifact: true
 
+  - template: jobs/build-net-library.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'BuildLookupApiClient'
+      projectName: 'lookup-api-client'
+      majorMinorVersion: '1.0'
+      publishArtifact: true
+
+  - template: jobs/build-net-library.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'BuildLookupApiAbstractions'
+      projectName: 'lookup-api-abstractions'
+      majorMinorVersion: '1.0'
+      publishArtifact: true
+
   - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
     parameters: 
-      jobName: 'BicepLintCode'
+      jobName: 'BicepLinter'
       azureSubscription: 'spn-ado-Personal-Public-devtest'
 
   - template: templates/bicep-environment-validation.yml
     parameters:
-      dependsOn: [BicepLintCode]
-      jobName: 'BicepEnvironmentValidationForPrd'
+      dependsOn: [BicepLinter]
+      jobName: 'ValidateBicepAgainstPrdEnvironment'
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
       environment: 'prd'
  

@@ -1,20 +1,6 @@
 stages:
 - stage: DeployPackages
   jobs:
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiClient'
-      projectName: 'lookup-api-client'
-      majorMinorVersion: '1.0'
-      publishArtifact: true
-
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiAbstractions'
-      projectName: 'lookup-api-abstractions'
-      majorMinorVersion: '1.0'
-      publishArtifact: true
-
   - template: jobs/push-nuget-package.yml@ado-pipeline-templates
     parameters: 
       jobName: 'PublishLookupApiClient'

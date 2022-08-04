@@ -87,7 +87,7 @@ stages:
                     --template-file bicep/services.bicep `
                     --parameters @params/services.${{ parameters.environment }}.json
 
-  - job: Deploy${{ parameters.environmentFriendlyName }}ServicePermissions
+  - job: Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions
     dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesBicep']
     steps:
       - task: AzureCLI@2
@@ -101,7 +101,7 @@ stages:
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
-      dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesBicep']
+      dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions']
       environment: 'platform-webapps-${{ parameters.environment }}-uksouth'
       projectName: lookup-webapi
       jobName: DeployLookupWebApi
@@ -111,7 +111,7 @@ stages:
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
-      dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesBicep']
+      dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions']
       environment: 'platform-webapps-${{ parameters.environment }}-uksouth'
       projectName: public-webapp
       jobName: DeployPublicWebApp
