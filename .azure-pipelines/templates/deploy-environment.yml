@@ -35,7 +35,7 @@ stages:
                       parKeyVaultCreateMode=$keyVaultCreateMode
 
   - job: Deploy${{ parameters.environmentFriendlyName }}PlatformPermissions
-    dependsOn: [Deploy${{ parameters.environmentFriendlyName }}PlatformBicep]
+    dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}PlatformBicep']
     steps:
       - task: AzureCLI@2
         displayName: SetDeployPrincipalPermissions
@@ -66,6 +66,7 @@ stages:
           scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrationsCredentials.ps1'
 
   - deployment: Deploy${{ parameters.environmentFriendlyName }}ServicesBicep
+    dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}PlatformPermissions']
     environment: 'geolocation-${{ parameters.environment }}'
 
     strategy:
