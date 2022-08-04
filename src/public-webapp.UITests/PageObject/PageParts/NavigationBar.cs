@@ -5,20 +5,20 @@ using OpenQA.Selenium;
 
 namespace MX.GeoLocation.PublicWebApp.UITests.PageObject.Components
 {
-    internal class NavigationComponent
+    internal class NavigationBar
     {
         private readonly IWebDriver driver;
 
-        public NavigationComponent(IWebDriver driver)
+        public NavigationBar(IWebDriver driver)
         {
             this.driver = driver;
         }
 
-        public IWebElement NavBarHomeControl
+        public IWebElement NavBarHome
         {
             get
             {
-                return driver.FindElementWithWait(By.Id("navBarHomeControl"));
+                return driver.FindElementWithWait(By.Id("navBarHome"));
             }
         }
 
@@ -46,9 +46,33 @@ namespace MX.GeoLocation.PublicWebApp.UITests.PageObject.Components
             }
         }
 
-        public void ClickNavBarHomeControl()
+        public IWebElement NavBarPrivacyDropdown
         {
-            NavBarHomeControl.ClickElement(driver);
+            get
+            {
+                return driver.FindElementWithWait(By.Id("navBarPrivacyDropdown"));
+            }
+        }
+
+        public IWebElement NavBarPrivacyPolicy
+        {
+            get
+            {
+                return driver.FindElementWithWait(By.Id("navBarPrivacyPolicy"));
+            }
+        }
+
+        public IWebElement NavBarPrivacyRemoveMyData
+        {
+            get
+            {
+                return driver.FindElementWithWait(By.Id("navBarPrivacyRemoveMyData"));
+            }
+        }
+
+        public void ClickNavBarHome()
+        {
+            NavBarHome.ClickElement(driver);
         }
 
         public void ClickNavBarLookupDropdown()
@@ -64,6 +88,21 @@ namespace MX.GeoLocation.PublicWebApp.UITests.PageObject.Components
         public void ClickNavBarLookupBatch()
         {
             NavBarLookupBatch.ClickElement(driver);
+        }
+
+        public void ClickNavBarPrivacyDropdown()
+        {
+            NavBarPrivacyDropdown.ClickElement(driver);
+        }
+
+        public void ClickNavBarPrivacyPolicy()
+        {
+            NavBarPrivacyPolicy.ClickElement(driver);
+        }
+
+        public void ClickNavBarPrivacyRemoveMyData()
+        {
+            NavBarPrivacyRemoveMyData.ClickElement(driver);
         }
     }
 }

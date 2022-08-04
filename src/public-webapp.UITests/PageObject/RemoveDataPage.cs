@@ -1,18 +1,18 @@
-﻿
-using MX.GeoLocation.PublicWebApp.UITests.Extensions;
+﻿using MX.GeoLocation.PublicWebApp.UITests.Extensions;
 using MX.GeoLocation.PublicWebApp.UITests.PageObject.Components;
 
 using OpenQA.Selenium;
 
 namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
 {
-    internal class BatchLookupPage : IPage
+    internal class RemoveDataPage : IPage
     {
         private readonly IWebDriver driver;
 
-        public BatchLookupPage(IWebDriver driver)
+        public RemoveDataPage(IWebDriver driver)
         {
             this.driver = driver;
+
             Navigation = new NavigationBar(driver);
         }
 
@@ -25,7 +25,7 @@ namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
                 try
                 {
                     var pageTitle = driver.FindElementWithWait(By.Id("pageTitle"));
-                    return pageTitle.Text == "Batch Lookup";
+                    return pageTitle.Text == "Remove My Data";
                 }
                 catch
                 {
@@ -38,12 +38,12 @@ namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
         {
             if (useNavigation)
             {
-                Navigation.ClickNavBarLookupDropdown();
-                Navigation.ClickNavBarLookupBatch();
+                Navigation.ClickNavBarPrivacyDropdown();
+                Navigation.ClickNavBarPrivacyRemoveMyData();
             }
             else
             {
-                driver.GoToPage("Home/BatchLookup");
+                driver.GoToPage("Home/RemoveData");
             }
         }
     }

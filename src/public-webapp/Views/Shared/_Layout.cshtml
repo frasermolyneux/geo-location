@@ -25,7 +25,7 @@
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container">
-            <a id="navBarHomeControl" class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GeoLocation</a>
+            <a id="navBarHome" class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GeoLocation</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -42,12 +42,12 @@
                         </div>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarPrivacyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navBarPrivacyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Privacy
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarPrivacyDropdown">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="RemoveData">Remove My Data</a>
+                            <a id="navBarPrivacyPolicy" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                            <a id="navBarPrivacyRemoveMyData" class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="RemoveData">Remove My Data</a>
                         </div>
                     </li>
                 </ul>

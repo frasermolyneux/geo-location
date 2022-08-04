@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace MX.GeoLocation.PublicWebApp.UITests.Extensions
 {
@@ -49,6 +50,24 @@ namespace MX.GeoLocation.PublicWebApp.UITests.Extensions
             }
 
             return driver.FindElements(identifier);
+        }
+
+        public static void GoToPage(this IWebDriver driver, string? path = null)
+        {
+            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://localhost:7201";
+            url = url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
+
+            if (!string.IsNullOrEmpty(path))
+                url = $"{url}/{path}";
+
+            Console.WriteLine($"Navigating to site URL: '{url}'");
+
+            driver.Navigate().GoToUrl(url);
+
+            new WebDriverWait(driver, TimeSpan.FromSeconds(10))
+                .Until(d => ((IJavaScriptExecutor)d)
+                    .ExecuteScript("return document.readyState")
+                    .Equals("complete"));
         }
     }
 }
