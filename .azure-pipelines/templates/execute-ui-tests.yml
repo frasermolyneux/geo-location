@@ -4,6 +4,7 @@ parameters:
 - name: siteUrl
   type: string
 
+stages:
 - stage: ExecuteUITestsFor${{ parameters.environmentFriendlyName }}
   jobs:
   - job: RunUITests
