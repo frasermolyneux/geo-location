@@ -88,7 +88,7 @@ stages:
                     --parameters @params/services.${{ parameters.environment }}.json
 
   - job: Deploy${{ parameters.environmentFriendlyName }}ServicePermissions
-    dependsOn: [Deploy${{ parameters.environmentFriendlyName }}ServicesBicep]
+    dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesBicep']
     steps:
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
