@@ -48,7 +48,7 @@ stages:
       jobName: 'BicepLintCode'
       azureSubscription: 'spn-ado-Personal-Public-devtest'
 
-  - template: templates/bicep-environment-validate.yml
+  - template: templates/bicep-environment-validation.yml
     parameters:
       dependsOn: [BicepLintCode]
       jobName: 'BicepEnvironmentValidationForPrd'
