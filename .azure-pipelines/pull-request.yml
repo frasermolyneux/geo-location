@@ -52,7 +52,6 @@ stages:
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
       environment: 'prd'
 
-stages: 
 - template: templates/deploy-environment.yml
   parameters:
     azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
