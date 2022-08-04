@@ -1,0 +1,39 @@
+parameters:
+- name: environmentFriendlyName
+  type: string
+- name: siteUrl
+  type: string
+
+stages:
+- stage: RunUITestsAgainst${{ parameters.environmentFriendlyName }}
+  jobs:
+  - job: RunUITests
+    displayName: 'Run UI Tests'
+
+    variables:
+    - name: SITE_URL
+      value: '${{ parameters.siteUrl }}'
+
+    steps: 
+    - pwsh: Invoke-WebRequest -Uri ${{ parameters.siteUrl }} -MaximumRetryCount 10 -RetryIntervalSec 5
+
+    - task: UseDotNet@2
+      displayName: 'Use .NET SDK 6.x'
+      inputs:
+        version: '6.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build the project - Release'
+      inputs:
+        command: 'build'
+        arguments: '--configuration Release'
+        projects: '$(System.DefaultWorkingDirectory)/**/*.UITests.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run UI Tests'
+      inputs:
+        command: 'test'
+        arguments: '--no-build --configuration Release'
+        publishTestResults: true
+        projects: '$(System.DefaultWorkingDirectory)/**/*.UITests.csproj'
+    

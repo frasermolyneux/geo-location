@@ -1,7 +1,9 @@
 trigger: none
-pr: none
 
-pool: 'Dedicated'
+pr:
+  branches:
+    include:
+    - '*'
 
 resources:
   repositories:
@@ -9,16 +11,11 @@ resources:
       type: github
       name: frasermolyneux/ado-pipeline-templates
       endpoint: github.com_frasermolyneux
-  pipelines:
-  - pipeline: geo-location.Validate
-    source: geo-location.Validate
-    trigger:
-      branches:
-        include:
-        - main
+
+pool: 'Dedicated'
 
 stages: 
-- stage: Build
+- stage: Validation
   jobs:
   - template: jobs/dependency-check.yml@ado-pipeline-templates
     parameters: 
@@ -42,21 +39,7 @@ stages:
       jobName: 'BuildLookupWebApi'
       projectName: 'lookup-webapi'
       publishArtifact: true
-
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiClient'
-      projectName: 'lookup-api-client'
-      majorMinorVersion: '1.0'
-      publishArtifact: true
-
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiAbstractions'
-      projectName: 'lookup-api-abstractions'
-      majorMinorVersion: '1.0'
-      publishArtifact: true
-
+      
   - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
     parameters: 
       jobName: 'BicepLinter'
@@ -68,7 +51,7 @@ stages:
       jobName: 'ValidateBicepAgainstPrdEnvironment'
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
       environment: 'prd'
- 
+
 - template: templates/deploy-environment.yml
   parameters:
     azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
@@ -79,5 +62,3 @@ stages:
   parameters:
     environmentFriendlyName: 'Prd'
     siteUrl: 'https://www.geo-location.net'
-
-- template: templates/deploy-nuget-packages.yml

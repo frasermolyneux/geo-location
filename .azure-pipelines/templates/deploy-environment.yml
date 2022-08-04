@@ -1,0 +1,120 @@
+parameters:
+- name: azureSubscription
+  type: string
+- name: environmentFriendlyName
+  type: string
+- name: environment
+  type: string
+
+stages:
+- stage: Deploy${{ parameters.environmentFriendlyName }}
+  jobs:
+
+  - deployment: Deploy${{ parameters.environmentFriendlyName }}PlatformBicep
+    environment: 'geolocation-${{ parameters.environment }}'
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: AzureCLI@2
+              displayName: Deploy${{ parameters.environmentFriendlyName }}PlatformBicep
+              inputs:
+                azureSubscription: ${{ parameters.azureSubscription }}
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  if ($null -eq (az keyvault show --name 'kv-geoloc-${{ parameters.environment }}-uksouth')) { $keyVaultCreateMode = 'default' } else { $keyVaultCreateMode = 'recover' }
+
+                  az deployment sub create `
+                    --template-file bicep/platform.bicep `
+                    --location 'uksouth' `
+                    --parameters @params/platform.${{ parameters.environment }}.json `
+                      parKeyVaultCreateMode=$keyVaultCreateMode
+
+  - job: Deploy${{ parameters.environmentFriendlyName }}PlatformPermissions
+    dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}PlatformBicep']
+    steps:
+      - task: AzureCLI@2
+        displayName: SetDeployPrincipalPermissions
+        inputs:
+          azureSubscription: ${{ parameters.azureSubscription }}
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: '"${{ parameters.environment }}" "uksouth"'
+          addSpnToEnvironment: true
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetDeployPrincipalPermissions.ps1'
+
+      - task: AzureCLI@2
+        displayName: CreateAppRegistrations
+        inputs:
+          azureSubscription: ${{ parameters.azureSubscription }}
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: '"${{ parameters.environment }}" "uksouth"'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrations.ps1'
+
+      - task: AzureCLI@2
+        displayName: CreateAppRegistrationsCredentials
+        inputs:
+          azureSubscription: ${{ parameters.azureSubscription }}
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: '"${{ parameters.environment }}" "uksouth"'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/CreateAppRegistrationsCredentials.ps1'
+
+  - deployment: Deploy${{ parameters.environmentFriendlyName }}ServicesBicep
+    dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}PlatformPermissions']
+    environment: 'geolocation-${{ parameters.environment }}'
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - checkout: self
+
+            - task: AzureCLI@2
+              displayName: Deploy${{ parameters.environmentFriendlyName }}ServicesBicep
+              inputs:
+                azureSubscription: ${{ parameters.azureSubscription }}
+                scriptType: 'pscore'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  az deployment group create `
+                    --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
+                    --template-file bicep/services.bicep `
+                    --parameters @params/services.${{ parameters.environment }}.json
+
+  - job: Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions
+    dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesBicep']
+    steps:
+      - task: AzureCLI@2
+        displayName: SetPublicWebAppPermissions
+        inputs:
+          azureSubscription: 'spn-ado-Personal-Public-geolocation-${{ parameters.environment }}-webapps'
+          scriptType: 'pscore'
+          scriptLocation: 'scriptPath'
+          arguments: '"${{ parameters.environment }}" "uksouth"'
+          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetPublicWebAppPermissions.ps1'
+
+  - template: jobs/deploy-web-app.yml@ado-pipeline-templates
+    parameters:
+      dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions']
+      environment: 'platform-webapps-${{ parameters.environment }}-uksouth'
+      projectName: lookup-webapi
+      jobName: DeployLookupWebApi
+      webAppName: 'webapi-geolocation-lookup-${{ parameters.environment }}-uksouth'
+      webAppNameResourceGroup: 'rg-platform-webapps-${{ parameters.environment }}-uksouth'
+      subscription: 'spn-ado-Personal-Public-geolocation-${{ parameters.environment }}-webapps'
+
+  - template: jobs/deploy-web-app.yml@ado-pipeline-templates
+    parameters:
+      dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions']
+      environment: 'platform-webapps-${{ parameters.environment }}-uksouth'
+      projectName: public-webapp
+      jobName: DeployPublicWebApp
+      webAppName: 'webapp-geolocation-public-${{ parameters.environment }}-uksouth'
+      webAppNameResourceGroup: 'rg-platform-webapps-${{ parameters.environment }}-uksouth'
+      subscription: 'spn-ado-Personal-Public-geolocation-${{ parameters.environment }}-webapps'
