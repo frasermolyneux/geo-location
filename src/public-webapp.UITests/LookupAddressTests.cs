@@ -9,11 +9,11 @@ namespace MX.GeoLocation.PublicWebApp.UITests
         {
         }
 
-        [TestCase("209.163.116.89", "New York, United States")]
-        [TestCase("81.174.169.80", "Chesterfield, United Kingdom")]
-        [TestCase("35.6.5.8", "US")]
-        [TestCase("1.1.1.1", "Unknown")]
-        [TestCase("8.8.8.8", "US")]
+        [TestCase("13.64.69.151", "San Jose, United States")]
+        [TestCase("51.107.144.68", "Geneva, Switzerland")]
+        [TestCase("2603:1040:1302::580", "Taipei, Taiwan")]
+        [TestCase("20.21.82.128", "Doha, Qatar")]
+        [TestCase("40.78.195.16", "Chennai, India")]
         public void CanPerformLookupOfWellKnownAddress(string address, string expectedLocation)
         {
             PageFactory.LookupAddressPage.GoToPage(true);
