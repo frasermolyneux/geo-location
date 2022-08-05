@@ -45,6 +45,13 @@ stages:
   - template: templates/bicep-environment-validation.yml
     parameters:
       dependsOn: [BicepLinter]
+      jobName: 'ValidateBicepAgainstDevEnvironment'
+      azureSubscription: 'spn-ado-Personal-Public-devtest'
+      environment: 'dev'
+
+  - template: templates/bicep-environment-validation.yml
+    parameters:
+      dependsOn: [BicepLinter]
       jobName: 'ValidateBicepAgainstPrdEnvironment'
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
       environment: 'prd'

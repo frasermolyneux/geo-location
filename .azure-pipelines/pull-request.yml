@@ -48,17 +48,24 @@ stages:
   - template: templates/bicep-environment-validation.yml
     parameters:
       dependsOn: [BicepLinter]
+      jobName: 'ValidateBicepAgainstDevEnvironment'
+      azureSubscription: 'spn-ado-Personal-Public-devtest'
+      environment: 'dev'
+
+  - template: templates/bicep-environment-validation.yml
+    parameters:
+      dependsOn: [BicepLinter]
       jobName: 'ValidateBicepAgainstPrdEnvironment'
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
       environment: 'prd'
 
 - template: templates/deploy-environment.yml
   parameters:
-    azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
-    environmentFriendlyName: 'Prd'
-    environment: 'prd'
+    azureSubscription: 'spn-ado-Personal-Public-devtest'
+    environmentFriendlyName: 'Dev'
+    environment: 'dev'
 
 - template: templates/execute-ui-tests.yml
   parameters:
-    environmentFriendlyName: 'Prd'
-    siteUrl: 'https://www.geo-location.net'
+    environmentFriendlyName: 'Dev'
+    siteUrl: 'https://dev.geo-location.net'
