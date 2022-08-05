@@ -58,14 +58,14 @@ stages:
         inputs:
           command: pack
           packagesToPack: '**/lookup-api-client.csproj'
-          outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+          output: '$(Build.ArtifactStagingDirectory)/packages'
           buildProperties: 'Version="1.0.$(Build.BuildId)"'
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
           command: pack
           packagesToPack: '**/lookup-api-abstractions.csproj'
-          outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+          output: '$(Build.ArtifactStagingDirectory)/packages'
           buildProperties: 'Version="1.0.$(Build.BuildId)"'
       additionalPublishSteps: 
       - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
