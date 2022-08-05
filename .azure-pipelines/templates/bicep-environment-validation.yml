@@ -33,6 +33,13 @@ jobs:
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environment }}.json
 
+                if (az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth') { 
+                  az deployment group validate `
+                    --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
+                    --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
+                    --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environment }}.json
+                }
+
           - task: AzureCLI@2
             name: RunWhatIfDeploy
             inputs:
@@ -45,7 +52,7 @@ jobs:
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environment }}.json
 
-                if ($null -ne (az group show --name 'rg-geolocation-${{ parameters.environment }}-uksouth')) { 
+                if (az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth') { 
                   az deployment group validate `
                     --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
