@@ -79,6 +79,7 @@ stages:
 - template: templates/deploy-environment.yml
   parameters:
     azureSubscription: 'spn-ado-Personal-Public-devtest'
+    webAppsAzureSubscription: 'spn-ado-Personal-Public-devtest'
     environmentFriendlyName: 'Dev'
     environment: 'dev'
 
@@ -90,6 +91,7 @@ stages:
 - template: templates/deploy-environment.yml
   parameters:
     azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+    webAppsAzureSubscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
     environmentFriendlyName: 'Prd'
     environment: 'prd'
 

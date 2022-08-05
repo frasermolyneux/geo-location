@@ -1,6 +1,8 @@
 parameters:
 - name: azureSubscription
   type: string
+- name: webAppsAzureSubscription
+  type: string
 - name: environmentFriendlyName
   type: string
 - name: environment
@@ -107,7 +109,7 @@ stages:
       jobName: DeployLookupWebApi
       webAppName: 'webapi-geolocation-lookup-${{ parameters.environment }}-uksouth'
       webAppNameResourceGroup: 'rg-platform-webapps-${{ parameters.environment }}-uksouth'
-      subscription: 'spn-ado-Personal-Public-geolocation-${{ parameters.environment }}-webapps'
+      subscription: ${{ parameters.webAppsAzureSubscription }}
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
@@ -117,4 +119,4 @@ stages:
       jobName: DeployPublicWebApp
       webAppName: 'webapp-geolocation-public-${{ parameters.environment }}-uksouth'
       webAppNameResourceGroup: 'rg-platform-webapps-${{ parameters.environment }}-uksouth'
-      subscription: 'spn-ado-Personal-Public-geolocation-${{ parameters.environment }}-webapps'
+      subscription: ${{ parameters.webAppsAzureSubscription }}
