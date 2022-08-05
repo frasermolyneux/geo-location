@@ -21,6 +21,9 @@ resources:
       name: frasermolyneux/ado-pipeline-templates
       endpoint: github.com_frasermolyneux
 
+variables:
+  buildConfiguration: 'Release'
+
 stages: 
 - stage: Build
   jobs:
@@ -34,6 +37,7 @@ stages:
       jobName: 'BuildNetCoreProjects'
       toolsManifestPath: '$(Build.SourcesDirectory)/.config/dotnet-tools.json'
       useCobertura: true
+      buildConfiguration: $(buildConfiguration)
       additionalBuildSteps:
       - task: DotNetCoreCLI@2
         displayName: 'Publish public-webapp project'
@@ -41,14 +45,14 @@ stages:
           command: 'publish'
           publishWebProjects: false
           projects: '**/public-webapp.csproj'
-          arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/public-webapp.zip'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-webapp.zip'
       - task: DotNetCoreCLI@2
         displayName: 'Publish lookup-webapi project'
         inputs:
           command: 'publish'
           publishWebProjects: false
           projects: '**/lookup-webapi.csproj'
-          arguments: '--configuration ${{ parameters.buildConfiguration }} --output $(Build.ArtifactStagingDirectory)/lookup-webapi.zip'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/lookup-webapi.zip'
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-client project'
         inputs:
