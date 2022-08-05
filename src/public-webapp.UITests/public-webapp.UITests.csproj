@@ -16,7 +16,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.3.0" />
     <PackageReference Include="coverlet.collector" Version="3.1.2" />
-	<PackageReference Include="Selenium.Support" Version="3.141.0" />
+	<PackageReference Include="Selenium.Support" Version="4.3.0" />
 	<PackageReference Include="Selenium.WebDriver" Version="3.141.0" />
 	<PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="104.0.5112.7900" />
 	<PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.29.1" />
