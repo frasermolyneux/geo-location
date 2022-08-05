@@ -15,6 +15,9 @@ jobs:
   dependsOn: ${{ parameters.dependsOn }}
   environment: 'geolocation-${{ parameters.environment }}'
 
+  workspace:
+    clean: all
+
   strategy:
     runOnce:
       deploy:
