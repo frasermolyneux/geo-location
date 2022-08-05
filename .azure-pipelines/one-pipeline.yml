@@ -58,14 +58,14 @@ stages:
         inputs:
           command: pack
           packagesToPack: '**/lookup-api-client.csproj'
-          packDestination: '$(Build.ArtifactStagingDirectory)/lookup-api-client/'
+          packDestination: '$(Build.ArtifactStagingDirectory)'
           buildProperties: 'Version="1.0.$(Build.BuildId)"'
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
           command: pack
           packagesToPack: '**/lookup-api-abstractions.csproj'
-          packDestination: '$(Build.ArtifactStagingDirectory)/lookup-api-abstractions/'
+          packDestination: '$(Build.ArtifactStagingDirectory)'
           buildProperties: 'Version="1.0.$(Build.BuildId)"'
       additionalPublishSteps: 
       - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
@@ -74,12 +74,9 @@ stages:
       - publish: '$(Build.artifactStagingDirectory)/lookup-webapi.zip'
         displayName: 'Publish lookup-webapi artifact'
         artifact: lookup-webapi
-      - publish: '$(Build.artifactStagingDirectory)/lookup-api-client'
-        displayName: 'Publish lookup-api-client artifact'
-        artifact: lookup-api-client
-      - publish: '$(Build.artifactStagingDirectory)/lookup-api-abstractions'
-        displayName: 'Publish lookup-api-abstractions artifact'
-        artifact: lookup-api-abstractions
+      - publish: '$(Build.artifactStagingDirectory)/*.nupkg'
+        displayName: 'Publish NuGet Packages artifact'
+        artifact: nuget-packages
 
   - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
     parameters: 
@@ -127,4 +124,8 @@ stages:
       siteUrl: 'https://www.geo-location.net'
 
 - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-  - template: templates/deploy-nuget-packages.yml
+  - stage: PushNuGetPackages
+    jobs:
+    - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
+      parameters: 
+        artifactName: 'nuget-packages'
