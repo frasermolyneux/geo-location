@@ -6,7 +6,7 @@
             "value": "uksouth"
         },
         "parEnvironment": {
-            "value": "prd"
+            "value": "dev"
         },
         "parLoggingSubscriptionId": {
             "value": "7760848c-794d-4a19-8cb2-52f71a21ac2b"
