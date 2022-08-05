@@ -33,7 +33,7 @@ jobs:
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environment }}.json
 
-                if (az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth') { 
+                if ((az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth'_ -eq $true) { 
                   Write-Host "Performing az deployment group validation as 'rg-geolocation-${{ parameters.environment }}-uksouth' exists"
                   az deployment group validate `
                     --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
@@ -53,7 +53,7 @@ jobs:
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environment }}.json
 
-                if (az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth') { 
+                if ((az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth'_ -eq $true) { 
                   Write-Host "Performing az deployment group what-if as 'rg-geolocation-${{ parameters.environment }}-uksouth' exists"
                   az deployment group what-if `
                     --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
