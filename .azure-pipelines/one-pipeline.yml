@@ -63,14 +63,20 @@ stages:
           command: pack
           packagesToPack: '**/lookup-api-client.csproj'
           outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-          buildProperties: 'Version="1.0.$(Build.BuildId)"'
+          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+            buildProperties: 'Version="1.0.$(Build.BuildId)"'
+          ${{ else }}:
+            buildProperties: 'Version="1.0.$(Build.BuildId)-preview"'
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
           command: pack
           packagesToPack: '**/lookup-api-abstractions.csproj'
           outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-          buildProperties: 'Version="1.0.$(Build.BuildId)"'
+          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+            buildProperties: 'Version="1.0.$(Build.BuildId)"'
+          ${{ else }}:
+            buildProperties: 'Version="1.0.$(Build.BuildId)-preview"'
       additionalPublishSteps: 
       - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
         displayName: 'Publish public-webapp artifact'
@@ -127,9 +133,9 @@ stages:
       environmentFriendlyName: 'Prd'
       siteUrl: 'https://www.geo-location.net'
 
-- ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-  - stage: PushNuGetPackages
-    jobs:
-    - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
-      parameters: 
-        artifactName: 'nuget-packages'
+
+- stage: PushNuGetPackages
+  jobs:
+  - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
+    parameters: 
+      artifactName: 'nuget-packages'
