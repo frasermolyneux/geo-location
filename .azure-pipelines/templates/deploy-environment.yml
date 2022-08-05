@@ -95,7 +95,7 @@ stages:
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
         inputs:
-          azureSubscription: 'spn-ado-Personal-Public-geolocation-${{ parameters.environment }}-webapps'
+          azureSubscription: ${{ parameters.webAppsAzureSubscription }}
           scriptType: 'pscore'
           scriptLocation: 'scriptPath'
           arguments: '"${{ parameters.environment }}" "uksouth"'
