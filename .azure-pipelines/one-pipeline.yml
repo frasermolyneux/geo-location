@@ -34,32 +34,40 @@ stages:
       jobName: 'BuildNetCoreProjects'
       toolsManifestPath: '$(Build.SourcesDirectory)/.config/dotnet-tools.json'
       useCobertura: true
-
-  - template: jobs/build-web-app.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildPublicWebApp'
-      projectName: 'public-webapp'
-      publishArtifact: true
-
-  - template: jobs/build-web-app.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupWebApi'
-      projectName: 'lookup-webapi'
-      publishArtifact: true
-
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiClient'
-      projectName: 'lookup-api-client'
-      majorMinorVersion: '1.0'
-      publishArtifact: true
-
-  - template: jobs/build-net-library.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'BuildLookupApiAbstractions'
-      projectName: 'lookup-api-abstractions'
-      majorMinorVersion: '1.0'
-      publishArtifact: true
+      additionalBuildSteps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/public-webapp.csproj'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-webapp.zip'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/lookup-webapi.csproj'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/lookup-webapi.zip'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: pack
+          packagesToPack: '**/lookup-api-client.csproj'
+          packDestination: '$(Build.ArtifactStagingDirectory)/lookup-api-client'
+          buildProperties: 'Version="1.0.$(Build.BuildId)"'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: pack
+          packagesToPack: '**/lookup-api-abstractions.csproj'
+          packDestination: '$(Build.ArtifactStagingDirectory)/lookup-api-abstractions'
+          buildProperties: 'Version="1.0.$(Build.BuildId)"'
+      additionalPublishSteps: 
+      - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
+        artifact: public-webapp
+      - publish: '$(Build.artifactStagingDirectory)/lookup-webapi.zip'
+        artifact: lookup-webapi
+      - publish: '$(Build.artifactStagingDirectory)/lookup-api-client'
+        artifact: lookup-api-client
+      - publish: '$(Build.artifactStagingDirectory)/lookup-api-abstractions'
+        artifact: lookup-api-abstractions
 
   - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
     parameters: 
