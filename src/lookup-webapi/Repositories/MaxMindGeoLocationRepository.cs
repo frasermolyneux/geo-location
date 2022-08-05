@@ -35,24 +35,24 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                     var lookupResult = await reader.CityAsync(address);
 
                     var traits = new Dictionary<string, string?>
-                {
-                    {"AutonomousSystemNumber", lookupResult.Traits.AutonomousSystemNumber?.ToString()},
-                    {"AutonomousSystemOrganization", lookupResult.Traits?.AutonomousSystemOrganization},
-                    {"ConnectionType", lookupResult.Traits?.ConnectionType},
-                    {"Domain", lookupResult.Traits?.Domain},
-                    {"IPAddress", lookupResult.Traits?.IPAddress},
-                    {"IsAnonymous", lookupResult.Traits?.IsAnonymous.ToString()},
-                    {"IsAnonymousVpn", lookupResult.Traits?.IsAnonymousVpn.ToString()},
-                    {"IsHostingProvider", lookupResult.Traits?.IsHostingProvider.ToString()},
-                    {"IsLegitimateProxy", lookupResult.Traits?.IsLegitimateProxy.ToString()},
-                    {"IsPublicProxy", lookupResult.Traits?.IsPublicProxy.ToString()},
-                    {"IsTorExitNode", lookupResult.Traits?.IsTorExitNode.ToString()},
-                    {"Isp", lookupResult.Traits?.Isp},
-                    {"Organization", lookupResult.Traits?.Organization},
-                    {"StaticIPScore", lookupResult.Traits?.StaticIPScore.ToString()},
-                    {"UserCount", lookupResult.Traits?.UserCount.ToString()},
-                    {"UserType", lookupResult.Traits?.UserType}
-                };
+                    {
+                        {"AutonomousSystemNumber", lookupResult.Traits.AutonomousSystemNumber?.ToString()},
+                        {"AutonomousSystemOrganization", lookupResult.Traits?.AutonomousSystemOrganization},
+                        {"ConnectionType", lookupResult.Traits?.ConnectionType},
+                        {"Domain", lookupResult.Traits?.Domain},
+                        {"IPAddress", lookupResult.Traits?.IPAddress},
+                        {"IsAnonymous", lookupResult.Traits?.IsAnonymous.ToString()},
+                        {"IsAnonymousVpn", lookupResult.Traits?.IsAnonymousVpn.ToString()},
+                        {"IsHostingProvider", lookupResult.Traits?.IsHostingProvider.ToString()},
+                        {"IsLegitimateProxy", lookupResult.Traits?.IsLegitimateProxy.ToString()},
+                        {"IsPublicProxy", lookupResult.Traits?.IsPublicProxy.ToString()},
+                        {"IsTorExitNode", lookupResult.Traits?.IsTorExitNode.ToString()},
+                        {"Isp", lookupResult.Traits?.Isp},
+                        {"Organization", lookupResult.Traits?.Organization},
+                        {"StaticIPScore", lookupResult.Traits?.StaticIPScore.ToString()},
+                        {"UserCount", lookupResult.Traits?.UserCount.ToString()},
+                        {"UserType", lookupResult.Traits?.UserType}
+                    };
 
                     var geoLocationDto =
                         new GeoLocationDto()
