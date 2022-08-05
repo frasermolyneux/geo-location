@@ -1,0 +1,131 @@
+trigger:
+  branches:
+    include:
+    - '*'
+    exclude:
+    - 'docs/*'
+
+pr:
+  branches:
+    include:
+    - '*'
+    exclude:
+    - 'docs/*'
+
+pool: 'Dedicated'
+
+resources:
+  repositories:
+    - repository: ado-pipeline-templates
+      type: github
+      name: frasermolyneux/ado-pipeline-templates
+      endpoint: github.com_frasermolyneux
+
+variables:
+  buildConfiguration: 'Release'
+
+stages: 
+- stage: Build
+  jobs:
+  - template: jobs/dependency-check.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'DependencyCheck'
+      failOnCVSS: 4
+
+  - template: jobs/build-net-core-projects.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'BuildNetCoreProjects'
+      toolsManifestPath: '$(Build.SourcesDirectory)/.config/dotnet-tools.json'
+      useCobertura: true
+      buildConfiguration: $(buildConfiguration)
+      additionalBuildSteps:
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish public-webapp project'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/public-webapp.csproj'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-webapp.zip'
+      - task: DotNetCoreCLI@2
+        displayName: 'Publish lookup-webapi project'
+        inputs:
+          command: 'publish'
+          publishWebProjects: false
+          projects: '**/lookup-webapi.csproj'
+          arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/lookup-webapi.zip'
+      - task: DotNetCoreCLI@2
+        displayName: 'Pack lookup-api-client project'
+        inputs:
+          command: pack
+          packagesToPack: '**/lookup-api-client.csproj'
+          outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+          buildProperties: 'Version="1.0.$(Build.BuildId)"'
+      - task: DotNetCoreCLI@2
+        displayName: 'Pack lookup-api-abstractions project'
+        inputs:
+          command: pack
+          packagesToPack: '**/lookup-api-abstractions.csproj'
+          outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+          buildProperties: 'Version="1.0.$(Build.BuildId)"'
+      additionalPublishSteps: 
+      - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
+        displayName: 'Publish public-webapp artifact'
+        artifact: public-webapp
+      - publish: '$(Build.artifactStagingDirectory)/lookup-webapi.zip'
+        displayName: 'Publish lookup-webapi artifact'
+        artifact: lookup-webapi
+      - publish: '$(Build.artifactStagingDirectory)/packages'
+        displayName: 'Publish NuGet Packages artifact'
+        artifact: nuget-packages
+
+  - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
+    parameters: 
+      jobName: 'BicepLinter'
+      azureSubscription: 'spn-ado-Personal-Public-devtest'
+
+  - template: templates/bicep-environment-validation.yml
+    parameters:
+      dependsOn: [BicepLinter]
+      jobName: 'ValidateBicepAgainstDevEnvironment'
+      azureSubscription: 'spn-ado-Personal-Public-devtest'
+      environment: 'dev'
+
+  - template: templates/bicep-environment-validation.yml
+    parameters:
+      dependsOn: [BicepLinter]
+      jobName: 'ValidateBicepAgainstPrdEnvironment'
+      azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+      environment: 'prd'
+
+- template: templates/deploy-environment.yml
+  parameters:
+    azureSubscription: 'spn-ado-Personal-Public-devtest'
+    webAppsAzureSubscription: 'spn-ado-Personal-Public-devtest'
+    environmentFriendlyName: 'Dev'
+    environment: 'dev'
+
+- template: templates/execute-ui-tests.yml
+  parameters:
+    environmentFriendlyName: 'Dev'
+    siteUrl: 'https://dev.geo-location.net'
+
+- ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  - template: templates/deploy-environment.yml
+    parameters:
+      azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+      webAppsAzureSubscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
+      environmentFriendlyName: 'Prd'
+      environment: 'prd'
+
+- ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  - template: templates/execute-ui-tests.yml
+    parameters:
+      environmentFriendlyName: 'Prd'
+      siteUrl: 'https://www.geo-location.net'
+
+- ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+  - stage: PushNuGetPackages
+    jobs:
+    - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
+      parameters: 
+        artifactName: 'nuget-packages'

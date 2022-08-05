@@ -33,7 +33,8 @@ jobs:
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environment }}.json
 
-                if ($null -ne (az group show --name 'rg-geolocation-${{ parameters.environment }}-uksouth')) { 
+                if ((az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth') -eq $true) { 
+                  Write-Host "Performing az deployment group validation as 'rg-geolocation-${{ parameters.environment }}-uksouth' exists"
                   az deployment group validate `
                     --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
@@ -52,8 +53,9 @@ jobs:
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environment }}.json
 
-                if ($null -ne (az group show --name 'rg-geolocation-${{ parameters.environment }}-uksouth')) { 
-                  az deployment group validate `
+                if ((az group exists --name 'rg-geolocation-${{ parameters.environment }}-uksouth') -eq $true) { 
+                  Write-Host "Performing az deployment group what-if as 'rg-geolocation-${{ parameters.environment }}-uksouth' exists"
+                  az deployment group what-if `
                     --resource-group 'rg-geolocation-${{ parameters.environment }}-uksouth' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
                     --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environment }}.json
