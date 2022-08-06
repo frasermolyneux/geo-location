@@ -1,8 +1,6 @@
-﻿
-using Microsoft.Edge.SeleniumTools;
-
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 
 namespace MX.GeoLocation.PublicWebApp.UITests
@@ -24,12 +22,7 @@ namespace MX.GeoLocation.PublicWebApp.UITests
                     driver = new FirefoxDriver();
                     break;
                 case "Edge":
-                    driver = new EdgeDriver(
-                        new EdgeOptions
-                        {
-                            UseChromium = true
-                        }
-                    );
+                    driver = new EdgeDriver();
                     break;
                 default:
                     throw new ArgumentException($"'{browser}': Unknown browser");
