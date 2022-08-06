@@ -93,43 +93,51 @@ stages:
   - template: templates/bicep-environment-validation.yml
     parameters:
       dependsOn: [BicepLinter]
-      jobName: 'ValidateBicepAgainstDevEnvironment'
       azureSubscription: 'spn-ado-Personal-Public-devtest'
-      environment: 'dev'
+      environment: 'geolocation-dev'
+      environmentName: 'Dev'
+      environmentTag: 'dev'
 
   - template: templates/bicep-environment-validation.yml
     parameters:
       dependsOn: [BicepLinter]
       jobName: 'ValidateBicepAgainstPrdEnvironment'
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
-      environment: 'prd'
+      environment: 'geolocation-prd'
+      environmentName: 'Prd'
+      environmentTag: 'prd'
 
 - template: templates/deploy-environment.yml
   parameters:
     azureSubscription: 'spn-ado-Personal-Public-devtest'
+    environment: 'geolocation-dev'
+    environmentName: 'Dev'
+    environmentTag: 'dev'
     webAppsAzureSubscription: 'spn-ado-Personal-Public-devtest'
-    environmentFriendlyName: 'Dev'
-    environment: 'dev'
+    webAppsEnvironment: 'platform-webapps-dev-uksouth'
+    webAppsResourceGroup: 'rg-platform-webapps-dev-uksouth'
 
 - template: templates/execute-ui-tests.yml
   parameters:
-    environmentFriendlyName: 'Dev'
+    environmentName: 'Prd'
     siteUrl: 'https://dev.geo-location.net'
 
 - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
   - template: templates/deploy-environment.yml
     parameters:
       azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+      environment: 'geolocation-prd'
+      environmentName: 'Prd'
+      environmentTag: 'prd'
       webAppsAzureSubscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
-      environmentFriendlyName: 'Prd'
-      environment: 'prd'
+      webAppsEnvironment: 'platform-webapps-prd-uksouth'
+      webAppsResourceGroup: 'rg-platform-webapps-prd-uksouth'
 
 - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
   - template: templates/execute-ui-tests.yml
     parameters:
-      environmentFriendlyName: 'Prd'
+      environmentName: 'Prd'
       siteUrl: 'https://www.geo-location.net'
-
 
 - stage: PushNuGetPackages
   jobs:

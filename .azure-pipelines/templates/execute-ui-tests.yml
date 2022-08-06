@@ -1,11 +1,11 @@
 parameters:
-- name: environmentFriendlyName
+- name: environmentName
   type: string
 - name: siteUrl
   type: string
 
 stages:
-- stage: RunUITestsAgainst${{ parameters.environmentFriendlyName }}
+- stage: RunUITestsAgainst${{ parameters.environmentName }}
   jobs:
   - job: RunUITests
     displayName: 'Run UI Tests'
