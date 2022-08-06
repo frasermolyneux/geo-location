@@ -11,9 +11,11 @@ parameters:
 stages:
 - stage: Deploy${{ parameters.environmentFriendlyName }}
   jobs:
-
   - deployment: Deploy${{ parameters.environmentFriendlyName }}PlatformBicep
     environment: 'geolocation-${{ parameters.environment }}'
+
+    workspace:
+      clean: all
 
     strategy:
       runOnce:
@@ -38,6 +40,10 @@ stages:
 
   - job: Deploy${{ parameters.environmentFriendlyName }}PlatformPermissions
     dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}PlatformBicep']
+
+    workspace:
+      clean: all
+
     steps:
       - task: AzureCLI@2
         displayName: SetDeployPrincipalPermissions
@@ -71,6 +77,9 @@ stages:
     dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}PlatformPermissions']
     environment: 'geolocation-${{ parameters.environment }}'
 
+    workspace:
+      clean: all
+
     strategy:
       runOnce:
         deploy:
@@ -91,6 +100,10 @@ stages:
 
   - job: Deploy${{ parameters.environmentFriendlyName }}ServicesPermissions
     dependsOn: ['Deploy${{ parameters.environmentFriendlyName }}ServicesBicep']
+
+    workspace:
+      clean: all
+
     steps:
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions

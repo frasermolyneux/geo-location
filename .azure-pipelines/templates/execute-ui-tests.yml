@@ -10,6 +10,9 @@ stages:
   - job: RunUITests
     displayName: 'Run UI Tests'
 
+    workspace:
+      clean: all
+
     variables:
     - name: SITE_URL
       value: '${{ parameters.siteUrl }}'
