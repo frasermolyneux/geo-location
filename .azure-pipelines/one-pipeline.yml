@@ -118,7 +118,7 @@ stages:
 
 - template: templates/execute-ui-tests.yml
   parameters:
-    environmentName: 'Prd'
+    environmentName: 'Dev'
     siteUrl: 'https://dev.geo-location.net'
 
 - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
