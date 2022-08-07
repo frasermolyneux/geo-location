@@ -1,32 +1,43 @@
-# GeoLocation API
+# GeoLocation Service
 
-This repository contains a simple GeoLocation API that is backed by the MaxMind service. It exists as a caching layer to reduce cost and improve performance.
+[![Build Status](https://dev.azure.com/frasermolyneux/Personal-Public/_apis/build/status/geo-location.OnePipeline?repoName=frasermolyneux%2Fgeo-location&branchName=main)](https://dev.azure.com/frasermolyneux/Personal-Public/_build/latest?definitionId=170&repoName=frasermolyneux%2Fgeo-location&branchName=main)
 
-The primary use-case for the API integration with the [xtremeidiots-portal](https://github.com/frasermolyneux/xtremeidiots-portal) solution. As many lookups may be done against the same connected players this can become costly.
+## Overview
 
----
+This repository contains a simple GeoLocation service that is backed by the MaxMind service. It exists as a caching layer to reduce cost and improve performance.
 
-## Documentation
-
-* [manual-steps](/docs/manual-steps.md)
+The primary use-case for integration with the [xtremeidiots-portal](https://github.com/frasermolyneux/xtremeidiots-portal) solution. As many lookups may be done against the same connected players this can become costly.
 
 ---
 
 ## Related Projects
 
-* [azure-landing-zones](https://github.com/frasermolyneux/azure-landing-zones)
-* [platform-connectivity](https://github.com/frasermolyneux/platform-connectivity)
-* [platform-strategic-services](https://github.com/frasermolyneux/platform-strategic-services)
-* [xtremeidiots-portal](https://github.com/frasermolyneux/xtremeidiots-portal)
+* [frasermolyneux/azure-landing-zones](https://github.com/frasermolyneux/azure-landing-zones) - The deploy service principal is managed by this project, as is the workload subscription.
+* [frasermolyneux/xtremeidiots-portal](https://github.com/frasermolyneux/xtremeidiots-portal) - The xtremeidiots-portal project is the primary project that uses the GeoLocation service.
+* [frasermolyneux/platform-connectivity](https://github.com/frasermolyneux/platform-connectivity) - The platform connectivity project provides DNS and Azure Front Door shared resources.
+* [frasermolyneux/platform-strategic-services](https://github.com/frasermolyneux/platform-strategic-services) - The platform strategic services project provides a shared services such as API Management and App Service Plans.
 
 ---
 
-## Build Status
+## Solution
 
-[![Build Status](https://dev.azure.com/frasermolyneux/Personal-Public/_apis/build/status/geo-location.Validate?branchName=main)](https://dev.azure.com/frasermolyneux/Personal-Public/_build/latest?definitionId=143&branchName=main)
+TODO
 
 ---
 
-## Deployment Status
+## Azure Pipelines
 
-[![Build Status](https://dev.azure.com/frasermolyneux/Personal-Public/_apis/build/status/geo-location.Deploy?branchName=main)](https://dev.azure.com/frasermolyneux/Personal-Public/_build/latest?definitionId=144&branchName=main)
+The `one-pipeline` is within the `.azure-pipelines` folder and output is visible on the [frasermolyneux/Personal-Public](https://dev.azure.com/frasermolyneux/Personal-Public/_build?definitionId=170) Azure DevOps project.
+The `.github` folder contains `dependabot` configuration and some code quality workflows.
+
+---
+
+## Contributing
+
+Please read the [contributing](CONTRIBUTING.md) guidance; this is a learning and development project.
+
+---
+
+## Security
+
+Please read the [security](SECURITY.md) guidance; I am always open to security feedback through email or opening an issue.
