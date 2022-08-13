@@ -3,15 +3,10 @@ using MX.GeoLocation.PublicWebApp.Extensions;
 
 namespace MX.GeoLocation.PublicWebApp.Tests.Extensions
 {
-    public class GeoLocationDtoExtensionsTests
+    internal class GeoLocationDtoExtensionsTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
-        public void TestLocationSummaryForCityAndCountry()
+        public void LocationSummaryShouldBeCityAndCountryWhenAllPropertiesPresent()
         {
             // Arrange
             var geoLocationDto = new GeoLocationDto()
@@ -30,7 +25,7 @@ namespace MX.GeoLocation.PublicWebApp.Tests.Extensions
         }
 
         [Test]
-        public void TestLocationSummaryForCityAndCountryOnly()
+        public void LocationSummaryShouldBeCityAndCountryWhenCityAndCountryOnly()
         {
             // Arrange
             var geoLocationDto = new GeoLocationDto()
@@ -47,7 +42,7 @@ namespace MX.GeoLocation.PublicWebApp.Tests.Extensions
         }
 
         [Test]
-        public void TestLocationSummaryForCountryCodeOnly()
+        public void LocationSummaryShouldBeCountryCodeWhenCountryCodeOnly()
         {
             // Arrange
             var geoLocationDto = new GeoLocationDto()
@@ -63,7 +58,7 @@ namespace MX.GeoLocation.PublicWebApp.Tests.Extensions
         }
 
         [Test]
-        public void TestLocationSummaryForRegisteredCountryOnly()
+        public void LocationSummaryShouldBeRegisteredCountryWhenRegisteredCountryOnly()
         {
             // Arrange
             var geoLocationDto = new GeoLocationDto()
@@ -79,7 +74,7 @@ namespace MX.GeoLocation.PublicWebApp.Tests.Extensions
         }
 
         [Test]
-        public void TestLocationSummaryForInvalid()
+        public void LocationSummaryShouldBeUnknownWhenNoPropertiesAreSet()
         {
             // Arrange
             var geoLocationDto = new GeoLocationDto();
