@@ -65,32 +65,13 @@ stages:
           custom: pack
           arguments: >
             $(Build.SourcesDirectory)\src\lookup-api-client\lookup-api-client.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
-      #- task: DotNetCoreCLI@2
-      #  displayName: 'Pack lookup-api-client project'
-      #  inputs:
-      #    command: pack
-      #    packagesToPack: '**/lookup-api-client.csproj'
-      #    outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-      #    versioningScheme: byPrereleaseNumber
-      #    majorVersion: '1'
-      #    minorVersion: '0'       
-      #    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-      #      patchVersion: $(Build.BuildNumber)
-      #    ${{ else }}:
-      #      patchVersion: "$(Build.BuildNumber)-preview"
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
-          command: pack
-          packagesToPack: '**/lookup-api-abstractions.csproj'
-          outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-          versioningScheme: byPrereleaseNumber
-          majorVersion: '1'
-          minorVersion: '0' 
-          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-            patchVersion: $(Build.BuildNumber)
-          ${{ else }}:
-            patchVersion: "$(Build.BuildNumber)-preview"
+          command: custom
+          custom: pack
+          arguments: >
+            $(Build.SourcesDirectory)\src\lookup-api-abstractions\lookup-api-abstractions.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
       additionalPublishSteps: 
       - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
         displayName: 'Publish public-webapp artifact'
