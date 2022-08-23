@@ -60,6 +60,7 @@ stages:
           command: pack
           packagesToPack: '**/lookup-api-client.csproj'
           outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+          versioningScheme: byPrereleaseNumber
           majorVersion: '1'
           minorVersion: '0' 
           patchVersion: $(Build.BuildId) 
