@@ -78,7 +78,7 @@ stages:
       #      patchVersion: $(Build.BuildNumber)
       #    ${{ else }}:
       #      patchVersion: "$(Build.BuildNumber)-preview"
-      #- task: DotNetCoreCLI@2
+      - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
           command: pack
