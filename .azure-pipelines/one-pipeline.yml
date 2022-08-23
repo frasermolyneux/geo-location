@@ -60,20 +60,23 @@ stages:
           command: pack
           packagesToPack: '**/lookup-api-client.csproj'
           outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-            buildProperties: 'Version="1.0.$(Build.BuildId)"'
-          ${{ else }}:
-            buildProperties: 'Version="1.0.$(Build.BuildId)-preview"'
+          majorVersion: '1'
+          minorVersion: '0' 
+          patchVersion: $(Build.BuildId) 
+          #${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+            #TODO: Come back and fix this so -preview is appended to the version number
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
           command: pack
           packagesToPack: '**/lookup-api-abstractions.csproj'
           outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-            buildProperties: 'Version="1.0.$(Build.BuildId)"'
-          ${{ else }}:
-            buildProperties: 'Version="1.0.$(Build.BuildId)-preview"'
+          versioningScheme: byPrereleaseNumber
+          majorVersion: '1'
+          minorVersion: '0' 
+          patchVersion: $(Build.BuildId) 
+          #${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+            #TODO: Come back and fix this so -preview is appended to the version number
       additionalPublishSteps: 
       - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
         displayName: 'Publish public-webapp artifact'
