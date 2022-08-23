@@ -64,7 +64,7 @@ stages:
           command: custom
           custom: pack
           arguments: >
-            **/lookup-api-client.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
+            $(Build.SourcesDirectory)\src\lookup-api-client\lookup-api-client.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
       #- task: DotNetCoreCLI@2
       #  displayName: 'Pack lookup-api-client project'
       #  inputs:
