@@ -23,6 +23,10 @@ resources:
 
 variables:
   buildConfiguration: 'Release'
+  ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+    nugetPackageVersion: "1.0.$(Build.BuildNumber)"
+  ${{ else }}:
+    nugetPackageVersion: "1.0.$(Build.BuildNumber)-preview"
 
 stages: 
 - stage: Build
@@ -57,17 +61,24 @@ stages:
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-client project'
         inputs:
-          command: pack
-          packagesToPack: '**/lookup-api-client.csproj'
-          outputDir: '$(Build.ArtifactStagingDirectory)/packages'
-          versioningScheme: byPrereleaseNumber
-          majorVersion: '1'
-          minorVersion: '0'       
-          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-            patchVersion: $(Build.BuildNumber)
-          ${{ else }}:
-            patchVersion: "$(Build.BuildNumber)-preview"
-      - task: DotNetCoreCLI@2
+          command: custom
+          custom: pack
+          arguments: >
+            **/lookup-api-client.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
+      #- task: DotNetCoreCLI@2
+      #  displayName: 'Pack lookup-api-client project'
+      #  inputs:
+      #    command: pack
+      #    packagesToPack: '**/lookup-api-client.csproj'
+      #    outputDir: '$(Build.ArtifactStagingDirectory)/packages'
+      #    versioningScheme: byPrereleaseNumber
+      #    majorVersion: '1'
+      #    minorVersion: '0'       
+      #    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+      #      patchVersion: $(Build.BuildNumber)
+      #    ${{ else }}:
+      #      patchVersion: "$(Build.BuildNumber)-preview"
+      #- task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
           command: pack
