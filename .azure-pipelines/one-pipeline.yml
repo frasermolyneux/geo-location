@@ -62,10 +62,11 @@ stages:
           outputDir: '$(Build.ArtifactStagingDirectory)/packages'
           versioningScheme: byPrereleaseNumber
           majorVersion: '1'
-          minorVersion: '0' 
-          patchVersion: $(Build.BuildId) 
-          #${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
-            #TODO: Come back and fix this so -preview is appended to the version number
+          minorVersion: '0'       
+          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+            patchVersion: $(Build.BuildNumber)
+          ${{ else }}:
+            patchVersion: "$(Build.BuildNumber)-preview"
       - task: DotNetCoreCLI@2
         displayName: 'Pack lookup-api-abstractions project'
         inputs:
@@ -75,9 +76,10 @@ stages:
           versioningScheme: byPrereleaseNumber
           majorVersion: '1'
           minorVersion: '0' 
-          patchVersion: $(Build.BuildId) 
-          #${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
-            #TODO: Come back and fix this so -preview is appended to the version number
+          ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+            patchVersion: $(Build.BuildNumber)
+          ${{ else }}:
+            patchVersion: "$(Build.BuildNumber)-preview"
       additionalPublishSteps: 
       - publish: '$(Build.artifactStagingDirectory)/public-webapp.zip'
         displayName: 'Publish public-webapp artifact'
