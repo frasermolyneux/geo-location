@@ -11,7 +11,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Api
 {
     public class GeoLookupApi : BaseApi, IGeoLookupApi
     {
-        public GeoLookupApi(ILogger<GeoLookupApi> logger, IOptions<GeoLocationApiClientOptions> options, IApiTokenProvider serversApiTokenProvider) : base(logger, options, serversApiTokenProvider)
+        public GeoLookupApi(ILogger<GeoLookupApi> logger, IOptions<GeoLocationApiClientOptions> options, IApiTokenProvider apiTokenProvider, IRestClientSingleton restClientSingletonFactory) : base(logger, options, apiTokenProvider, restClientSingletonFactory)
         {
         }
 

@@ -17,6 +17,8 @@ namespace MX.GeoLocation.GeoLocationApi.Client
             serviceCollection.AddSingleton<IGeoLookupApi, GeoLookupApi>();
 
             serviceCollection.AddSingleton<IGeoLocationApiClient, GeoLocationApiClient>();
+
+            serviceCollection.AddSingleton<IRestClientSingleton, RestClientSingleton>();
         }
     }
 }

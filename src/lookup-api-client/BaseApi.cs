@@ -1,17 +1,18 @@
-﻿using System.Net;
-
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using RestSharp;
+
+using System.Net;
 
 namespace MX.GeoLocation.GeoLocationApi.Client
 {
     public class BaseApi
     {
         private readonly string _apimSubscriptionKey;
+        private readonly IRestClientSingleton restClientSingleton;
 
-        public BaseApi(ILogger logger, IOptions<GeoLocationApiClientOptions> options, IApiTokenProvider serversApiTokenProvider)
+        public BaseApi(ILogger logger, IOptions<GeoLocationApiClientOptions> options, IApiTokenProvider apiTokenProvider, IRestClientSingleton restClientSingletonFactory)
         {
             if (string.IsNullOrWhiteSpace(options.Value.BaseUrl))
                 throw new ArgumentNullException(nameof(options.Value.BaseUrl));
@@ -21,17 +22,23 @@ namespace MX.GeoLocation.GeoLocationApi.Client
 
             _apimSubscriptionKey = options.Value.ApiKey;
 
-            RestClient = string.IsNullOrWhiteSpace(options.Value.ApiPathPrefix)
-                ? new RestClient($"{options.Value.BaseUrl}")
-                : new RestClient($"{options.Value.BaseUrl}/{options.Value.ApiPathPrefix}");
-
             Logger = logger;
-            ServersApiTokenProvider = serversApiTokenProvider;
+            ServersApiTokenProvider = apiTokenProvider;
+
+            this.restClientSingleton = restClientSingletonFactory;
+
+            if (string.IsNullOrWhiteSpace(options.Value.ApiPathPrefix))
+            {
+                restClientSingletonFactory.ConfigureBaseUrl(options.Value.BaseUrl);
+            }
+            else
+            {
+                restClientSingletonFactory.ConfigureBaseUrl($"{options.Value.BaseUrl}/{options.Value.ApiPathPrefix}");
+            }
         }
 
         public ILogger Logger { get; }
         public IApiTokenProvider ServersApiTokenProvider { get; }
-        private RestClient RestClient { get; }
 
         public async Task<RestRequest> CreateRequest(string resource, Method method)
         {
@@ -47,7 +54,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client
 
         public async Task<RestResponse> ExecuteAsync(RestRequest request)
         {
-            var response = await RestClient.ExecuteAsync(request);
+            var response = await restClientSingleton.ExecuteAsync(request);
 
             if (response.ErrorException != null)
             {
