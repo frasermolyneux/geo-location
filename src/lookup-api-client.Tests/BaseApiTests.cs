@@ -69,7 +69,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
 
         [TestCase(null)]
         [TestCase("")]
-        public void BaseApiCtorShouldCreateARestClientWithTheBaseUrlAndInvalidApiPaths(string apiPathPrefix)
+        public void BaseApiCtorShouldConfigureTheRestClientWithPlainUrlWhenInvalidApiPrefix(string apiPathPrefix)
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
@@ -83,11 +83,11 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
             var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
 
             // Assert
-            A.CallTo(() => fakeRestClientSingleton.ConfigureBaseUrl("https://google.co.uk/geolocation")).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeRestClientSingleton.ConfigureBaseUrl("https://google.co.uk")).MustHaveHappenedOnceExactly();
         }
 
         [Test]
-        public void BaseApiCtorShouldCreateARestClientWithTheBaseUrlAndCustomApiPath()
+        public void BaseApiCtorShouldConfigureTheRestClientWithUrlAndApiPathPrefixWhenApiPathPrefixProvided()
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
