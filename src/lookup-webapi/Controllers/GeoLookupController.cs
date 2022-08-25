@@ -1,9 +1,6 @@
-﻿using System.Net;
-
-using MaxMind.GeoIP2.Exceptions;
+﻿using MaxMind.GeoIP2.Exceptions;
 
 using Microsoft.AspNetCore.Authorization;
-
 using Microsoft.AspNetCore.Mvc;
 
 using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
@@ -12,6 +9,8 @@ using MX.GeoLocation.LookupWebApi.Extensions;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
 using Newtonsoft.Json;
+
+using System.Net;
 
 namespace MX.GeoLocation.LookupWebApi.Controllers
 {
@@ -101,9 +100,54 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             return response.ToHttpResult();
         }
 
-        Task<ApiResponseDto<GeoLocationCollectionDto>> IGeoLookupApi.GetGeoLocations(List<string> hostnames)
+        async Task<ApiResponseDto<GeoLocationCollectionDto>> IGeoLookupApi.GetGeoLocations(List<string> hostnames)
         {
-            throw new NotImplementedException();
+            var entries = new List<GeoLocationDto>();
+            var errors = new List<string>();
+
+            foreach (var hostname in hostnames)
+            {
+                try
+                {
+                    if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                    {
+                        var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
+
+                        if (geoLocationDto != null)
+                            entries.Add(geoLocationDto);
+                        else
+                        {
+                            geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
+                            geoLocationDto.Address = hostname;
+
+                            entries.Add(geoLocationDto);
+
+                            await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
+                        }
+                    }
+                    else
+                    {
+                        errors.Add($"The hostname provided '{hostname} is invalid'");
+                    }
+                }
+                catch (AddressNotFoundException ex)
+                {
+                    errors.Add(ex.Message);
+                }
+                catch (GeoIP2Exception ex)
+                {
+                    errors.Add(ex.Message);
+                }
+            }
+
+            var result = new GeoLocationCollectionDto
+            {
+                Entries = entries,
+                TotalRecords = entries.Count,
+                FilteredRecords = entries.Count
+            };
+
+            return new ApiResponseDto<GeoLocationCollectionDto>(HttpStatusCode.OK, result, errors);
         }
 
         [HttpDelete]

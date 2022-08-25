@@ -67,14 +67,16 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
                             .WithMessage("Value cannot be null. (Parameter 'ApiKey')");
         }
 
-        [Test]
-        public void BaseApiCtorShouldCreateARestClientWithTheBaseUrlAndDefaultApiPath()
+        [TestCase(null)]
+        [TestCase("")]
+        public void BaseApiCtorShouldCreateARestClientWithTheBaseUrlAndInvalidApiPaths(string apiPathPrefix)
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
             {
                 BaseUrl = "https://google.co.uk",
-                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                ApiPathPrefix = apiPathPrefix
             });
 
             // Act
