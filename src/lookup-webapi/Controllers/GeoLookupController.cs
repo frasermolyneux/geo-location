@@ -1,4 +1,6 @@
-﻿using MaxMind.GeoIP2.Exceptions;
+﻿using System.Net;
+
+using MaxMind.GeoIP2.Exceptions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,8 +11,6 @@ using MX.GeoLocation.LookupWebApi.Extensions;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
 using Newtonsoft.Json;
-
-using System.Net;
 
 namespace MX.GeoLocation.LookupWebApi.Controllers
 {
@@ -55,7 +55,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                         return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, geoLocationDto);
 
                     geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
-                    geoLocationDto.Address = hostname;
+                    geoLocationDto.Address = hostname; // Set the address to be the original hostname query
 
                     await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
 
@@ -118,7 +118,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                         else
                         {
                             geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
-                            geoLocationDto.Address = hostname;
+                            geoLocationDto.Address = hostname; // Set the address to be the original hostname query
 
                             entries.Add(geoLocationDto);
 
