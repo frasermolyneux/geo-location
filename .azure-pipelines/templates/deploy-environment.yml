@@ -36,6 +36,7 @@ stages:
                 azureSubscription: ${{ parameters.azureSubscription }}
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
+                addSpnToEnvironment: true
                 inlineScript: |
                   if ($null -eq (az keyvault show --name 'kv-geoloc-${{ parameters.environmentTag }}-uksouth')) { $keyVaultCreateMode = 'default' } else { $keyVaultCreateMode = 'recover' }
 
@@ -43,7 +44,8 @@ stages:
                     --template-file bicep/platform.bicep `
                     --location 'uksouth' `
                     --parameters @params/platform.${{ parameters.environmentTag }}.json `
-                      parKeyVaultCreateMode=$keyVaultCreateMode
+                      parKeyVaultCreateMode=$keyVaultCreateMode `
+                      parDeployPrincipalId=$env:servicePrincipalId
 
   - job: Deploy${{ parameters.environmentName }}PlatformPermissions
     dependsOn: ['Deploy${{ parameters.environmentName }}PlatformBicep']
@@ -52,16 +54,6 @@ stages:
       clean: all
 
     steps:
-      - task: AzureCLI@2
-        displayName: SetDeployPrincipalPermissions
-        inputs:
-          azureSubscription: ${{ parameters.azureSubscription }}
-          scriptType: 'pscore'
-          scriptLocation: 'scriptPath'
-          arguments: '"${{ parameters.environmentTag }}" "uksouth"'
-          addSpnToEnvironment: true
-          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetDeployPrincipalPermissions.ps1'
-
       - task: AzureCLI@2
         displayName: CreateAppRegistrations
         inputs:

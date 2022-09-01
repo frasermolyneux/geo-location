@@ -14,6 +14,8 @@ param parApiManagementName string
 
 param parKeyVaultCreateMode string = 'recover'
 
+param parDeployPrincipalId string
+
 param parTags object
 
 // Variables
@@ -50,8 +52,19 @@ module keyVault 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvault:la
   }
 }
 
-module keyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
-  name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
+module deployKeyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
+  name: '${varDeploymentPrefix}-deployKeyVaultAccessPolicy'
+  scope: resourceGroup(defaultResourceGroup.name)
+
+  params: {
+    parKeyVaultName: keyVault.outputs.outKeyVaultName
+    parPrincipalId: parDeployPrincipalId
+    parSecretsPermissions: [ 'get', 'set' ]
+  }
+}
+
+module apimKeyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
+  name: '${varDeploymentPrefix}-apimKeyVaultAccessPolicy'
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
