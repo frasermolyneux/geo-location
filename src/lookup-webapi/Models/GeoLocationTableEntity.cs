@@ -27,7 +27,7 @@ namespace MX.GeoLocation.LookupWebApi.Models
         public GeoLocationTableEntity(GeoLocationDto geoLocationDto)
         {
             PartitionKey = "addresses";
-            RowKey = geoLocationDto.Address ?? throw new NullReferenceException(nameof(geoLocationDto.Address));
+            RowKey = geoLocationDto.TranslatedAddress ?? throw new NullReferenceException(nameof(geoLocationDto.TranslatedAddress));
 
             Address = geoLocationDto.Address;
             TranslatedAddress = geoLocationDto.TranslatedAddress;
