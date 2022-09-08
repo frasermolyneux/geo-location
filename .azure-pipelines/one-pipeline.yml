@@ -119,13 +119,13 @@ stages:
     environmentName: 'Dev'
     siteUrl: 'https://dev.geo-location.net'
 
-- stage: NonFunctionalTests
-  jobs: 
-  - job: K6
-    steps:
-      - task: k6-load-test@0
-        inputs:
-          filename: '$(Build.SourcesDirectory)/k6-tests/tests.js'
+#- stage: NonFunctionalTests
+#  jobs: 
+#  - job: K6
+#    steps:
+#      - task: k6-load-test@0
+#        inputs:
+#          filename: '$(Build.SourcesDirectory)/k6-tests/tests.js'
 
 - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
   - template: templates/deploy-environment.yml
