@@ -32,6 +32,7 @@ jobs:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 az deployment sub validate `
+                  --name 'geolocationPlatform${{ parameters.environmentName }}' `
                   --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json
@@ -39,6 +40,7 @@ jobs:
                 if ((az group exists --name 'rg-geolocation-${{ parameters.environmentTag }}-uksouth') -eq $true) { 
                   Write-Host "Performing az deployment group validation as 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' exists"
                   az deployment group validate `
+                    --name 'geolocationServices${{ parameters.environmentName }}' `
                     --resource-group 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
                     --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environmentTag }}.json
@@ -52,6 +54,7 @@ jobs:
               scriptLocation: 'inlineScript'
               inlineScript: |
                 az deployment sub what-if `
+                  --name 'geolocationPlatform${{ parameters.environmentName }}' `
                   --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
                   --location 'uksouth' `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json
@@ -59,6 +62,7 @@ jobs:
                 if ((az group exists --name 'rg-geolocation-${{ parameters.environmentTag }}-uksouth') -eq $true) { 
                   Write-Host "Performing az deployment group what-if as 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' exists"
                   az deployment group what-if `
+                    --name 'geolocationServices${{ parameters.environmentName }}' `
                     --resource-group 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
                     --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environmentTag }}.json
