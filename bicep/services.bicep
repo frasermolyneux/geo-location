@@ -4,10 +4,12 @@ targetScope = 'resourceGroup'
 param parLocation string
 param parEnvironment string
 
-param parConnectivitySubscriptionId string
+param parFrontDoorSubscriptionId string
 param parFrontDoorResourceGroupName string
-param parDnsResourceGroupName string
 param parFrontDoorName string
+
+param parDnsSubscriptionId string
+param parDnsResourceGroupName string
 param parPublicWebAppDnsPrefix string
 param parParentDnsName string
 
@@ -31,7 +33,8 @@ module lookupWebApi 'services/lookupWebApi.bicep' = {
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
-    parConnectivitySubscriptionId: parConnectivitySubscriptionId
+    parFrontDoorSubscriptionId: parFrontDoorSubscriptionId
+    parDnsSubscriptionId: parDnsSubscriptionId
     parFrontDoorResourceGroupName: parFrontDoorResourceGroupName
     parDnsResourceGroupName: parDnsResourceGroupName
     parFrontDoorName: parFrontDoorName
@@ -52,7 +55,8 @@ module publicWebApp 'services/publicWebApp.bicep' = {
     parEnvironment: parEnvironment
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
-    parConnectivitySubscriptionId: parConnectivitySubscriptionId
+    parFrontDoorSubscriptionId: parFrontDoorSubscriptionId
+    parDnsSubscriptionId: parDnsSubscriptionId
     parFrontDoorResourceGroupName: parFrontDoorResourceGroupName
     parDnsResourceGroupName: parDnsResourceGroupName
     parFrontDoorName: parFrontDoorName
