@@ -1,3 +1,4 @@
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
@@ -13,7 +14,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 builder.Services.AddLogging();
 builder.Services.AddMemoryCache();
-builder.Services.AddApplicationInsightsTelemetry();
+
+builder.Services.Configure<TelemetryConfiguration>(telemetryConfiguration =>
+{
+    var builder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
+
+    // Using fixed rate sampling
+    double fixedSamplingPercentage = 50;
+    builder.UseSampling(fixedSamplingPercentage);
+});
+
+builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
+{
+    EnableAdaptiveSampling = false,
+});
 
 builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration);
 
