@@ -1,0 +1,41 @@
+schedules:
+- cron: "0 3 * * 1"
+  displayName: Destroy Development
+  branches:
+    include:
+    - main
+
+pool: 'Dedicated'
+
+resources:
+  repositories:
+    - repository: ado-pipeline-templates
+      type: github
+      name: frasermolyneux/ado-pipeline-templates
+      endpoint: github.com_frasermolyneux
+
+stages: 
+- stage: CleanUpDevResources
+  jobs:
+
+  - deployment: CleanUpDevResources
+    environment: platform-webapps-dev-uksouth
+
+    workspace:
+      clean: all
+
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: AzureCLI@2
+            displayName: DestroyDevResources
+            inputs:
+              azureSubscription: 'spn-ado-Personal-Public-devtest'
+              scriptType: 'pscore'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az monitor app-insights web-test delete --resource-group rg-geolocation-dev-uksouth --name publicWebApp-webTest
+
+                az webapp delete --name webapi-geolocation-lookup-dev-uksouth --resource-group rg-platform-webapps-dev-uksouth --keep-empty-plan
+                az webapp delete --name webapp-geolocation-public-dev-uksouth --resource-group rg-platform-webapps-dev-uksouth --keep-empty-plan

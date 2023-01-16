@@ -1,16 +1,7 @@
 trigger:
   branches:
     include:
-    - '*'
-    exclude:
-    - 'docs/*'
-
-pr:
-  branches:
-    include:
-    - '*'
-    exclude:
-    - 'docs/*'
+    - 'main'
 
 pool: 'Dedicated'
 
@@ -105,6 +96,12 @@ stages:
       environmentName: 'Prd'
       environmentTag: 'prd'
 
+- stage: PushNuGetPackages
+  jobs:
+  - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
+    parameters: 
+      artifactName: 'nuget-packages'
+
 - template: templates/deploy-environment.yml
   parameters:
     azureSubscription: 'spn-ado-Personal-Public-devtest'
@@ -120,50 +117,17 @@ stages:
     environmentName: 'Dev'
     siteUrl: 'https://dev.geo-location.net'
 
-- stage: CleanUpDevResources
-  jobs:
+- template: templates/deploy-environment.yml
+  parameters:
+    azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
+    environment: 'geolocation-prd'
+    environmentName: 'Prd'
+    environmentTag: 'prd'
+    webAppsAzureSubscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
+    webAppsEnvironment: 'platform-webapps-prd-uksouth'
+    webAppsResourceGroup: 'rg-platform-webapps-prd-uksouth'
 
-  - deployment: CleanUpDevResources
-    environment: platform-webapps-dev-uksouth
-
-    workspace:
-      clean: all
-
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: AzureCLI@2
-            displayName: DestroyDevResources
-            inputs:
-              azureSubscription: 'spn-ado-Personal-Public-devtest'
-              scriptType: 'pscore'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az monitor app-insights web-test delete --resource-group rg-geolocation-dev-uksouth --name publicWebApp-webTest
-
-                az webapp delete --name webapi-geolocation-lookup-dev-uksouth --resource-group rg-platform-webapps-dev-uksouth --keep-empty-plan
-                az webapp delete --name webapp-geolocation-public-dev-uksouth --resource-group rg-platform-webapps-dev-uksouth --keep-empty-plan
-
-- ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-  - template: templates/deploy-environment.yml
-    parameters:
-      azureSubscription: 'spn-ado-Personal-Public-geolocation-prd'
-      environment: 'geolocation-prd'
-      environmentName: 'Prd'
-      environmentTag: 'prd'
-      webAppsAzureSubscription: 'spn-ado-Personal-Public-geolocation-prd-webapps'
-      webAppsEnvironment: 'platform-webapps-prd-uksouth'
-      webAppsResourceGroup: 'rg-platform-webapps-prd-uksouth'
-
-- ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-  - template: templates/execute-ui-tests.yml
-    parameters:
-      environmentName: 'Prd'
-      siteUrl: 'https://www.geo-location.net'
-
-- stage: PushNuGetPackages
-  jobs:
-  - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
-    parameters: 
-      artifactName: 'nuget-packages'
+- template: templates/execute-ui-tests.yml
+  parameters:
+    environmentName: 'Prd'
+    siteUrl: 'https://www.geo-location.net'
