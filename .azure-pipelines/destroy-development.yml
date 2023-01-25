@@ -21,8 +21,7 @@ stages:
   jobs:
 
   - deployment: CleanUpDevResources
-    environment: platform-webapps-dev-uksouth
-
+    environment: geo-location-Development
     workspace:
       clean: all
 
@@ -33,7 +32,7 @@ stages:
           - task: AzureCLI@2
             displayName: DestroyDevResources
             inputs:
-              azureSubscription: 'spn-ado-Personal-Public-devtest'
+              azureSubscription: 'spn-geo-location-development'
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |
