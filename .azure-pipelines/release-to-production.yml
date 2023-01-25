@@ -101,6 +101,7 @@ stages:
   - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
     parameters: 
       artifactName: 'nuget-packages'
+      variableGroupName: "NuGet"
 
 - template: templates/deploy-environment.yml
   parameters:
