@@ -12,16 +12,16 @@
             "value": "db34f572-8b71-40d6-8f99-f29a27612144"
         },
         "parFrontDoorResourceGroupName": {
-            "value": "rg-platform-frontdoor-prd-uksouth"
+            "value": "rg-platform-frontdoor-utftcdi77in3c-prd-uksouth"
         },
         "parFrontDoorName": {
-            "value": "fd-mx-platform-prd"
+            "value": "fd-platform-utftcdi77in3c-prd"
         },
         "parDnsSubscriptionId": {
             "value": "db34f572-8b71-40d6-8f99-f29a27612144"
         },
         "parDnsResourceGroupName": {
-            "value": "rg-platform-dns-prd-uksouth"
+            "value": "rg-platform-dns-utftcdi77in3c-prd-uksouth"
         },
         "parPublicWebAppDnsPrefix": {
             "value": "www"
@@ -33,16 +33,16 @@
             "value": "903b6685-c12a-4703-ac54-7ec1ff15ca43"
         },
         "parApiManagementResourceGroupName": {
-            "value": "rg-platform-apim-prd-uksouth"
+            "value": "rg-platform-apim-4xhbmv4lmxxbs-prd-uksouth"
         },
         "parApiManagementName": {
-            "value": "apim-mx-platform-prd-uksouth"
+            "value": "apim-mx-platform-4xhbmv4lmxxbs-prd-uksouth"
         },
         "parWebAppsResourceGroupName": {
-            "value": "rg-platform-webapps-prd-uksouth"
+            "value": "rg-platform-webapps-4xhbmv4lmxxbs-prd-uksouth"
         },
         "parAppServicePlanName": {
-            "value": "plan-platform-prd-uksouth"
+            "value": "plan-platform-4xhbmv4lmxxbs-prd-uksouth-01"
         },
         "parTags": {
             "value": {

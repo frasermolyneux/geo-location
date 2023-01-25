@@ -56,7 +56,7 @@ module webApp 'lookupWebApi/webApp.bicep' = {
   }
 }
 
-module keyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
+module keyVaultAccessPolicy 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
   name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
 
   params: {
@@ -81,7 +81,7 @@ module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
   }
 }
 
-module frontDoorEndpoint 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/frontdoorendpoint:latest' = {
+module frontDoorEndpoint 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/frontdoorendpoint:latest' = {
   name: '${varDeploymentPrefix}-frontDoorEndpoint'
   scope: resourceGroup(parFrontDoorSubscriptionId, parFrontDoorResourceGroupName)
 

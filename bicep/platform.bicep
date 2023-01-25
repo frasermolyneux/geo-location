@@ -19,10 +19,12 @@ param parDeployPrincipalId string
 param parTags object
 
 // Variables
-var varDeploymentPrefix = 'geolocationPlatform' //Prevent deployment naming conflicts
-var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}'
-var varKeyVaultName = 'kv-geoloc-${parEnvironment}-${parLocation}'
-var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}'
+var environmentUniqueId = uniqueString('geolocation', parEnvironment)
+var varDeploymentPrefix = 'platform-${environmentUniqueId}' //Prevent deployment naming conflicts
+
+var varResourceGroupName = 'rg-geolocation-${environmentUniqueId}-${parEnvironment}-${parLocation}'
+var varKeyVaultName = 'kv-${environmentUniqueId}-${parLocation}'
+var varAppInsightsName = 'ai-geolocation-${environmentUniqueId}-${parEnvironment}-${parLocation}'
 
 // Existing Out-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
@@ -39,7 +41,7 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   properties: {}
 }
 
-module keyVault 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvault:latest' = {
+module keyVault 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvault:latest' = {
   name: '${varDeploymentPrefix}-keyVault'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -52,29 +54,41 @@ module keyVault 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvault:la
   }
 }
 
-module deployKeyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
-  name: '${varDeploymentPrefix}-deployKeyVaultAccessPolicy'
+@description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-officer')
+resource keyVaultSecretsOfficerRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+}
+
+module keyVaultSecretsOfficerRoleAssignmentDeploy 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+  name: '${varDeploymentPrefix}-keyVaultSecretsOfficerRoleAssignmentDeploy'
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
     parKeyVaultName: keyVault.outputs.outKeyVaultName
+    parRoleDefinitionId: keyVaultSecretsOfficerRoleDefinition.id
     parPrincipalId: parDeployPrincipalId
-    parSecretsPermissions: [ 'get', 'set' ]
   }
 }
 
-module apimKeyVaultAccessPolicy 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
-  name: '${varDeploymentPrefix}-apimKeyVaultAccessPolicy'
+@description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
+resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: '4633458b-17de-408a-b874-0445c86b69e6'
+}
+
+module keyVaultSecretUserRoleAssignmentApim 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+  name: '${varDeploymentPrefix}-keyVaultSecretUserRoleAssignmentApim'
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
     parKeyVaultName: keyVault.outputs.outKeyVaultName
+    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
     parPrincipalId: apiManagement.identity.principalId
-    parSecretsPermissions: [ 'get' ]
   }
 }
 
-module appInsights 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/appinsights:latest' = {
+module appInsights 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/appinsights:latest' = {
   name: '${varDeploymentPrefix}-appInsights'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -88,7 +102,7 @@ module appInsights 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/appinsig
   }
 }
 
-module apiManagementLogger 'br:acrmxplatformprduksouth.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
+module apiManagementLogger 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
   name: '${varDeploymentPrefix}-apiManagementLogger'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 

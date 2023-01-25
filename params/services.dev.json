@@ -9,19 +9,19 @@
             "value": "dev"
         },
         "parFrontDoorSubscriptionId": {
-            "value": "1b5b28ed-1365-4a48-b285-80f80a6aaa1b"
+            "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parFrontDoorResourceGroupName": {
-            "value": "rg-platform-frontdoor-dev-uksouth"
+            "value": "rg-platform-frontdoor-22ll2pfvig6pg-dev-uksouth"
         },
         "parFrontDoorName": {
-            "value": "fd-mx-platform-dev"
+            "value": "fd-platform-22ll2pfvig6pg-dev"
         },
         "parDnsSubscriptionId": {
             "value": "db34f572-8b71-40d6-8f99-f29a27612144"
         },
         "parDnsResourceGroupName": {
-            "value": "rg-platform-dns-prd-uksouth"
+            "value": "rg-platform-dns-utftcdi77in3c-prd-uksouth"
         },
         "parPublicWebAppDnsPrefix": {
             "value": "dev"
@@ -30,19 +30,19 @@
             "value": "geo-location.net"
         },
         "parStrategicServicesSubscriptionId": {
-            "value": "1b5b28ed-1365-4a48-b285-80f80a6aaa1b"
+            "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parApiManagementResourceGroupName": {
-            "value": "rg-platform-apim-dev-uksouth"
+            "value": "rg-platform-apim-22ll2pfvig6pg-dev-uksouth"
         },
         "parApiManagementName": {
-            "value": "apim-mx-platform-dev-uksouth"
+            "value": "apim-mx-platform-22ll2pfvig6pg-dev-uksouth"
         },
         "parWebAppsResourceGroupName": {
-            "value": "rg-platform-webapps-dev-uksouth"
+            "value": "rg-platform-webapps-22ll2pfvig6pg-dev-uksouth"
         },
         "parAppServicePlanName": {
-            "value": "plan-platform-dev-uksouth"
+            "value": "plan-platform-22ll2pfvig6pg-dev-uksouth-01"
         },
         "parTags": {
             "value": {

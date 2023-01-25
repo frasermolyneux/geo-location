@@ -9,22 +9,22 @@
             "value": "dev"
         },
         "parLoggingSubscriptionId": {
-            "value": "7760848c-794d-4a19-8cb2-52f71a21ac2b"
+            "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parLoggingResourceGroupName": {
-            "value": "rg-platform-logging-prd-uksouth"
+            "value": "rg-platform-logging-3s6dbzxizuv4m-prd-uksouth"
         },
         "parLoggingWorkspaceName": {
-            "value": "log-platform-prd-uksouth"
+            "value": "log-platform-3s6dbzxizuv4m-prd-uksouth"
         },
         "parStrategicServicesSubscriptionId": {
-            "value": "1b5b28ed-1365-4a48-b285-80f80a6aaa1b"
+            "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parApiManagementResourceGroupName": {
-            "value": "rg-platform-apim-dev-uksouth"
+            "value": "rg-platform-apim-22ll2pfvig6pg-dev-uksouth"
         },
         "parApiManagementName": {
-            "value": "apim-mx-platform-dev-uksouth"
+            "value": "apim-mx-platform-22ll2pfvig6pg-dev-uksouth"
         },
         "parTags": {
             "value": {
