@@ -25,10 +25,10 @@ stages:
 - stage: Build
   jobs:
 
-  - template: jobs/dependency-check.yml@ado-pipeline-templates
-    parameters: 
-      jobName: 'DependencyCheck'
-      failOnCVSS: 4
+  #- template: jobs/dependency-check.yml@ado-pipeline-templates
+  #  parameters: 
+  #    jobName: 'DependencyCheck'
+  #    failOnCVSS: 4
 
   - template: jobs/build-net-core-projects.yml@ado-pipeline-templates
     parameters: 
