@@ -38,15 +38,26 @@ stages:
                 scriptLocation: 'inlineScript'
                 addSpnToEnvironment: true
                 inlineScript: |
-                  if ($null -eq (az keyvault show --name 'kv-geoloc-${{ parameters.environmentTag }}-uksouth')) { $keyVaultCreateMode = 'default' } else { $keyVaultCreateMode = 'recover' }
+                  $config = (Get-Content $(Build.sourcesDirectory)/params/platformKeyVault.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+
+                  $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
+                  $isDeleted = $deletedKeyVaults | where {$_ -match 'rg-platform-vault-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)'}
+
+                  $keyVaultCreateMode = "default"
+                  if ($isDeleted -ne $null) {
+                    # To allow the environments to be torn-down and re-created, the Key Vault Create Mode must be set to 'recover'.
+                    $keyVaultCreateMode = "recover"
+                  }
+
+                  $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
 
                   az deployment sub create `
                     --name 'geolocationPlatform${{ parameters.environmentName }}' `
                     --template-file bicep/platform.bicep `
                     --location 'uksouth' `
                     --parameters @params/platform.${{ parameters.environmentTag }}.json `
-                      parKeyVaultCreateMode=$keyVaultCreateMode `
-                      parDeployPrincipalId=$env:servicePrincipalId
+                      parPlatformKeyVaultCreateMode=$keyVaultCreateMode `
+                      parDeployPrincipalId=$deployPrincipalId
 
   - job: Deploy${{ parameters.environmentName }}PlatformPermissions
     dependsOn: ['Deploy${{ parameters.environmentName }}PlatformBicep']
@@ -92,10 +103,13 @@ stages:
                 azureSubscription: ${{ parameters.azureSubscription }}
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
+                addSpnToEnvironment: true
                 inlineScript: |
+                  $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+
                   az deployment group create `
                     --name 'geolocationServices${{ parameters.environmentName }}' `
-                    --resource-group 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' `
+                    --resource-group 'rg-geo-location-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)' `
                     --template-file bicep/services.bicep `
                     --parameters @params/services.${{ parameters.environmentTag }}.json
 

@@ -1,8 +1,11 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-param parLocation string
 param parEnvironment string
+param parEnvironmentUniqueId string
+param parLocation string
+param parInstance string
+
 param parKeyVaultName string
 param parAppInsightsName string
 
@@ -24,9 +27,9 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varDeploymentPrefix = 'publicWebApp' //Prevent deployment naming conflicts
-var varWebAppName = 'webapp-geolocation-public-${parEnvironment}-${parLocation}'
-var varWorkloadName = 'webapp-geolocation-public-${parEnvironment}'
+var varDeploymentPrefix = 'web-${parEnvironmentUniqueId}' //Prevent deployment naming conflicts
+
+var varWorkloadName = 'app-geo-location-web-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Existing In-Scope Resources
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
@@ -39,8 +42,11 @@ module webApp 'publicWebApp/webApp.bicep' = {
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
-    parLocation: parLocation
     parEnvironment: parEnvironment
+    parEnvironmentUniqueId: parEnvironmentUniqueId
+    parLocation: parLocation
+    parInstance: parInstance
+
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
     parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
@@ -71,7 +77,7 @@ module apiManagementSubscription 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/a
     parApiManagementName: parApiManagementName
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
-    parWorkloadName: varWebAppName
+    parWorkloadName: varWorkloadName
     parKeyVaultName: parKeyVaultName
     parSubscriptionScopeIdentifier: 'geolocation'
     parSubscriptionScope: '/apis/geolocation-api'

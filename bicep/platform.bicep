@@ -1,8 +1,9 @@
 targetScope = 'subscription'
 
 // Parameters
-param parLocation string
 param parEnvironment string
+param parLocation string
+param parInstance string
 
 param parLoggingSubscriptionId string
 param parLoggingResourceGroupName string
@@ -19,12 +20,12 @@ param parDeployPrincipalId string
 param parTags object
 
 // Variables
-var environmentUniqueId = uniqueString('geolocation', parEnvironment)
-var varDeploymentPrefix = 'platform-${environmentUniqueId}' //Prevent deployment naming conflicts
+var varEnvironmentUniqueId = uniqueString('geo-location', parEnvironment, parInstance)
+var varDeploymentPrefix = 'platform-${varEnvironmentUniqueId}' //Prevent deployment naming conflicts
 
-var varResourceGroupName = 'rg-geolocation-${environmentUniqueId}-${parEnvironment}-${parLocation}'
-var varKeyVaultName = 'kv-${environmentUniqueId}-${parLocation}'
-var varAppInsightsName = 'ai-geolocation-${environmentUniqueId}-${parEnvironment}-${parLocation}'
+var varResourceGroupName = 'rg-geo-location-${parEnvironment}-${parLocation}-${parInstance}'
+var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
+var varAppInsightsName = 'ai-geo-location-${parEnvironment}-${parLocation}-${parInstance}'
 
 // Existing Out-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {

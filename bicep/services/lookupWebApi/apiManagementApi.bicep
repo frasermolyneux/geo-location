@@ -1,10 +1,11 @@
 targetScope = 'resourceGroup'
 
 // Parameters
+param parEnvironment string
+
 param parApiManagementName string
 param parFrontDoorDns string
 param parParentDnsName string
-param parEnvironment string
 param parWorkloadSubscriptionId string
 param parWorkloadResourceGroupName string
 param parKeyVaultName string
@@ -46,22 +47,22 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
 }
 
 resource apiActiveBackendNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
-  name: 'lookup-api-active-backend'
+  name: 'geo-location-active-backend'
   parent: apiManagement
 
   properties: {
-    displayName: 'lookup-api-active-backend'
+    displayName: 'geo-location-active-backend'
     value: apiBackend.name
     secret: false
   }
 }
 
 resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
-  name: 'lookup-api-audience'
+  name: 'geo-location-api-audience'
   parent: apiManagement
 
   properties: {
-    displayName: 'lookup-api-audience'
+    displayName: 'geo-location-api-audience'
     keyVault: {
       secretIdentifier: '${keyVault.properties.vaultUri}secrets/geolocation-lookup-api-${parEnvironment}-clientid'
     }
@@ -104,12 +105,12 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = 
 <policies>
   <inbound>
       <base/>
-      <set-backend-service backend-id="{{lookup-api-active-backend}}" />
+      <set-backend-service backend-id="{{geo-location-active-backend}}" />
       <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="none" />
       <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="JWT validation was unsuccessful" require-expiration-time="true" require-scheme="Bearer" require-signed-tokens="true">
           <openid-config url="{{tenant-login-url}}{{tenant-id}}/v2.0/.well-known/openid-configuration" />
           <audiences>
-              <audience>{{lookup-api-audience}}</audience>
+              <audience>{{geo-location-api-audience}}</audience>
           </audiences>
           <issuers>
               <issuer>https://sts.windows.net/{{tenant-id}}/</issuer>

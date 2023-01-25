@@ -30,18 +30,26 @@ jobs:
               azureSubscription: ${{ parameters.azureSubscription }}
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
               inlineScript: |
+                $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
+                $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+
                 az deployment sub validate `
                   --name 'geolocationPlatform${{ parameters.environmentName }}' `
                   --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
-                  --location 'uksouth' `
-                  --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json
+                  --location $config.parameters.parLocation.value `
+                  --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json `
+                      parPlatformKeyVaultCreateMode='recover' `
+                      parDeployPrincipalId=$deployPrincipalId
 
-                if ((az group exists --name 'rg-geolocation-${{ parameters.environmentTag }}-uksouth') -eq $true) { 
-                  Write-Host "Performing az deployment group validation as 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' exists"
+                $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
+                $existing = $keyVaults | where {$_ -match 'rg-geo-location-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)'}
+
+                if ($null -ne $existing) { 
                   az deployment group validate `
                     --name 'geolocationServices${{ parameters.environmentName }}' `
-                    --resource-group 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' `
+                    --resource-group 'rg-geo-location-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
                     --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environmentTag }}.json
                 }
@@ -52,18 +60,26 @@ jobs:
               azureSubscription: ${{ parameters.azureSubscription }}
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
               inlineScript: |
+                $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
+                $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+
                 az deployment sub what-if `
                   --name 'geolocationPlatform${{ parameters.environmentName }}' `
                   --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
-                  --location 'uksouth' `
-                  --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json
+                  --location $config.parameters.parLocation.value `
+                  --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json `
+                      parPlatformKeyVaultCreateMode='recover' `
+                      parDeployPrincipalId=$deployPrincipalId
 
-                if ((az group exists --name 'rg-geolocation-${{ parameters.environmentTag }}-uksouth') -eq $true) { 
-                  Write-Host "Performing az deployment group what-if as 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' exists"
+                $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
+                $existing = $keyVaults | where {$_ -match 'rg-geo-location-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)'}
+
+                if ($null -ne $existing) { 
                   az deployment group what-if `
                     --name 'geolocationServices${{ parameters.environmentName }}' `
-                    --resource-group 'rg-geolocation-${{ parameters.environmentTag }}-uksouth' `
+                    --resource-group 'rg-geo-location-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)' `
                     --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
                     --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environmentTag }}.json
                 }

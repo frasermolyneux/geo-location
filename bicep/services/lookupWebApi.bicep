@@ -1,8 +1,11 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-param parLocation string
 param parEnvironment string
+param parEnvironmentUniqueId string
+param parLocation string
+param parInstance string
+
 param parKeyVaultName string
 param parAppInsightsName string
 
@@ -23,8 +26,9 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var varDeploymentPrefix = 'lookupApi' //Prevent deployment naming conflicts
-var varWorkloadName = 'webapi-geolocation-lookup-${parEnvironment}'
+var varDeploymentPrefix = 'api-${parEnvironmentUniqueId}' //Prevent deployment naming conflicts
+
+var varWorkloadName = 'app-geo-location-api-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Module Resources
 module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
@@ -44,8 +48,11 @@ module webApp 'lookupWebApi/webApp.bicep' = {
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
-    parLocation: parLocation
     parEnvironment: parEnvironment
+    parEnvironmentUniqueId: parEnvironmentUniqueId
+    parLocation: parLocation
+    parInstance: parInstance
+
     parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
     parAppDataStorageAccountName: appDataStorage.outputs.outStorageAccountName

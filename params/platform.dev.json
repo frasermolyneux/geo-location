@@ -2,29 +2,32 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "parEnvironment": {
+            "value": "dev"
+        },
         "parLocation": {
             "value": "uksouth"
         },
-        "parEnvironment": {
-            "value": "dev"
+        "parInstance": {
+            "value": "01"
         },
         "parLoggingSubscriptionId": {
             "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parLoggingResourceGroupName": {
-            "value": "rg-platform-logging-3s6dbzxizuv4m-prd-uksouth"
+            "value": "rg-platform-logging-prd-uksouth-01"
         },
         "parLoggingWorkspaceName": {
-            "value": "log-platform-3s6dbzxizuv4m-prd-uksouth"
+            "value": "log-platform-prd-uksouth-01"
         },
         "parStrategicServicesSubscriptionId": {
             "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parApiManagementResourceGroupName": {
-            "value": "rg-platform-apim-22ll2pfvig6pg-dev-uksouth"
+            "value": "rg-platform-apim-dev-uksouth-01"
         },
         "parApiManagementName": {
-            "value": "apim-mx-platform-22ll2pfvig6pg-dev-uksouth"
+            "value": "apim-platform-dev-uksouth-amjx44uuirhb6"
         },
         "parTags": {
             "value": {

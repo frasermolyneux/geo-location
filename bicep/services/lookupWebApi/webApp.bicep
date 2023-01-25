@@ -1,8 +1,10 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-param parLocation string
 param parEnvironment string
+param parEnvironmentUniqueId string
+param parLocation string
+param parInstance string
 
 param parKeyVaultName string
 param parAppInsightsName string
@@ -16,7 +18,7 @@ param parWorkloadResourceGroupName string
 param parTags object
 
 // Variables
-var varWebAppName = 'webapi-geolocation-lookup-${parEnvironment}-${parLocation}'
+var varWebAppName = 'app-geo-location-api-${parEnvironment}-${parLocation}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Existing In-Scope Resources
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {

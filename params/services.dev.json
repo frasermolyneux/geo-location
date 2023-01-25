@@ -2,26 +2,29 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "parEnvironment": {
+            "value": "dev"
+        },
         "parLocation": {
             "value": "uksouth"
         },
-        "parEnvironment": {
-            "value": "dev"
+        "parInstance": {
+            "value": "01"
         },
         "parFrontDoorSubscriptionId": {
             "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parFrontDoorResourceGroupName": {
-            "value": "rg-platform-frontdoor-22ll2pfvig6pg-dev-uksouth"
+            "value": "rg-platform-frontdoor-dev-uksouth-01"
         },
         "parFrontDoorName": {
-            "value": "fd-platform-22ll2pfvig6pg-dev"
+            "value": "fd-platform-dev-pa2u36baumsfc"
         },
         "parDnsSubscriptionId": {
             "value": "db34f572-8b71-40d6-8f99-f29a27612144"
         },
         "parDnsResourceGroupName": {
-            "value": "rg-platform-dns-utftcdi77in3c-prd-uksouth"
+            "value": "rg-platform-dns-prd-uksouth-01"
         },
         "parPublicWebAppDnsPrefix": {
             "value": "dev"
@@ -33,16 +36,16 @@
             "value": "d68448b0-9947-46d7-8771-baa331a3063a"
         },
         "parApiManagementResourceGroupName": {
-            "value": "rg-platform-apim-22ll2pfvig6pg-dev-uksouth"
+            "value": "rg-platform-apim-dev-uksouth-01"
         },
         "parApiManagementName": {
-            "value": "apim-mx-platform-22ll2pfvig6pg-dev-uksouth"
+            "value": "apim-platform-dev-uksouth-amjx44uuirhb6"
         },
         "parWebAppsResourceGroupName": {
-            "value": "rg-platform-webapps-22ll2pfvig6pg-dev-uksouth"
+            "value": "rg-platform-plans-dev-uksouth-01"
         },
         "parAppServicePlanName": {
-            "value": "plan-platform-22ll2pfvig6pg-dev-uksouth-01"
+            "value": "plan-platform-dev-uksouth-01"
         },
         "parTags": {
             "value": {

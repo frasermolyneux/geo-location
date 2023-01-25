@@ -1,8 +1,9 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-param parLocation string
 param parEnvironment string
+param parLocation string
+param parInstance string
 
 param parFrontDoorSubscriptionId string
 param parFrontDoorResourceGroupName string
@@ -22,17 +23,20 @@ param parAppServicePlanName string
 param parTags object
 
 // Variables
-var environmentUniqueId = uniqueString('geolocation', parEnvironment)
-var varDeploymentPrefix = 'services-${environmentUniqueId}' //Prevent deployment naming conflicts
+var varEnvironmentUniqueId = uniqueString('geo-location', parEnvironment, parInstance)
+var varDeploymentPrefix = 'services-${varEnvironmentUniqueId}' //Prevent deployment naming conflicts
 
-var varKeyVaultName = 'kv-${environmentUniqueId}-${parLocation}'
-var varAppInsightsName = 'ai-geolocation-${environmentUniqueId}-${parEnvironment}-${parLocation}'
+var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
+var varAppInsightsName = 'ai-geo-location-${parEnvironment}-${parLocation}-${parInstance}'
 
 module lookupWebApi 'services/lookupWebApi.bicep' = {
   name: '${varDeploymentPrefix}-lookupWebApi'
   params: {
-    parLocation: parLocation
     parEnvironment: parEnvironment
+    parEnvironmentUniqueId: varEnvironmentUniqueId
+    parLocation: parLocation
+    parInstance: parInstance
+
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
     parFrontDoorSubscriptionId: parFrontDoorSubscriptionId
@@ -53,8 +57,11 @@ module lookupWebApi 'services/lookupWebApi.bicep' = {
 module publicWebApp 'services/publicWebApp.bicep' = {
   name: '${varDeploymentPrefix}-publicWebApp'
   params: {
-    parLocation: parLocation
     parEnvironment: parEnvironment
+    parEnvironmentUniqueId: varEnvironmentUniqueId
+    parLocation: parLocation
+    parInstance: parInstance
+
     parKeyVaultName: varKeyVaultName
     parAppInsightsName: varAppInsightsName
     parFrontDoorSubscriptionId: parFrontDoorSubscriptionId
