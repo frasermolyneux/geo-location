@@ -42,7 +42,7 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   properties: {}
 }
 
-module keyVault 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvault:latest' = {
+module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' = {
   name: '${varDeploymentPrefix}-keyVault'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -50,6 +50,8 @@ module keyVault 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvault:latest' =
     parLocation: parLocation
 
     parKeyVaultCreateMode: parKeyVaultCreateMode
+
+    parEnabledForRbacAuthorization: true
 
     parTags: parTags
   }
@@ -61,7 +63,7 @@ resource keyVaultSecretsOfficerRoleDefinition 'Microsoft.Authorization/roleDefin
   name: 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
 }
 
-module keyVaultSecretsOfficerRoleAssignmentDeploy 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+module keyVaultSecretsOfficerRoleAssignmentDeploy 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
   name: '${varDeploymentPrefix}-kvSecretsOfficerRoleAssignmentDeploy'
   scope: resourceGroup(defaultResourceGroup.name)
 
@@ -78,7 +80,7 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-module keyVaultSecretUserRoleAssignmentApim 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+module keyVaultSecretUserRoleAssignmentApim 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
   name: '${varDeploymentPrefix}-kvSecretUserRoleAssignmentApim'
   scope: resourceGroup(defaultResourceGroup.name)
 
@@ -89,7 +91,7 @@ module keyVaultSecretUserRoleAssignmentApim 'br:acr4xhbmv4lmxxbs.azurecr.io/bice
   }
 }
 
-module appInsights 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/appinsights:latest' = {
+module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:latest' = {
   name: '${varDeploymentPrefix}-appInsights'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
@@ -103,7 +105,7 @@ module appInsights 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/appinsights:lat
   }
 }
 
-module apiManagementLogger 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
+module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
   name: '${varDeploymentPrefix}-apiManagementLogger'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
