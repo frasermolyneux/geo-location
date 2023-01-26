@@ -40,7 +40,7 @@ jobs:
                   --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json `
-                      parPlatformKeyVaultCreateMode='recover' `
+                      parKeyVaultCreateMode='recover' `
                       parDeployPrincipalId=$deployPrincipalId
 
                 $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
@@ -70,7 +70,7 @@ jobs:
                   --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
                   --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json `
-                      parPlatformKeyVaultCreateMode='recover' `
+                      parKeyVaultCreateMode='recover' `
                       parDeployPrincipalId=$deployPrincipalId
 
                 $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
