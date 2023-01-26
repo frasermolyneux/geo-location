@@ -62,7 +62,7 @@ resource keyVaultSecretsOfficerRoleDefinition 'Microsoft.Authorization/roleDefin
 }
 
 module keyVaultSecretsOfficerRoleAssignmentDeploy 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${varDeploymentPrefix}-keyVaultSecretsOfficerRoleAssignmentDeploy'
+  name: '${varDeploymentPrefix}-kvSecretsOfficerRoleAssignmentDeploy'
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
@@ -79,7 +79,7 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 module keyVaultSecretUserRoleAssignmentApim 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${varDeploymentPrefix}-keyVaultSecretUserRoleAssignmentApim'
+  name: '${varDeploymentPrefix}-kvSecretUserRoleAssignmentApim'
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
