@@ -114,4 +114,8 @@ module apiManagementLogger 'br:acr4xhbmv4lmxxbs.azurecr.io/bicep/modules/apimana
     parAppInsightsName: appInsights.outputs.outAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName
   }
+
+  dependsOn: [
+    keyVaultSecretUserRoleAssignmentApim
+  ]
 }
