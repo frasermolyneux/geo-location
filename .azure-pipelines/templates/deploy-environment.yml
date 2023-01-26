@@ -38,7 +38,7 @@ stages:
                 scriptLocation: 'inlineScript'
                 addSpnToEnvironment: true
                 inlineScript: |
-                  $config = (Get-Content $(Build.sourcesDirectory)/params/platformKeyVault.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+                  $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
 
                   $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
                   $isDeleted = $deletedKeyVaults | where {$_ -match 'rg-platform-vault-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)'}
@@ -54,7 +54,7 @@ stages:
                   az deployment sub create `
                     --name 'geolocationPlatform${{ parameters.environmentName }}' `
                     --template-file bicep/platform.bicep `
-                    --location 'uksouth' `
+                    --location $config.parameters.parLocation.value `
                     --parameters @params/platform.${{ parameters.environmentTag }}.json `
                       parPlatformKeyVaultCreateMode=$keyVaultCreateMode `
                       parDeployPrincipalId=$deployPrincipalId
