@@ -121,3 +121,6 @@ module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimana
     keyVaultSecretUserRoleAssignmentApim
   ]
 }
+
+// Outputs
+output keyVaultName string = keyVault.outputs.outKeyVaultName
