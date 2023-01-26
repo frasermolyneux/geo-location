@@ -71,7 +71,7 @@ stages:
         inputs:
           azureSubscription: ${{ parameters.azureSubscription }}
           scriptType: 'pscore'
-          arguments: '"${{ parameters.environmentTag }}"'
+          scriptLocation: 'inlineScript'
           inlineScript: |
             $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
 
@@ -84,6 +84,7 @@ stages:
         inputs:
           azureSubscription: ${{ parameters.azureSubscription }}
           scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
           inlineScript: |
             $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
 
