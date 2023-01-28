@@ -64,7 +64,7 @@ resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021
   properties: {
     displayName: 'geolocation-api-audience'
     keyVault: {
-      secretIdentifier: '${keyVault.properties.vaultUri}secrets/geolocation-lookup-api-${parEnvironment}-clientid'
+      secretIdentifier: '${keyVault.properties.vaultUri}secrets/geolocation-api-${parEnvironment}-clientid'
     }
     secret: true
   }

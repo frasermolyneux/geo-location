@@ -5,10 +5,9 @@ parameters:
   type: string
 
 stages:
-- stage: RunUITestsAgainst${{ parameters.environmentName }}
+- stage: run_ui_tests_against_${{ parameters.environmentName }}
   jobs:
-  - job: RunUITests
-    displayName: 'Run UI Tests'
+  - job: run_ui_tests
 
     workspace:
       clean: all

@@ -11,9 +11,9 @@ parameters:
   type: string
 
 stages:
-- stage: Deploy${{ parameters.environmentName }}
+- stage: deploy_${{ parameters.environmentName }}
   jobs:
-  - deployment: Deploy${{ parameters.environmentName }}PlatformBicep
+  - deployment: deploy_${{ parameters.environmentName }}_platform_bicep
     environment: ${{ parameters.environment }}
 
     workspace:
@@ -26,7 +26,7 @@ stages:
             - checkout: self
 
             - task: AzureCLI@2
-              displayName: Deploy${{ parameters.environmentName }}PlatformBicep
+              displayName: deploy_${{ parameters.environmentName }}_platform_bicep
               inputs:
                 azureSubscription: ${{ parameters.azureSubscription }}
                 scriptType: 'pscore'
@@ -54,8 +54,8 @@ stages:
                       parKeyVaultCreateMode=$keyVaultCreateMode `
                       parDeployPrincipalId=$deployPrincipalId
 
-  - job: Deploy${{ parameters.environmentName }}PlatformPermissions
-    dependsOn: ['Deploy${{ parameters.environmentName }}PlatformBicep']
+  - job: deploy_${{ parameters.environmentName }}_platform_permissions
+    dependsOn: ['deploy_${{ parameters.environmentName }}_platform_bicep']
 
     workspace:
       clean: all
@@ -91,8 +91,8 @@ stages:
               -secretPrefix "geolocation-api-${{ parameters.environmentName }}" `
               -secretDisplayName 'publicwebapp'
 
-  - deployment: Deploy${{ parameters.environmentName }}ServicesBicep
-    dependsOn: ['Deploy${{ parameters.environmentName }}PlatformPermissions']
+  - deployment: deploy_${{ parameters.environmentName }}_services_bicep
+    dependsOn: ['deploy_${{ parameters.environmentName }}_platform_permissions']
     environment: ${{ parameters.environment }}
 
     workspace:
@@ -105,7 +105,7 @@ stages:
             - checkout: self
 
             - task: AzureCLI@2
-              displayName: Deploy${{ parameters.environmentName }}ServicesBicep
+              displayName: deploy_${{ parameters.environmentName }}_services_bicep
               inputs:
                 azureSubscription: ${{ parameters.azureSubscription }}
                 scriptType: 'pscore'
@@ -121,7 +121,7 @@ stages:
                     --parameters @params/services.${{ parameters.environmentName }}.json
 
   - job: post_bicep_deploy_${{ parameters.environmentName }}
-    dependsOn: ['Deploy${{ parameters.environmentName }}ServicesBicep']
+    dependsOn: ['deploy_${{ parameters.environmentName }}_services_bicep']
 
     workspace:
       clean: all
@@ -171,7 +171,7 @@ stages:
       dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
       environment: ${{ parameters.webAppsEnvironment }}
       projectName: lookup-webapi
-      jobName: DeployLookupWebApi
+      jobName: deploy_lookup_webapi
       webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
       webAppNameResourceGroup: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
       subscription: ${{ parameters.webAppsAzureSubscription }}
@@ -181,7 +181,7 @@ stages:
       dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
       environment: ${{ parameters.webAppsEnvironment }}
       projectName: public-webapp
-      jobName: DeployPublicWebApp
+      jobName: deploy_public_webapp
       webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
       webAppNameResourceGroup: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
       subscription: ${{ parameters.webAppsAzureSubscription }}
