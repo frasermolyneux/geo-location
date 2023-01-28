@@ -5,32 +5,27 @@ param parEnvironment string
 param parLocation string
 param parInstance string
 
-param parLoggingSubscriptionId string
-param parLoggingResourceGroupName string
-param parLoggingWorkspaceName string
-
-param parStrategicServicesSubscriptionId string
-param parApiManagementResourceGroupName string
-param parApiManagementName string
-
-param parKeyVaultCreateMode string = 'recover'
-
-param parDeployPrincipalId string
+param parLogging object
+param parStrategicServices object
 
 param parTags object
 
+// Dynamic params from pipeline invocation
+param parKeyVaultCreateMode string = 'recover'
+param parDeployPrincipalId string
+
 // Variables
-var varEnvironmentUniqueId = uniqueString('geo-location', parEnvironment, parInstance)
+var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
 var varDeploymentPrefix = 'platform-${varEnvironmentUniqueId}' //Prevent deployment naming conflicts
 
-var varResourceGroupName = 'rg-geo-location-${parEnvironment}-${parLocation}-${parInstance}'
+var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
-var varAppInsightsName = 'ai-geo-location-${parEnvironment}-${parLocation}-${parInstance}'
+var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 
 // Existing Out-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
-  name: parApiManagementName
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
+  name: parStrategicServices.ApiManagementName
+  scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)
 }
 
 // Module Resources
@@ -98,19 +93,19 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
     parAppInsightsName: varAppInsightsName
     parKeyVaultName: keyVault.outputs.outKeyVaultName
     parLocation: parLocation
-    parLoggingSubscriptionId: parLoggingSubscriptionId
-    parLoggingResourceGroupName: parLoggingResourceGroupName
-    parLoggingWorkspaceName: parLoggingWorkspaceName
+    parLoggingSubscriptionId: parLogging.SubscriptionId
+    parLoggingResourceGroupName: parLogging.WorkspaceResourceGroupName
+    parLoggingWorkspaceName: parLogging.WorkspaceName
     parTags: parTags
   }
 }
 
 module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
   name: '${varDeploymentPrefix}-apiManagementLogger'
-  scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
+  scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)
 
   params: {
-    parApiManagementName: parApiManagementName
+    parApiManagementName: parStrategicServices.ApiManagementName
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: defaultResourceGroup.name
     parAppInsightsName: appInsights.outputs.outAppInsightsName

@@ -89,16 +89,14 @@ stages:
       dependsOn: [BicepLinter]
       azureSubscription: 'spn-geo-location-development'
       environment: geo-location-Development
-      environmentName: 'Dev'
-      environmentTag: 'dev'
+      environmentName: 'dev'
 
   - template: templates/bicep-environment-validation.yml
     parameters:
       dependsOn: [BicepLinter]
       azureSubscription: 'spn-geo-location-production'
       environment: geo-location-Production
-      environmentName: 'Prd'
-      environmentTag: 'prd'
+      environmentName: 'prd'
 
 - stage: PushNuGetPackages
   jobs:
@@ -110,8 +108,7 @@ stages:
   parameters:
     azureSubscription: 'spn-geo-location-development'
     environment: geo-location-Development
-    environmentName: 'Dev'
-    environmentTag: 'dev'
+    environmentName: 'dev'
     webAppsAzureSubscription: 'spn-geo-location-development'
     webAppsEnvironment: 'platform-webapps-dev-uksouth'
     webAppsResourceGroup: 'rg-platform-webapps-dev-uksouth'

@@ -28,7 +28,7 @@ param parTags object
 // Variables
 var varDeploymentPrefix = 'api-${parEnvironmentUniqueId}' //Prevent deployment naming conflicts
 
-var varWorkloadName = 'app-geo-location-api-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
+var varWorkloadName = 'app-geolocation-api-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Module Resources
 module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {

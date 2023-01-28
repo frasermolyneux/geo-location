@@ -29,7 +29,7 @@ param parTags object
 // Variables
 var varDeploymentPrefix = 'web-${parEnvironmentUniqueId}' //Prevent deployment naming conflicts
 
-var varWorkloadName = 'app-geo-location-web-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
+var varWorkloadName = 'app-geolocation-web-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Existing In-Scope Resources
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
@@ -146,3 +146,6 @@ resource webTest 'Microsoft.Insights/webtests@2022-06-15' = {
     }
   }
 }
+
+// Outputs
+output outWebAppIdentityPrincipalId string = webApp.outputs.outWebAppIdentityPrincipalId

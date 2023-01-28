@@ -47,22 +47,22 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
 }
 
 resource apiActiveBackendNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
-  name: 'geo-location-active-backend'
+  name: 'geolocation-active-backend'
   parent: apiManagement
 
   properties: {
-    displayName: 'geo-location-active-backend'
+    displayName: 'geolocation-active-backend'
     value: apiBackend.name
     secret: false
   }
 }
 
 resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
-  name: 'geo-location-api-audience'
+  name: 'geolocation-api-audience'
   parent: apiManagement
 
   properties: {
-    displayName: 'geo-location-api-audience'
+    displayName: 'geolocation-api-audience'
     keyVault: {
       secretIdentifier: '${keyVault.properties.vaultUri}secrets/geolocation-lookup-api-${parEnvironment}-clientid'
     }
@@ -105,12 +105,12 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = 
 <policies>
   <inbound>
       <base/>
-      <set-backend-service backend-id="{{geo-location-active-backend}}" />
+      <set-backend-service backend-id="{{geolocation-active-backend}}" />
       <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="none" />
       <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="JWT validation was unsuccessful" require-expiration-time="true" require-scheme="Bearer" require-signed-tokens="true">
           <openid-config url="{{tenant-login-url}}{{tenant-id}}/v2.0/.well-known/openid-configuration" />
           <audiences>
-              <audience>{{geo-location-api-audience}}</audience>
+              <audience>{{geolocation-api-audience}}</audience>
           </audiences>
           <issuers>
               <issuer>https://sts.windows.net/{{tenant-id}}/</issuer>

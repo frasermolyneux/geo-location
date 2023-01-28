@@ -36,7 +36,4 @@ stages:
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                az monitor app-insights web-test delete --resource-group rg-geolocation-dev-uksouth --name publicWebApp-webTest
-
-                az webapp delete --name webapi-geolocation-lookup-dev-uksouth --resource-group rg-platform-webapps-dev-uksouth --keep-empty-plan
-                az webapp delete --name webapp-geolocation-public-dev-uksouth --resource-group rg-platform-webapps-dev-uksouth --keep-empty-plan
+                Write-Host "TODO"

@@ -5,8 +5,6 @@ parameters:
   type: string
 - name: environmentName
   type: string
-- name: environmentTag
-  type: string
 - name: webAppsAzureSubscription
   type: string
 - name: webAppsEnvironment
@@ -38,10 +36,10 @@ stages:
                 scriptLocation: 'inlineScript'
                 addSpnToEnvironment: true
                 inlineScript: |
-                  $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+                  $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
-                  $isDeleted = $deletedKeyVaults | where {$_ -match "rg-platform-vault-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
+                  $isDeleted = $deletedKeyVaults | where {$_ -match "rg-platform-vault-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
 
                   $keyVaultCreateMode = "default"
                   if ($isDeleted -ne $null) {
@@ -52,10 +50,10 @@ stages:
                   $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
 
                   az deployment sub create `
-                    --name 'geolocationPlatform${{ parameters.environmentName }}' `
+                    --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
                     --template-file bicep/platform.bicep `
                     --location $config.parameters.parLocation.value `
-                    --parameters @params/platform.${{ parameters.environmentTag }}.json `
+                    --parameters @params/platform.${{ parameters.environmentName }}.json `
                       parKeyVaultCreateMode=$keyVaultCreateMode `
                       parDeployPrincipalId=$deployPrincipalId
 
@@ -73,10 +71,10 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+            $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-            . "./.azure-pipelines/scripts/functions/CreateAppRegistration.ps1" `
-                -applicationName "geolocation-api-${{ parameters.environmentTag }}-$($config.parameters.parInstance.value)" `
+            . "./scripts/CreateAppRegistration.ps1" `
+                -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
                 -appRoles "lookup-api-approles.json"
 
       - task: AzureCLI@2
@@ -86,14 +84,14 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+            $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-            $keyVaultName = az deployment sub show --name geolocationPlatform${{ parameters.environmentName }} --query properties.outputs.keyVaultName.value
+            $keyVaultName = az deployment sub show --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.keyVaultName.value
 
-            . "./.azure-pipelines/scripts/functions/CreateAppRegistrationCredential.ps1" `
+            . "./scripts/CreateAppRegistrationCredential.ps1" `
               -keyVaultName $keyVaultName `
-              -applicationName "geolocation-api-${{ parameters.environmentTag }}-$($config.parameters.parInstance.value)" `
-              -secretPrefix "geolocation-api-${{ parameters.environmentTag }}" `
+              -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
+              -secretPrefix "geolocation-api-${{ parameters.environmentName }}" `
               -secretDisplayName 'publicwebapp'
 
   - deployment: Deploy${{ parameters.environmentName }}ServicesBicep
@@ -117,13 +115,13 @@ stages:
                 scriptLocation: 'inlineScript'
                 addSpnToEnvironment: true
                 inlineScript: |
-                  $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentTag }}.json | ConvertFrom-Json)
+                  $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   az deployment group create `
-                    --name 'geolocationServices${{ parameters.environmentName }}' `
-                    --resource-group "rg-geo-location-${{ parameters.environmentTag }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
+                    --name "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
+                    --resource-group "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
                     --template-file bicep/services.bicep `
-                    --parameters @params/services.${{ parameters.environmentTag }}.json
+                    --parameters @params/services.${{ parameters.environmentName }}.json
 
   - job: Deploy${{ parameters.environmentName }}ServicesPermissions
     dependsOn: ['Deploy${{ parameters.environmentName }}ServicesBicep']
@@ -137,9 +135,21 @@ stages:
         inputs:
           azureSubscription: ${{ parameters.webAppsAzureSubscription }}
           scriptType: 'pscore'
-          scriptLocation: 'scriptPath'
-          arguments: '"${{ parameters.environmentTag }}" "uksouth"'
-          scriptPath: '$(Build.sourcesDirectory)/.azure-pipelines/scripts/SetPublicWebAppPermissions.ps1'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+            $apiName = "geolocation-api-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)"
+            $apiId = (az ad app list --filter "displayName eq '$apiName'" --query '[].appId') | ConvertFrom-Json
+            $resourceId = (az ad sp list --filter "appId eq '$apiId'" --query '[0].id') | ConvertFrom-Json
+            $apiSpn = (az rest -m GET -u https://graph.microsoft.com/v1.0/servicePrincipals/$resourceId) | ConvertFrom-Json
+            $appRoleId = ($apiSpn.appRoles | Where-Object { $_.displayName -eq "LookupApiUser" }).id
+
+            $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
+              --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
+
+            $principalId = $deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value
+            . "./scripts/GrantPrincipalAppRole.ps1" -principalId $principalId -resourceId $resourceId -appRoleId $appRoleId
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
@@ -147,7 +157,7 @@ stages:
       environment: ${{ parameters.webAppsEnvironment }}
       projectName: lookup-webapi
       jobName: DeployLookupWebApi
-      webAppName: 'webapi-geolocation-lookup-${{ parameters.environmentTag }}-uksouth'
+      webAppName: 'webapi-geolocation-lookup-${{ parameters.environmentName }}-uksouth'
       webAppNameResourceGroup: ${{ parameters.webAppsResourceGroup }}
       subscription: ${{ parameters.webAppsAzureSubscription }}
 
@@ -157,6 +167,6 @@ stages:
       environment: ${{ parameters.webAppsEnvironment }}
       projectName: public-webapp
       jobName: DeployPublicWebApp
-      webAppName: 'webapp-geolocation-public-${{ parameters.environmentTag }}-uksouth'
+      webAppName: 'webapp-geolocation-public-${{ parameters.environmentName }}-uksouth'
       webAppNameResourceGroup: ${{ parameters.webAppsResourceGroup }}
       subscription: ${{ parameters.webAppsAzureSubscription }}

@@ -17,7 +17,7 @@ param parWorkloadResourceGroupName string
 param parTags object
 
 // Variables
-var varWebAppName = 'app-geo-location-web-${parEnvironment}-${parLocation}-${parInstance}-${parEnvironmentUniqueId}'
+var varWebAppName = 'app-geolocation-web-${parEnvironment}-${parLocation}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Existing In-Scope Resources
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
