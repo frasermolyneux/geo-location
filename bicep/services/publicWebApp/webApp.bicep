@@ -95,7 +95,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'geolocation_api_application_audience'
-          value: 'api://geolocation-lookup-api-${parEnvironment}'
+          value: 'api://geolocation-api-${parEnvironment}-${parInstance}'
         }
       ]
     }
