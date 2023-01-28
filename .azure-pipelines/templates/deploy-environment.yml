@@ -162,22 +162,37 @@ stages:
             $principalId = $deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value
             . "./scripts/GrantPrincipalAppRole.ps1" -principalId $principalId -resourceId $resourceId -appRoleId $appRoleId
 
-  - template: jobs/deploy-web-app.yml@ado-pipeline-templates
-    parameters:
-      dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
-      environment: ${{ parameters.webAppsEnvironment }}
-      projectName: lookup-webapi
-      jobName: deploy_lookup_webapi
-      webAppName: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] }}
-      webAppNameResourceGroup: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] }}
-      subscription: ${{ parameters.webAppsAzureSubscription }}
+  - deployment: deploy_app_services
+    dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
+    environment: ${{ parameters.webAppsEnvironment }}
 
-  - template: jobs/deploy-web-app.yml@ado-pipeline-templates
-    parameters:
-      dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
-      environment: ${{ parameters.webAppsEnvironment }}
-      projectName: public-webapp
-      jobName: deploy_public_webapp
-      webAppName: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] }}
-      webAppNameResourceGroup: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] }}
-      subscription: ${{ parameters.webAppsAzureSubscription }}
+    workspace:
+      clean: all
+
+    strategy:
+      runOnce:
+        deploy:
+          steps: 
+            - checkout: self
+            
+            - download: current
+              artifact: lookup-webapi
+
+            - download: current
+              artifact: public-webapp
+
+            - task: AzureRmWebAppDeployment@4
+              retryCountOnTaskFailure: 3
+              inputs:
+                azureSubscription:  ${{ parameters.webAppsAzureSubscription }}
+                webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
+                resourceGroupName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+                packageForLinux: '$(Pipeline.Workspace)/lookup-webapi/lookup-webapi.zip'
+
+            - task: AzureRmWebAppDeployment@4
+              retryCountOnTaskFailure: 3
+              inputs:
+                azureSubscription:  ${{ parameters.webAppsAzureSubscription }}
+                webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
+                resourceGroupName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+                packageForLinux: '$(Pipeline.Workspace)/public-webapp/public-webapp.zip'
