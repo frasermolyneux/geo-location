@@ -31,7 +31,6 @@ stages:
                 azureSubscription: ${{ parameters.azureSubscription }}
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
-                addSpnToEnvironment: true
                 inlineScript: |
                   $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
@@ -44,15 +43,12 @@ stages:
                     $keyVaultCreateMode = "recover"
                   }
 
-                  $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
-
                   az deployment sub create `
                     --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
                     --template-file bicep/platform.bicep `
                     --location $config.parameters.parLocation.value `
                     --parameters @params/platform.${{ parameters.environmentName }}.json `
-                      parKeyVaultCreateMode=$keyVaultCreateMode `
-                      parDeployPrincipalId=$deployPrincipalId
+                      parKeyVaultCreateMode=$keyVaultCreateMode
 
   - job: deploy_${{ parameters.environmentName }}_platform_permissions
     dependsOn: ['deploy_${{ parameters.environmentName }}_platform_bicep']
@@ -172,8 +168,8 @@ stages:
       environment: ${{ parameters.webAppsEnvironment }}
       projectName: lookup-webapi
       jobName: deploy_lookup_webapi
-      webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
-      webAppNameResourceGroup: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+      webAppName: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] }}
+      webAppNameResourceGroup: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] }}
       subscription: ${{ parameters.webAppsAzureSubscription }}
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
@@ -182,6 +178,6 @@ stages:
       environment: ${{ parameters.webAppsEnvironment }}
       projectName: public-webapp
       jobName: deploy_public_webapp
-      webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
-      webAppNameResourceGroup: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+      webAppName: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] }}
+      webAppNameResourceGroup: ${{ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] }}
       subscription: ${{ parameters.webAppsAzureSubscription }}

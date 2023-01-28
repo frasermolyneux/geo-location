@@ -29,9 +29,7 @@ jobs:
               azureSubscription: ${{ parameters.azureSubscription }}
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
-              addSpnToEnvironment: true
               inlineScript: |
-                $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
                 $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                 az deployment sub validate `
@@ -39,8 +37,7 @@ jobs:
                   --template-file ./bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
                   --parameters ./params/platform.${{ parameters.environmentName }}.json `
-                      parKeyVaultCreateMode='recover' `
-                      parDeployPrincipalId=$deployPrincipalId
+                      parKeyVaultCreateMode='recover'
 
                 $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
                 $existing = $keyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
@@ -59,9 +56,7 @@ jobs:
               azureSubscription: ${{ parameters.azureSubscription }}
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
-              addSpnToEnvironment: true
               inlineScript: |
-                $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
                 $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                 az deployment sub what-if `
@@ -69,8 +64,7 @@ jobs:
                   --template-file ./bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
                   --parameters @params/platform.${{ parameters.environmentName }}.json `
-                      parKeyVaultCreateMode='recover' `
-                      parDeployPrincipalId=$deployPrincipalId
+                      parKeyVaultCreateMode='recover'
 
                 $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
                 $existing = $keyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}

@@ -12,7 +12,6 @@ param parTags object
 
 // Dynamic params from pipeline invocation
 param parKeyVaultCreateMode string = 'recover'
-param parDeployPrincipalId string
 
 // Variables
 var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
@@ -49,23 +48,6 @@ module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' =
     parEnabledForRbacAuthorization: true
 
     parTags: parTags
-  }
-}
-
-@description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-officer')
-resource keyVaultSecretsOfficerRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: subscription()
-  name: 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
-}
-
-module keyVaultSecretsOfficerRoleAssignmentDeploy 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${varDeploymentPrefix}-kvSecretsOfficerRoleAssignmentDeploy'
-  scope: resourceGroup(defaultResourceGroup.name)
-
-  params: {
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
-    parRoleDefinitionId: keyVaultSecretsOfficerRoleDefinition.id
-    parPrincipalId: parDeployPrincipalId
   }
 }
 
