@@ -3,13 +3,12 @@ targetScope = 'resourceGroup'
 // Parameters
 param parDeploymentPrefix string
 param parLocation string
-param parEnvironment string
 param parKeyVaultName string
 param parTags object
 
 // Module Resources
 resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
-  name: 'salkupappdata${parEnvironment}'
+  name: 'saad${uniqueString(resourceGroup().name)}'
   location: parLocation
   kind: 'StorageV2'
   tags: parTags

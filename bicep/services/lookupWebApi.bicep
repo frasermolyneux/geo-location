@@ -37,7 +37,6 @@ module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
   params: {
     parDeploymentPrefix: varDeploymentPrefix
     parLocation: parLocation
-    parEnvironment: parEnvironment
     parKeyVaultName: parKeyVaultName
     parTags: parTags
   }

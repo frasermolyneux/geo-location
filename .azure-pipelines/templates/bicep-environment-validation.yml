@@ -10,7 +10,7 @@ parameters:
   type: string
 
 jobs:
-- deployment: ValidateBicepAgainst${{ parameters.environmentName }}Environment
+- deployment: validate_bicep_against_${{ parameters.environmentName }}_environment
   dependsOn: ${{ parameters.dependsOn }}
   environment: ${{ parameters.environment }}
 
@@ -32,13 +32,13 @@ jobs:
               addSpnToEnvironment: true
               inlineScript: |
                 $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
-                $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                 az deployment sub validate `
                   --name 'geolocationPlatform${{ parameters.environmentName }}' `
-                  --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
+                  --template-file ./bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
-                  --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentName }}.json `
+                  --parameters ./params/platform.${{ parameters.environmentName }}.json `
                       parKeyVaultCreateMode='recover' `
                       parDeployPrincipalId=$deployPrincipalId
 
@@ -49,8 +49,8 @@ jobs:
                   az deployment group validate `
                     --name 'geolocationServices${{ parameters.environmentName }}' `
                     --resource-group "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
-                    --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
-                    --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environmentName }}.json
+                    --template-file ./bicep/services.bicep `
+                    --parameters @./params/services.${{ parameters.environmentName }}.json
                 }
 
           - task: AzureCLI@2
@@ -62,13 +62,13 @@ jobs:
               addSpnToEnvironment: true
               inlineScript: |
                 $deployPrincipalId = (az ad sp show --id $env:servicePrincipalId | ConvertFrom-Json).id
-                $config = (Get-Content $(Build.sourcesDirectory)/params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                 az deployment sub what-if `
                   --name 'geolocationPlatform${{ parameters.environmentName }}' `
-                  --template-file $(Build.sourcesDirectory)/bicep/platform.bicep `
+                  --template-file ./bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
-                  --parameters @$(Build.sourcesDirectory)/params/platform.${{ parameters.environmentName }}.json `
+                  --parameters @./params/platform.${{ parameters.environmentName }}.json `
                       parKeyVaultCreateMode='recover' `
                       parDeployPrincipalId=$deployPrincipalId
 
@@ -79,6 +79,6 @@ jobs:
                   az deployment group what-if `
                     --name 'geolocationServices${{ parameters.environmentName }}' `
                     --resource-group "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
-                    --template-file $(Build.sourcesDirectory)/bicep/services.bicep `
-                    --parameters @$(Build.sourcesDirectory)/params/services.${{ parameters.environmentName }}.json
+                    --template-file ./bicep/services.bicep `
+                    --parameters ./params/services.${{ parameters.environmentName }}.json
                 }

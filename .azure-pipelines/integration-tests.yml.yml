@@ -22,5 +22,5 @@ variables:
 stages: 
 - template: templates/execute-ui-tests.yml
   parameters:
-    environmentName: 'Dev'
+    environmentName: 'dev'
     siteUrl: 'https://dev.geo-location.net'

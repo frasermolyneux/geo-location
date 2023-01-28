@@ -22,7 +22,7 @@ variables:
     nugetPackageVersion: "1.0.$(Build.BuildNumber)-preview"
 
 stages: 
-- stage: Build
+- stage: build
   jobs:
 
   #- template: jobs/dependency-check.yml@ado-pipeline-templates
@@ -79,19 +79,19 @@ stages:
 
   - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
     parameters: 
-      jobName: 'BicepLinter'
+      jobName: 'bicep_linter'
       azureSubscription: 'spn-geo-location-development'
 
   - template: templates/bicep-environment-validation.yml
     parameters:
-      dependsOn: [BicepLinter]
+      dependsOn: [bicep_linter]
       azureSubscription: 'spn-geo-location-development'
       environment: geo-location-Development
       environmentName: 'dev'
 
   - template: templates/bicep-environment-validation.yml
     parameters:
-      dependsOn: [BicepLinter]
+      dependsOn: [bicep_linter]
       azureSubscription: 'spn-geo-location-production'
       environment: geo-location-Production
       environmentName: 'prd'
@@ -107,5 +107,5 @@ stages:
 
 - template: templates/execute-ui-tests.yml
   parameters:
-    environmentName: 'Dev'
+    environmentName: 'dev'
     siteUrl: 'https://dev.geo-location.net'
