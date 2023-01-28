@@ -149,3 +149,4 @@ resource webTest 'Microsoft.Insights/webtests@2022-06-15' = {
 
 // Outputs
 output outWebAppIdentityPrincipalId string = webApp.outputs.outWebAppIdentityPrincipalId
+output outWebAppName string = webApp.outputs.outWebAppName

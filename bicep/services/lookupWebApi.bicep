@@ -104,3 +104,6 @@ module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoor
     parTags: parTags
   }
 }
+
+// Outputs
+output outWebAppName string = webApp.outputs.outWebAppName

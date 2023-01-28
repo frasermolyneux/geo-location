@@ -110,8 +110,6 @@ stages:
     environment: geo-location-Development
     environmentName: 'dev'
     webAppsAzureSubscription: 'spn-geo-location-development'
-    webAppsEnvironment: 'platform-webapps-dev-uksouth'
-    webAppsResourceGroup: 'rg-platform-webapps-dev-uksouth'
 
 - template: templates/execute-ui-tests.yml
   parameters:

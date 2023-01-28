@@ -71,3 +71,5 @@ module publicWebApp 'services/publicWebApp.bicep' = {
 
 // Outputs
 output outWebAppIdentityPrincipalId string = publicWebApp.outputs.outWebAppIdentityPrincipalId
+output outWebAppName string = publicWebApp.outputs.outWebAppName
+output outWebApiName string = lookupWebApi.outputs.outWebAppName

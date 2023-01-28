@@ -9,9 +9,6 @@ parameters:
   type: string
 - name: webAppsEnvironment
   type: string
-- name: webAppsResourceGroup
-  type: string
-
 
 stages:
 - stage: Deploy${{ parameters.environmentName }}
@@ -115,7 +112,7 @@ stages:
                 scriptLocation: 'inlineScript'
                 addSpnToEnvironment: true
                 inlineScript: |
-                  $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                  $config = (Get-Content ./params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   az deployment group create `
                     --name "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
@@ -123,7 +120,7 @@ stages:
                     --template-file bicep/services.bicep `
                     --parameters @params/services.${{ parameters.environmentName }}.json
 
-  - job: Deploy${{ parameters.environmentName }}ServicesPermissions
+  - job: post_bicep_deploy_${{ parameters.environmentName }}
     dependsOn: ['Deploy${{ parameters.environmentName }}ServicesBicep']
 
     workspace:
@@ -131,13 +128,31 @@ stages:
 
     steps:
       - task: AzureCLI@2
+        name: deploy_outputs
+        inputs:
+          azureSubscription: ${{ parameters.webAppsAzureSubscription }}
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            $config = (Get-Content ./params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+            $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
+              --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
+
+            echo "##vso[task.setvariable variable=webAppIdentityPrincipalId;isOutput=true]$($deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value)"
+            echo "##vso[task.setvariable variable=webAppName;isOutput=true]$($deploymentOutput.properties.outputs.outWebAppName.value)"
+            echo "##vso[task.setvariable variable=webApiName;isOutput=true]$($deploymentOutput.properties.outputs.outWebApiName.value)"
+
+            echo "##vso[task.setvariable variable=webAppsResourceGroupName;isOutput=true]$($config.parameters.parStrategicServices.value.WebAppsResourceGroupName)"
+
+      - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
         inputs:
           azureSubscription: ${{ parameters.webAppsAzureSubscription }}
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+            $config = (Get-Content ./params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
             $apiName = "geolocation-api-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)"
             $apiId = (az ad app list --filter "displayName eq '$apiName'" --query '[].appId') | ConvertFrom-Json
@@ -153,20 +168,20 @@ stages:
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
-      dependsOn: ['Deploy${{ parameters.environmentName }}ServicesPermissions']
-      environment: ${{ parameters.webAppsEnvironment }}
+      dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
+      environment: ${{ parameters.environment }}
       projectName: lookup-webapi
       jobName: DeployLookupWebApi
-      webAppName: 'webapi-geolocation-lookup-${{ parameters.environmentName }}-uksouth'
-      webAppNameResourceGroup: ${{ parameters.webAppsResourceGroup }}
+      webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
+      webAppNameResourceGroup: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
       subscription: ${{ parameters.webAppsAzureSubscription }}
 
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
-      dependsOn: ['Deploy${{ parameters.environmentName }}ServicesPermissions']
-      environment: ${{ parameters.webAppsEnvironment }}
+      dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
+      environment: ${{ parameters.environment }}
       projectName: public-webapp
       jobName: DeployPublicWebApp
-      webAppName: 'webapp-geolocation-public-${{ parameters.environmentName }}-uksouth'
-      webAppNameResourceGroup: ${{ parameters.webAppsResourceGroup }}
+      webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
+      webAppNameResourceGroup: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
       subscription: ${{ parameters.webAppsAzureSubscription }}
