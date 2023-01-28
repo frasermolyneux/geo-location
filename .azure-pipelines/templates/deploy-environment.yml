@@ -166,6 +166,11 @@ stages:
     dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
     environment: ${{ parameters.webAppsEnvironment }}
 
+    variables: 
+      webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
+      webApiName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
+      webAppsResourceGroupName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+
     workspace:
       clean: all
 
@@ -185,14 +190,14 @@ stages:
               retryCountOnTaskFailure: 3
               inputs:
                 azureSubscription:  ${{ parameters.webAppsAzureSubscription }}
-                webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
-                resourceGroupName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+                webAppName: $(webApiName)
+                resourceGroupName: $(webAppsResourceGroupName)
                 packageForLinux: '$(Pipeline.Workspace)/lookup-webapi/lookup-webapi.zip'
 
             - task: AzureRmWebAppDeployment@4
               retryCountOnTaskFailure: 3
               inputs:
                 azureSubscription:  ${{ parameters.webAppsAzureSubscription }}
-                webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
-                resourceGroupName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppsResourceGroupName'] ]
+                webAppName: $(webAppName)
+                resourceGroupName: $(webAppsResourceGroupName)
                 packageForLinux: '$(Pipeline.Workspace)/public-webapp/public-webapp.zip'
