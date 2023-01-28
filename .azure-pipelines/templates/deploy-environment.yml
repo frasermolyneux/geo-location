@@ -169,7 +169,7 @@ stages:
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
       dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
-      environment: ${{ parameters.environment }}
+      environment: ${{ parameters.webAppsEnvironment }}
       projectName: lookup-webapi
       jobName: DeployLookupWebApi
       webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webApiName'] ]
@@ -179,7 +179,7 @@ stages:
   - template: jobs/deploy-web-app.yml@ado-pipeline-templates
     parameters:
       dependsOn: ['post_bicep_deploy_${{ parameters.environmentName }}']
-      environment: ${{ parameters.environment }}
+      environment: ${{ parameters.webAppsEnvironment }}
       projectName: public-webapp
       jobName: DeployPublicWebApp
       webAppName: $[ dependencies.post_bicep_deploy_${{ parameters.environmentName }}.outputs['deploy_outputs.webAppName'] ]
