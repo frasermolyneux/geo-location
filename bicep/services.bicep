@@ -69,6 +69,32 @@ module publicWebApp 'services/publicWebApp.bicep' = {
   }
 }
 
+@description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
+resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: '4633458b-17de-408a-b874-0445c86b69e6'
+}
+
+module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+  name: '${varDeploymentPrefix}-lookupWebApiKeyVaultRoleAssignment'
+
+  params: {
+    parKeyVaultName: varKeyVaultName
+    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
+    parPrincipalId: lookupWebApi.outputs.outWebAppIdentityPrincipalId
+  }
+}
+
+module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+  name: '${varDeploymentPrefix}-publicWebAppKeyVaultRoleAssignment'
+
+  params: {
+    parKeyVaultName: varKeyVaultName
+    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
+    parPrincipalId: publicWebApp.outputs.outWebAppIdentityPrincipalId
+  }
+}
+
 // Outputs
 output outWebAppIdentityPrincipalId string = publicWebApp.outputs.outWebAppIdentityPrincipalId
 output outWebAppName string = publicWebApp.outputs.outWebAppName

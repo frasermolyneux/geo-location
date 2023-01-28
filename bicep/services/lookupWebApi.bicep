@@ -106,4 +106,5 @@ module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoor
 }
 
 // Outputs
+output outWebAppIdentityPrincipalId string = webApp.outputs.outWebAppIdentityPrincipalId
 output outWebAppName string = webApp.outputs.outWebAppName
