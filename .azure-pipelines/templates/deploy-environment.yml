@@ -126,7 +126,7 @@ stages:
       - task: AzureCLI@2
         name: deploy_outputs
         inputs:
-          azureSubscription: ${{ parameters.webAppsAzureSubscription }}
+          azureSubscription: ${{ parameters.azureSubscription }}
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
@@ -144,7 +144,7 @@ stages:
       - task: AzureCLI@2
         displayName: SetPublicWebAppPermissions
         inputs:
-          azureSubscription: ${{ parameters.webAppsAzureSubscription }}
+          azureSubscription: ${{ parameters.azureSubscription }}
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
