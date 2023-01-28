@@ -32,7 +32,7 @@ stages:
                 scriptType: 'pscore'
                 scriptLocation: 'inlineScript'
                 inlineScript: |
-                  $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                  $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
                   $isDeleted = $deletedKeyVaults | where {$_ -match "rg-platform-vault-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
@@ -64,7 +64,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+            $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
             . "./scripts/CreateAppRegistration.ps1" `
                 -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
@@ -77,7 +77,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+            $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
             $keyVaultName = az deployment sub show --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.keyVaultName.value
 
@@ -108,7 +108,7 @@ stages:
                 scriptLocation: 'inlineScript'
                 addSpnToEnvironment: true
                 inlineScript: |
-                  $config = (Get-Content ./params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                  $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   az deployment group create `
                     --name "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
@@ -130,7 +130,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content ./params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+            $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
             $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
               --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
@@ -148,7 +148,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            $config = (Get-Content ./params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+            $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
             $apiName = "geolocation-api-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)"
             $apiId = (az ad app list --filter "displayName eq '$apiName'" --query '[].appId') | ConvertFrom-Json

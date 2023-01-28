@@ -30,13 +30,13 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                 az deployment sub validate `
                   --name 'geolocationPlatform${{ parameters.environmentName }}' `
                   --template-file ./bicep/platform.bicep `
                   --location $config.parameters.parLocation.value `
-                  --parameters ./params/platform.${{ parameters.environmentName }}.json `
+                  --parameters params/platform.${{ parameters.environmentName }}.json `
                       parKeyVaultCreateMode='recover'
 
                 $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
@@ -57,7 +57,7 @@ jobs:
               scriptType: 'pscore'
               scriptLocation: 'inlineScript'
               inlineScript: |
-                $config = (Get-Content ./params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                 az deployment sub what-if `
                   --name 'geolocationPlatform${{ parameters.environmentName }}' `
@@ -74,5 +74,5 @@ jobs:
                     --name 'geolocationServices${{ parameters.environmentName }}' `
                     --resource-group "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
                     --template-file ./bicep/services.bicep `
-                    --parameters ./params/services.${{ parameters.environmentName }}.json
+                    --parameters params/services.${{ parameters.environmentName }}.json
                 }
