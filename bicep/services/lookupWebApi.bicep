@@ -84,13 +84,15 @@ module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
+    parEnvironment: parEnvironment
+    parInstance: parInstance
+
     parApiManagementName: parApiManagementName
     parFrontDoorDns: varWorkloadName
     parParentDnsName: parParentDnsName
-    parEnvironment: parEnvironment
+
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
-    parKeyVaultName: parKeyVaultName
     parAppInsightsName: parAppInsightsName
   }
 }

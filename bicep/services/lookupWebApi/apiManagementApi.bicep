@@ -2,13 +2,13 @@ targetScope = 'resourceGroup'
 
 // Parameters
 param parEnvironment string
+param parInstance string
 
 param parApiManagementName string
 param parFrontDoorDns string
 param parParentDnsName string
 param parWorkloadSubscriptionId string
 param parWorkloadResourceGroupName string
-param parKeyVaultName string
 param parAppInsightsName string
 
 // Existing In-Scope Resources
@@ -17,11 +17,6 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 }
 
 // Existing Out-Of-Scope Resources
-resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
-  name: parKeyVaultName
-  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
-}
-
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: parAppInsightsName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
@@ -63,10 +58,8 @@ resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021
 
   properties: {
     displayName: 'geolocation-api-audience'
-    keyVault: {
-      secretIdentifier: '${keyVault.properties.vaultUri}secrets/geolocation-api-${parEnvironment}-clientid'
-    }
-    secret: true
+    value: 'api://geolocation-api-${parEnvironment}-${parInstance}'
+    secret: false
   }
 }
 
