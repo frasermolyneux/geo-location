@@ -28,6 +28,7 @@
         "parTags": {
             "value": {
                 "Environment": "prd",
+                "Workload": "geolocation",
                 "DeployedBy": "AzDo-Bicep",
                 "Git": "https://github.com/frasermolyneux/geo-location"
             }

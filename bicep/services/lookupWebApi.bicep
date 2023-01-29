@@ -30,6 +30,13 @@ var varDeploymentPrefix = 'api-${parEnvironmentUniqueId}' //Prevent deployment n
 
 var varWorkloadName = 'app-geolocation-api-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
 
+// Existing Out-Of-Scope Resources
+@description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
+resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
+  scope: subscription()
+  name: '4633458b-17de-408a-b874-0445c86b69e6'
+}
+
 // Module Resources
 module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
   name: '${varDeploymentPrefix}-appDataStorage'
@@ -62,11 +69,12 @@ module webApp 'lookupWebApi/webApp.bicep' = {
   }
 }
 
-module keyVaultAccessPolicy 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultaccesspolicy:latest' = {
-  name: '${varDeploymentPrefix}-keyVaultAccessPolicy'
+module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
+  name: '${varDeploymentPrefix}-lookupWebApiKeyVaultRoleAssignment'
 
   params: {
     parKeyVaultName: parKeyVaultName
+    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
     parPrincipalId: webApp.outputs.outWebAppIdentityPrincipalId
   }
 }
