@@ -104,7 +104,7 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
         }
         {
           name: 'AzureAd__Audience'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=geolocation-api-${parEnvironment}-clientid)'
+          value: 'api://geolocation-api-${parEnvironment}-${parInstance}'
         }
         {
           name: 'maxmind_apikey'
