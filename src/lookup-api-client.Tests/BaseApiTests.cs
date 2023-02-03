@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Net;
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using RestSharp;
+using MxIO.ApiClient;
 
-using System.Net;
+using RestSharp;
 
 namespace MX.GeoLocation.GeoLocationApi.Client.Tests
 {
@@ -14,10 +16,11 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         private IApiTokenProvider fakeApiTokenProvider;
         private IRestClientSingleton fakeRestClientSingleton;
 
-        private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions
+        private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions()
         {
             BaseUrl = "https://google.co.uk",
-            ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            ApiAudience = "api://geolocation"
         };
 
         [SetUp]
@@ -34,14 +37,15 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         public void BaseApiCtorShouldThrowNullReferenceWhenBaseUrlIsInvalid(string baseUrl)
         {
             // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
+            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
             {
                 BaseUrl = baseUrl,
-                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                ApiAudience = "api://geolocation"
             });
 
             // Act
-            Action act = () => new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            Action act = () => new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             // Assert
             act.Should().Throw<ArgumentNullException>()
@@ -53,14 +57,15 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         public void BaseApiCtorShouldThrowNullReferenceWhenApiKeyIsInvalid(string apiKey)
         {
             // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
+            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
             {
                 BaseUrl = "https://google.co.uk",
-                ApiKey = apiKey
+                ApiKey = apiKey,
+                ApiAudience = "api://geolocation"
             });
 
             // Act
-            Action act = () => new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            Action act = () => new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             // Assert
             act.Should().Throw<ArgumentNullException>()
@@ -72,15 +77,16 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         public void BaseApiCtorShouldConfigureTheRestClientWithPlainUrlWhenInvalidApiPrefix(string apiPathPrefix)
         {
             // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
+            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
             {
                 BaseUrl = "https://google.co.uk",
                 ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                ApiAudience = "api://geolocation",
                 ApiPathPrefix = apiPathPrefix
             });
 
             // Act
-            var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             // Assert
             A.CallTo(() => fakeRestClientSingleton.ConfigureBaseUrl("https://google.co.uk")).MustHaveHappenedOnceExactly();
@@ -90,15 +96,16 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         public void BaseApiCtorShouldConfigureTheRestClientWithUrlAndApiPathPrefixWhenApiPathPrefixProvided()
         {
             // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions
+            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
             {
                 BaseUrl = "https://google.co.uk",
                 ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+                ApiAudience = "api://geolocation",
                 ApiPathPrefix = "custom"
             });
 
             // Act
-            var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             // Assert
             A.CallTo(() => fakeRestClientSingleton.ConfigureBaseUrl("https://google.co.uk/custom")).MustHaveHappenedOnceExactly();
@@ -112,8 +119,8 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            A.CallTo(() => fakeApiTokenProvider.GetAccessToken()).Returns("mytoken");
-            var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            A.CallTo(() => fakeApiTokenProvider.GetAccessToken(validGeoLocationApiClientOptions.ApiAudience)).Returns("mytoken");
+            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             // Act
             var result = await baseApi.CreateRequest(resource, method);
@@ -132,7 +139,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             RestResponse restResponse = new()
             {
@@ -157,7 +164,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             RestResponse restResponse = new()
             {
@@ -182,7 +189,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            var baseApi = new BaseApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             RestResponse restResponse = new()
             {

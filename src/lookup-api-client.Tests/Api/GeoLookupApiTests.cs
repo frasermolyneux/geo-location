@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 
 using MX.GeoLocation.GeoLocationApi.Client.Api;
 
+using MxIO.ApiClient;
+
 using RestSharp;
 
 namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
@@ -18,10 +20,11 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
 
         private GeoLookupApi geoLookupApi;
 
-        private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions
+        private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions()
         {
             BaseUrl = "https://google.co.uk",
-            ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            ApiAudience = "api://geolocation"
         };
 
         [SetUp]
@@ -33,9 +36,9 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
             fakeRestClientSingleton = A.Fake<IRestClientSingleton>();
 
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            A.CallTo(() => fakeApiTokenProvider.GetAccessToken()).Returns("mytoken");
+            A.CallTo(() => fakeApiTokenProvider.GetAccessToken(validGeoLocationApiClientOptions.ApiAudience)).Returns("mytoken");
 
-            geoLookupApi = new GeoLookupApi(fakeLogger, fakeOptions, fakeApiTokenProvider, fakeRestClientSingleton);
+            geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
         }
 
         [Test]

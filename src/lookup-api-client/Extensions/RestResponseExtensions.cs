@@ -1,7 +1,7 @@
 ﻿
 using System.Net;
 
-using MX.GeoLocation.LookupApi.Abstractions.Models;
+using MxIO.ApiClient.Abstractions;
 
 using Newtonsoft.Json;
 

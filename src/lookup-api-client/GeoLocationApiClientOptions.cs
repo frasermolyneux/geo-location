@@ -1,9 +1,9 @@
-﻿namespace MX.GeoLocation.GeoLocationApi.Client
+﻿using MxIO.ApiClient;
+
+namespace MX.GeoLocation.GeoLocationApi.Client
 {
-    public class GeoLocationApiClientOptions
+    public class GeoLocationApiClientOptions : ApiClientOptions
     {
-        public string BaseUrl { get; set; } = string.Empty;
-        public string ApiKey { get; set; } = string.Empty;
-        public string ApiPathPrefix { get; set; } = "geolocation";
+
     }
 }

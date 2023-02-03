@@ -5,14 +5,18 @@ using MX.GeoLocation.GeoLocationApi.Client.Extensions;
 using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
 using MX.GeoLocation.LookupApi.Abstractions.Models;
 
+using MxIO.ApiClient;
+using MxIO.ApiClient.Abstractions;
+
 using RestSharp;
 
 namespace MX.GeoLocation.GeoLocationApi.Client.Api
 {
     public class GeoLookupApi : BaseApi, IGeoLookupApi
     {
-        public GeoLookupApi(ILogger<GeoLookupApi> logger, IOptions<GeoLocationApiClientOptions> options, IApiTokenProvider apiTokenProvider, IRestClientSingleton restClientSingletonFactory) : base(logger, options, apiTokenProvider, restClientSingletonFactory)
+        public GeoLookupApi(ILogger<GeoLookupApi> logger, IApiTokenProvider apiTokenProvider, IRestClientSingleton restClientSingletonFactory, IOptions<GeoLocationApiClientOptions> options) : base(logger, apiTokenProvider, restClientSingletonFactory, options)
         {
+
         }
 
         public async Task<ApiResponseDto<GeoLocationDto>> GetGeoLocation(string hostname)

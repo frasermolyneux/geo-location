@@ -1,9 +1,10 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
 
-using MX.GeoLocation.LookupApi.Abstractions.Models;
 using MX.GeoLocation.LookupWebApi.Controllers;
 using MX.GeoLocation.LookupWebApi.Repositories;
+
+using MxIO.ApiClient.Abstractions;
 
 namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
 {

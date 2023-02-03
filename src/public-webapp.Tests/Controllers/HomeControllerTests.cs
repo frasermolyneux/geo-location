@@ -11,6 +11,8 @@ using MX.GeoLocation.GeoLocationApi.Client;
 using MX.GeoLocation.LookupApi.Abstractions.Models;
 using MX.GeoLocation.PublicWebApp.Controllers;
 
+using MxIO.ApiClient.Abstractions;
+
 using Newtonsoft.Json;
 
 namespace MX.GeoLocation.PublicWebApp.Tests.Controllers

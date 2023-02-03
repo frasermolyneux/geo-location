@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
 using MX.GeoLocation.LookupApi.Abstractions.Models;
-using MX.GeoLocation.LookupWebApi.Extensions;
 using MX.GeoLocation.LookupWebApi.Repositories;
+
+using MxIO.ApiClient.Abstractions;
+using MxIO.ApiClient.WebExtensions;
 
 using Newtonsoft.Json;
 
