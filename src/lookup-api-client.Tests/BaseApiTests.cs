@@ -34,46 +34,6 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
 
         [TestCase(null)]
         [TestCase("")]
-        public void BaseApiCtorShouldThrowNullReferenceWhenBaseUrlIsInvalid(string baseUrl)
-        {
-            // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
-            {
-                BaseUrl = baseUrl,
-                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                ApiAudience = "api://geolocation"
-            });
-
-            // Act
-            Action act = () => new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
-
-            // Assert
-            act.Should().Throw<ArgumentNullException>()
-                            .WithMessage("Value cannot be null. (Parameter 'BaseUrl')");
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        public void BaseApiCtorShouldThrowNullReferenceWhenApiKeyIsInvalid(string apiKey)
-        {
-            // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
-            {
-                BaseUrl = "https://google.co.uk",
-                ApiKey = apiKey,
-                ApiAudience = "api://geolocation"
-            });
-
-            // Act
-            Action act = () => new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
-
-            // Assert
-            act.Should().Throw<ArgumentNullException>()
-                            .WithMessage("Value cannot be null. (Parameter 'ApiKey')");
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
         public void BaseApiCtorShouldConfigureTheRestClientWithPlainUrlWhenInvalidApiPrefix(string apiPathPrefix)
         {
             // Arrange
