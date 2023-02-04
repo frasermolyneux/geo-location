@@ -15,7 +15,7 @@
 	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
 	<PackageReference Include="Microsoft.Identity.Web" Version="1.25.10" />
-	<PackageReference Include="MxIO.ApiClient.WebExtensions" Version="1.0.20232.3121" />
+	<PackageReference Include="MxIO.ApiClient.WebExtensions" Version="1.0.20232.4131" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.2" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />

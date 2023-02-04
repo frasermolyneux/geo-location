@@ -32,45 +32,6 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
             fakeRestClientSingleton = A.Fake<IRestClientSingleton>();
         }
 
-        [TestCase(null)]
-        [TestCase("")]
-        public void BaseApiCtorShouldConfigureTheRestClientWithPlainUrlWhenInvalidApiPrefix(string apiPathPrefix)
-        {
-            // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
-            {
-                BaseUrl = "https://google.co.uk",
-                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                ApiAudience = "api://geolocation",
-                ApiPathPrefix = apiPathPrefix
-            });
-
-            // Act
-            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
-
-            // Assert
-            A.CallTo(() => fakeRestClientSingleton.ConfigureBaseUrl("https://google.co.uk")).MustHaveHappenedOnceExactly();
-        }
-
-        [Test]
-        public void BaseApiCtorShouldConfigureTheRestClientWithUrlAndApiPathPrefixWhenApiPathPrefixProvided()
-        {
-            // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(new GeoLocationApiClientOptions()
-            {
-                BaseUrl = "https://google.co.uk",
-                ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                ApiAudience = "api://geolocation",
-                ApiPathPrefix = "custom"
-            });
-
-            // Act
-            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
-
-            // Assert
-            A.CallTo(() => fakeRestClientSingleton.ConfigureBaseUrl("https://google.co.uk/custom")).MustHaveHappenedOnceExactly();
-        }
-
         [TestCase("custom/path/to/resource", Method.Get)]
         [TestCase("custom/path/to/resource/1234567890", Method.Post)]
         [TestCase("custom/path/to/resource/0987654321", Method.Put)]
@@ -106,7 +67,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
                 ErrorException = new Exception("Test Exception")
             };
 
-            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync(A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             var restRequest = new RestRequest("path/to/resource", Method.Get);
@@ -131,7 +92,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
                 StatusCode = httpStatusCode
             };
 
-            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync(A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             var restRequest = new RestRequest("path/to/resource", Method.Get);
@@ -156,7 +117,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
                 StatusCode = httpStatusCode
             };
 
-            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync(A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             var restRequest = new RestRequest("path/to/resource", Method.Get);

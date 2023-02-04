@@ -53,7 +53,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
                 Content = jsonPayload
             };
 
-            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync(A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             // Act
@@ -79,7 +79,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
                 Content = jsonPayload
             };
 
-            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync(A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             // Act
