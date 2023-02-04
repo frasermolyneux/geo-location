@@ -19,9 +19,16 @@ The primary use-case for integration with the [xtremeidiots-portal](https://gith
 
 ---
 
-## Solution
+## Architecture
 
-TODO
+![architecture](./docs/images/architecture.png)
+
+* This workload is deployed to the shared Molyneux.IO platform; as such services such as `Azure Front Door`, `API Management`, `App Service Plans` and `Log Analytics Workspace` are already deployed. This workload will either extend them or integrate with them.
+* The `Web App` is a public-facing ASP .NET 7 website that allows geo location lookups.
+  * No authentication is required for the application
+* The `API App` is a .NET 7 Web Api that performs the geo location lookups using the MaxMind service.
+  * AAD authentication is required for the application.
+* The GeoLocation API is published to API Management and will require AAD Authentication and Subscription Keys.
 
 ---
 
