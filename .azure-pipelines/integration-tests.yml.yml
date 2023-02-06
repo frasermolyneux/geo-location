@@ -3,6 +3,8 @@ trigger:
     include:
     - 'integration/*'
 
+pr: none
+
 pool: 'Dedicated'
 
 resources:

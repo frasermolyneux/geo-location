@@ -7,6 +7,8 @@ trigger:
     - 'integration/*'
     - 'dependabot/*'
 
+pr: none
+
 pool: 'Dedicated'
 
 resources:
