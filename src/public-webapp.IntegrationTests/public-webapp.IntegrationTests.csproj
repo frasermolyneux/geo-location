@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>MX.GeoLocation.PublicWebApp.UITests</RootNamespace>
+    <RootNamespace>MX.GeoLocation.PublicWebApp.IntegrationTests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PublishChromeDriver>True</PublishChromeDriver>

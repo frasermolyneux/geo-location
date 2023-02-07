@@ -29,7 +29,7 @@ stages:
       inputs:
         command: 'build'
         arguments: '--configuration Release'
-        projects: '$(System.DefaultWorkingDirectory)/**/*.UITests.csproj'
+        projects: '$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj'
 
     - task: DotNetCoreCLI@2
       displayName: 'Run UI Tests'
@@ -37,5 +37,5 @@ stages:
         command: 'test'
         arguments: '--no-build --configuration Release'
         publishTestResults: true
-        projects: '$(System.DefaultWorkingDirectory)/**/*.UITests.csproj'
+        projects: '$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj'
     

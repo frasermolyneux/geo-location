@@ -1,9 +1,8 @@
-﻿
-using MX.GeoLocation.PublicWebApp.UITests.Extensions;
+﻿using MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions;
 
 using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.UITests.PageObject.Components
+namespace MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject.PageParts
 {
     internal class NavigationBar
     {

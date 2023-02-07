@@ -3,7 +3,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 
-namespace MX.GeoLocation.PublicWebApp.UITests
+namespace MX.GeoLocation.PublicWebApp.IntegrationTests
 {
     internal class TestBase
     {

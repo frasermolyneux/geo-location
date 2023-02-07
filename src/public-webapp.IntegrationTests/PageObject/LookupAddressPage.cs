@@ -1,10 +1,9 @@
-﻿
-using MX.GeoLocation.PublicWebApp.UITests.Extensions;
-using MX.GeoLocation.PublicWebApp.UITests.PageObject.Components;
+﻿using MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions;
+using MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject.PageParts;
 
 using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
+namespace MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject
 {
     internal class LookupAddressPage : IPage
     {

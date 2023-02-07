@@ -1,15 +1,15 @@
-﻿using MX.GeoLocation.PublicWebApp.UITests.Extensions;
-using MX.GeoLocation.PublicWebApp.UITests.PageObject.Components;
+﻿using MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions;
+using MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject.PageParts;
 
 using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
+namespace MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject
 {
-    internal class RemoveDataPage : IPage
+    internal class HomePage : IPage
     {
         private readonly IWebDriver driver;
 
-        public RemoveDataPage(IWebDriver driver)
+        public HomePage(IWebDriver driver)
         {
             this.driver = driver;
 
@@ -25,7 +25,7 @@ namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
                 try
                 {
                     var pageTitle = driver.FindElementWithWait(By.Id("pageTitle"));
-                    return pageTitle.Text == "Remove My Data";
+                    return pageTitle.Text.Contains("Welcome - ");
                 }
                 catch
                 {
@@ -38,12 +38,11 @@ namespace MX.GeoLocation.PublicWebApp.UITests.PageObject
         {
             if (useNavigation)
             {
-                Navigation.ClickNavBarPrivacyDropdown();
-                Navigation.ClickNavBarPrivacyRemoveMyData();
+                Navigation.ClickNavBarHome();
             }
             else
             {
-                driver.GoToPage("Home/RemoveData");
+                driver.GoToPage();
             }
         }
     }

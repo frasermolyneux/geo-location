@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-namespace MX.GeoLocation.PublicWebApp.UITests
+namespace MX.GeoLocation.PublicWebApp.IntegrationTests
 {
     [TestFixture("Chrome")]
     //[TestFixture("Firefox")]

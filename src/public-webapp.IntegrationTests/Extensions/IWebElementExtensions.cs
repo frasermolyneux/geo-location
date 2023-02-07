@@ -1,7 +1,6 @@
-﻿
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.UITests.Extensions
+namespace MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions
 {
     public static class IWebElementExtensions
     {
