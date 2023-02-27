@@ -37,7 +37,26 @@ namespace MX.GeoLocation.PublicWebApp.IntegrationTests
         [SetUp]
         public void Setup()
         {
+            WarmUp();
+
             PageFactory.HomePage.GoToPage();
+        }
+
+        private void WarmUp()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    PageFactory.HomePage.GoToPage();
+                    Thread.Sleep(5000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error performing warmup request");
+                    Console.WriteLine(ex);
+                }
+            }
         }
 
         [OneTimeTearDown]
