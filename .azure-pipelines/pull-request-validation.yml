@@ -103,8 +103,4 @@ stages:
     environmentName: 'dev'
     webAppsAzureSubscription: 'spn-geo-location-development'
     webAppsEnvironment: geo-location-Development
-
-- template: templates/execute-ui-tests.yml
-  parameters:
-    environmentName: 'dev'
     siteUrl: 'https://dev.geo-location.net'

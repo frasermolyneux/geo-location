@@ -110,10 +110,6 @@ stages:
     environmentName: 'dev'
     webAppsAzureSubscription: 'spn-geo-location-development'
     webAppsEnvironment: geo-location-Development
-
-- template: templates/execute-ui-tests.yml
-  parameters:
-    environmentName: 'dev'
     siteUrl: 'https://dev.geo-location.net'
 
 - template: templates/deploy-environment.yml
@@ -123,8 +119,4 @@ stages:
     environmentName: 'prd'
     webAppsAzureSubscription: 'spn-geo-location-productionwebapps'
     webAppsEnvironment: geo-location-ProductionWebApps
-
-- template: templates/execute-ui-tests.yml
-  parameters:
-    environmentName: 'prd'
     siteUrl: 'https://www.geo-location.net'

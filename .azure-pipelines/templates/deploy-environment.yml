@@ -9,12 +9,18 @@ parameters:
   type: string
 - name: webAppsEnvironment
   type: string
+- name: siteUrl
+  type: string
 
 stages:
 - stage: deploy_${{ parameters.environmentName }}
   jobs:
   - deployment: deploy_${{ parameters.environmentName }}
     environment: ${{ parameters.environment }}
+
+    variables:
+    - name: SITE_URL
+      value: '${{ parameters.siteUrl }}'
 
     workspace:
       clean: all
@@ -165,3 +171,27 @@ stages:
                 webAppName: $(webAppName)
                 resourceGroupName: $(webAppsResourceGroupName)
                 packageForLinux: '$(Pipeline.Workspace)/public-webapp/public-webapp.zip'
+
+        postRouteTraffic:
+          steps:
+            - pwsh: Invoke-WebRequest -Uri ${{ parameters.siteUrl }} -MaximumRetryCount 10 -RetryIntervalSec 5
+
+            - task: UseDotNet@2
+              displayName: 'Use .NET SDK 7.x'
+              inputs:
+                version: '7.x'
+
+            - task: DotNetCoreCLI@2
+              displayName: 'Build the project - Release'
+              inputs:
+                command: 'build'
+                arguments: '--configuration Release'
+                projects: '$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj'
+
+            - task: DotNetCoreCLI@2
+              displayName: 'Run UI Tests'
+              inputs:
+                command: 'test'
+                arguments: '--no-build --configuration Release'
+                publishTestResults: true
+                projects: '$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj'
