@@ -51,7 +51,7 @@ stages:
 
                   $deploymentName = "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
                   az deployment sub create `
-                    --name  $deploymentName`
+                    --name $deploymentName `
                     --template-file bicep/platform.bicep `
                     --location $config.parameters.parLocation.value `
                     --parameters @params/platform.${{ parameters.environmentName }}.json `
