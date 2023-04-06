@@ -50,9 +50,6 @@ stages:
                   }
 
                   $deploymentName = "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
-
-                  . "./scripts/WaitForSubscriptionArmDeployment.ps1" -deploymentName $deploymentName
-
                   az deployment sub create `
                     --name  $deploymentName`
                     --template-file bicep/platform.bicep `
@@ -102,8 +99,6 @@ stages:
 
                   $deploymentName = "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
                   $resourceGroupName = "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"
-
-                  . "./scripts/WaitForGroupArmDeployment.ps1" -deploymentName $deploymentName -resourceGroupName $resourceGroupName 
 
                   az deployment group create `
                     --name  $deploymentName `
