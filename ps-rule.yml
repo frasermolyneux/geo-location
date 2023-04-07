@@ -8,7 +8,7 @@
 # https://github.com/microsoft/PSRule.Rules.CAF
 
 input:
-  objectPath: bicep/*.json
+  objectPath: /bicep
 
 include:
   module:
