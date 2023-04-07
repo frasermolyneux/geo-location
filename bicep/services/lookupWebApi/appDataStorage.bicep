@@ -44,7 +44,7 @@ resource geoLocationsTable 'Microsoft.Storage/storageAccounts/tableServices/tabl
 
 @description('Key vault secret for storage connection string')
 module keyVaultSecret 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultsecret:latest' = {
-  name: '${parDeploymentPrefix}-${storageAccount.name}-keyVaultSecret'
+  name: '${parDeploymentPrefix}-${storageAccount.name}-kvsecret'
 
   params: {
     parKeyVaultName: parKeyVaultName
