@@ -8,7 +8,15 @@
 # https://github.com/microsoft/PSRule.Rules.CAF
 
 input:
-  objectPath: bicep
+  pathIgnore:
+    - ".azure-pipelines/"
+    - ".config/"
+    - ".vs/"
+    - ".vscode/"
+    - "app-registration-manifests/"
+    - "docs/"
+    - "scripts/"
+    - "src/"
 
 include:
   module:
