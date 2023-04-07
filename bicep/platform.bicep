@@ -29,14 +29,12 @@ var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 
 // Existing Out-Of-Scope Resources
-@description('Reference to the existing platform API Management instance')
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parStrategicServices.ApiManagementName
   scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)
 }
 
 // Module Resources
-@description('The resource group for the resources')
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   name: varResourceGroupName
   location: parLocation
@@ -45,7 +43,6 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
   properties: {}
 }
 
-@description('The key vault for the resources')
 module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' = {
   name: '${deployment().name}-keyVault'
   scope: resourceGroup(defaultResourceGroup.name)
@@ -67,7 +64,6 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
   name: '4633458b-17de-408a-b874-0445c86b69e6'
 }
 
-@description('The key vault secret user role assignment for the API Management managed identity')
 module keyVaultSecretUserRoleAssignmentApim 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
   name: '${deployment().name}-kvSecretUserRoleAssignmentApim'
   scope: resourceGroup(defaultResourceGroup.name)
@@ -79,7 +75,6 @@ module keyVaultSecretUserRoleAssignmentApim 'br:acrty7og2i6qpv3s.azurecr.io/bice
   }
 }
 
-@description('The application insights for the resources')
 module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:latest' = {
   name: '${deployment().name}-appInsights'
   scope: resourceGroup(defaultResourceGroup.name)
@@ -94,7 +89,6 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
   }
 }
 
-@description('The API Management logger for the resources')
 module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
   name: '${deployment().name}-apiManagementLogger'
   scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)

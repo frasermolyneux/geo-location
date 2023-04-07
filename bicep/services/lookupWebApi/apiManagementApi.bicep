@@ -26,20 +26,17 @@ param parWorkloadResourceGroupName string
 param parAppInsightsName string
 
 // Existing In-Scope Resources
-@description('Reference to the existing API Management instance.')
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
 }
 
 // Existing Out-Of-Scope Resources
-@description('Reference to the existing application insights.')
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: parAppInsightsName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 }
 
 // Module Resources
-@description('API Management Backend.')
 resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
   name: parFrontDoorDns
   parent: apiManagement
@@ -58,7 +55,6 @@ resource apiBackend 'Microsoft.ApiManagement/service/backends@2021-08-01' = {
   }
 }
 
-@description('API Management Named Value (Active Backend).')
 resource apiActiveBackendNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
   name: 'geolocation-active-backend'
   parent: apiManagement
@@ -70,7 +66,6 @@ resource apiActiveBackendNamedValue 'Microsoft.ApiManagement/service/namedValues
   }
 }
 
-@description('API Management Named Value (API Audience).')
 resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
   name: 'geolocation-api-audience'
   parent: apiManagement
@@ -82,7 +77,6 @@ resource apiAudienceNamedValue 'Microsoft.ApiManagement/service/namedValues@2021
   }
 }
 
-@description('API Management API.')
 resource api 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
   name: 'geolocation-api'
   parent: apiManagement
@@ -109,7 +103,6 @@ resource api 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
   }
 }
 
-@description('API Management API Policy.')
 resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = {
   name: 'policy'
   parent: api
@@ -153,7 +146,6 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = 
   ]
 }
 
-@description('API Management API Diagnostics.')
 resource apiDiagnostics 'Microsoft.ApiManagement/service/apis/diagnostics@2021-08-01' = {
   name: 'applicationinsights'
   parent: api

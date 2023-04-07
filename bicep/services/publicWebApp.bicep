@@ -69,13 +69,11 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 // Existing In-Scope Resources
-@description('Reference to the existing Application Insights resource.')
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: parAppInsightsName
 }
 
 // Module Resources
-@description('The public web app.')
 module webApp 'publicWebApp/webApp.bicep' = {
   name: '${deployment().name}-webApp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
@@ -98,7 +96,6 @@ module webApp 'publicWebApp/webApp.bicep' = {
   }
 }
 
-@description('The public web app Key Vault role assignment.')
 module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
   name: '${deployment().name}-publicWebAppKeyVaultRoleAssignment'
 
@@ -109,7 +106,6 @@ module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
   }
 }
 
-@description('The public web app API Management subscription.')
 module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementsubscription:latest' = {
   name: '${deployment().name}-apiManagementSubscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
@@ -127,7 +123,6 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
   }
 }
 
-@description('The public web app Front Door endpoint.')
 module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoorendpoint:latest' = {
   name: '${deployment().name}-frontDoorEndpoint'
   scope: resourceGroup(parFrontDoorSubscriptionId, parFrontDoorResourceGroupName)
@@ -146,7 +141,6 @@ module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoor
   }
 }
 
-@description('The public web app web test')
 resource webTest 'Microsoft.Insights/webtests@2022-06-15' = {
   name: '${deployment().name}-webTest'
   location: parLocation
