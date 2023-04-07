@@ -1,33 +1,61 @@
 targetScope = 'resourceGroup'
 
 // Parameters
+@description('The environment name (e.g. dev, test, prod)')
 param parEnvironment string
+
+@description('The environment unique identifier (e.g. 1234)')
 param parEnvironmentUniqueId string
+
+@description('The location of the resource group.')
 param parLocation string
+
+@description('The instance name (e.g. 01, 02, 03)')
 param parInstance string
 
+@description('The name of the key vault.')
 param parKeyVaultName string
+
+@description('The name of the application insights.')
 param parAppInsightsName string
 
+@description('The subscription id of the front door. (e.g. 12345678-1234-1234-1234-123456789012)')
 param parFrontDoorSubscriptionId string
+
+@description('The resource group name of the front door.')
 param parFrontDoorResourceGroupName string
+
+@description('The name of the front door.')
 param parFrontDoorName string
 
+@description('The subscription id of the DNS. (e.g. 12345678-1234-1234-1234-123456789012)')
 param parDnsSubscriptionId string
+
+@description('The resource group name of the DNS.')
 param parDnsResourceGroupName string
+
+@description('The parent DNS name (e.g. example.com)')
 param parParentDnsName string
 
+@description('The subscription id of the strategic services. (e.g. 12345678-1234-1234-1234-123456789012)')
 param parStrategicServicesSubscriptionId string
+
+@description('The resource group name of the API Management.')
 param parApiManagementResourceGroupName string
+
+@description('The name of the API Management.')
 param parApiManagementName string
+
+@description('The resource group name of the web apps.')
 param parWebAppsResourceGroupName string
+
+@description('The name of the app service plan.')
 param parAppServicePlanName string
 
+@description('The tags to apply to the resources.')
 param parTags object
 
 // Variables
-var varDeploymentPrefix = 'api-${parEnvironmentUniqueId}' //Prevent deployment naming conflicts
-
 var varWorkloadName = 'app-geolocation-api-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Existing Out-Of-Scope Resources
@@ -38,19 +66,21 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 // Module Resources
+@description('Application data storage account')
 module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
-  name: '${varDeploymentPrefix}-appDataStorage'
+  name: '${deployment().name}-appDataStorage'
 
   params: {
-    parDeploymentPrefix: varDeploymentPrefix
+    parDeploymentPrefix: deployment().name
     parLocation: parLocation
     parKeyVaultName: parKeyVaultName
     parTags: parTags
   }
 }
 
+@description('Web App')
 module webApp 'lookupWebApi/webApp.bicep' = {
-  name: '${varDeploymentPrefix}-webApp'
+  name: '${deployment().name}-webApp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -69,8 +99,9 @@ module webApp 'lookupWebApi/webApp.bicep' = {
   }
 }
 
+@description('Web app managed identity role assignment to key vault')
 module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${varDeploymentPrefix}-lookupWebApiKeyVaultRoleAssignment'
+  name: '${deployment().name}-lookupWebApiKeyVaultRoleAssignment'
 
   params: {
     parKeyVaultName: parKeyVaultName
@@ -79,8 +110,9 @@ module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
   }
 }
 
+@description('API Management API')
 module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
-  name: '${varDeploymentPrefix}-apiManagementApi'
+  name: '${deployment().name}-apiManagementApi'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
@@ -97,12 +129,13 @@ module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
   }
 }
 
+@description('API Management API frontdoor endpoint')
 module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoorendpoint:latest' = {
-  name: '${varDeploymentPrefix}-frontDoorEndpoint'
+  name: '${deployment().name}-frontDoorEndpoint'
   scope: resourceGroup(parFrontDoorSubscriptionId, parFrontDoorResourceGroupName)
 
   params: {
-    parDeploymentPrefix: varDeploymentPrefix
+    parDeploymentPrefix: deployment().name
     parFrontDoorName: parFrontDoorName
     parDnsSubscriptionId: parDnsSubscriptionId
     parDnsResourceGroupName: parDnsResourceGroupName

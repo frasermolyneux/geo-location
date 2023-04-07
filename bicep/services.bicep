@@ -1,25 +1,35 @@
 targetScope = 'resourceGroup'
 
-// Parameters
+@description('The environment name (e.g. dev, test, prod)')
 param parEnvironment string
+
+@description('The location of the resource group')
 param parLocation string
+
+@description('The instance name (e.g. 01, 02, 03, etc.')
 param parInstance string
 
+@description('The Front Door configuration')
 param parFrontDoor object
+
+@description('The DNS configuration')
 param parDns object
+
+@description('The Strategic Services configuration')
 param parStrategicServices object
 
+@description('The tags to apply to the resources')
 param parTags object
 
 // Variables
 var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
-var varDeploymentPrefix = 'services-${varEnvironmentUniqueId}' //Prevent deployment naming conflicts
 
 var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 
+@description('Lookup web API resources')
 module lookupWebApi 'services/lookupWebApi.bicep' = {
-  name: '${varDeploymentPrefix}-lookupWebApi'
+  name: '${deployment().name}-lookupWebApi'
   params: {
     parEnvironment: parEnvironment
     parEnvironmentUniqueId: varEnvironmentUniqueId
@@ -43,8 +53,9 @@ module lookupWebApi 'services/lookupWebApi.bicep' = {
   }
 }
 
+@description('Public web app resources')
 module publicWebApp 'services/publicWebApp.bicep' = {
-  name: '${varDeploymentPrefix}-publicWebApp'
+  name: '${deployment().name}-publicWebApp'
   params: {
     parEnvironment: parEnvironment
     parEnvironmentUniqueId: varEnvironmentUniqueId

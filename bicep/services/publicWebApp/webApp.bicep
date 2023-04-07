@@ -1,46 +1,74 @@
 targetScope = 'resourceGroup'
 
-// Parameters
+@description('The environment name (e.g. dev, test, prod).')
 param parEnvironment string
+
+@description('The environment unique identifier (e.g. 1234).')
 param parEnvironmentUniqueId string
+
+@description('The location of the resource group.')
 param parLocation string
+
+@description('The instance name (e.g. 01, 02, 03).')
 param parInstance string
 
+@description('The name of the key vault.')
 param parKeyVaultName string
+
+@description('The name of the application insights.')
 param parAppInsightsName string
+
+@description('The subscription id of the API Management.')
 param parApiManagementSubscriptionId string
+
+@description('The resource group name of the API Management.')
 param parApiManagementResourceGroupName string
+
+@description('The name of the API Management.')
 param parApiManagementName string
+
+@description('The name of the application service plan.')
 param parAppServicePlanName string
+
+@description('The subscription id of the workload.')
 param parWorkloadSubscriptionId string
+
+@description('The resource group name of the workload.')
 param parWorkloadResourceGroupName string
+
+@description('The tags to apply to the resources.')
 param parTags object
 
 // Variables
 var varWebAppName = 'app-geolocation-web-${parEnvironment}-${parLocation}-${parInstance}-${parEnvironmentUniqueId}'
 
 // Existing In-Scope Resources
+@description('Reference to the existing application service plan.')
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
   name: parAppServicePlanName
 }
 
 // Existing Out-Of-Scope Resources
+@description('Reference to the existing application insights.')
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
   name: parAppInsightsName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 }
 
+@description('Reference to the existing key vault.')
 resource keyVault 'Microsoft.KeyVault/vaults@2021-11-01-preview' existing = {
   name: parKeyVaultName
   scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 }
 
+@description('Reference to the existing API Management.')
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
   scope: resourceGroup(parApiManagementSubscriptionId, parApiManagementResourceGroupName)
 }
 
 // Module Resources
+@description('Web application resource')
 resource webApp 'Microsoft.Web/sites@2020-06-01' = {
   name: varWebAppName
   location: parLocation
