@@ -7,6 +7,11 @@
 # https://azure.github.io/PSRule.Rules.Azure/setup/configuring-options/
 # https://github.com/microsoft/PSRule.Rules.CAF
 
+include:
+  module:
+    - "PSRule.Rules.Azure"
+    - "PSRule.Rules.CAF"
+
 output:
   culture:
     - en-US
