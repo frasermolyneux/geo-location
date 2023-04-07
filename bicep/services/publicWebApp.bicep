@@ -90,8 +90,7 @@ module webApp 'publicWebApp/webApp.bicep' = {
     parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
     parAppServicePlanName: parAppServicePlanName
-    parWorkloadSubscriptionId: subscription().subscriptionId
-    parWorkloadResourceGroupName: resourceGroup().name
+
     parTags: parTags
   }
 }

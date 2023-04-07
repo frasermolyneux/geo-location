@@ -91,8 +91,7 @@ module webApp 'lookupWebApi/webApp.bicep' = {
     parAppInsightsName: parAppInsightsName
     parAppDataStorageAccountName: appDataStorage.outputs.outStorageAccountName
     parAppServicePlanName: parAppServicePlanName
-    parWorkloadSubscriptionId: subscription().subscriptionId
-    parWorkloadResourceGroupName: resourceGroup().name
+
     parTags: parTags
   }
 }
@@ -119,8 +118,6 @@ module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
     parFrontDoorDns: varWorkloadName
     parParentDnsName: parParentDnsName
 
-    parWorkloadSubscriptionId: subscription().subscriptionId
-    parWorkloadResourceGroupName: resourceGroup().name
     parAppInsightsName: parAppInsightsName
   }
 }
@@ -139,6 +136,7 @@ module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoor
     parOriginHostName: webApp.outputs.outWebAppDefaultHostName
     parDnsZoneHostnamePrefix: varWorkloadName
     parCustomHostname: '${varWorkloadName}.${parParentDnsName}'
+
     parTags: parTags
   }
 }

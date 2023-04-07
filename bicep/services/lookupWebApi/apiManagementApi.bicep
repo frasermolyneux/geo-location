@@ -16,24 +16,12 @@ param parFrontDoorDns string
 @description('The name of the parent DNS.')
 param parParentDnsName string
 
-@description('The subscription ID of the workload resource group.')
-param parWorkloadSubscriptionId string
-
-@description('The name of the workload resource group.')
-param parWorkloadResourceGroupName string
-
 @description('The name of the Application Insights instance.')
 param parAppInsightsName string
 
 // Existing In-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
-}
-
-// Existing Out-Of-Scope Resources
-resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
-  name: parAppInsightsName
-  scope: resourceGroup(parWorkloadSubscriptionId, parWorkloadResourceGroupName)
 }
 
 // Module Resources
@@ -155,7 +143,7 @@ resource apiDiagnostics 'Microsoft.ApiManagement/service/apis/diagnostics@2021-0
 
     httpCorrelationProtocol: 'W3C'
     logClientIp: true
-    loggerId: resourceId('Microsoft.ApiManagement/service/loggers', apiManagement.name, appInsights.name)
+    loggerId: resourceId('Microsoft.ApiManagement/service/loggers', apiManagement.name, parAppInsightsName)
     operationNameFormat: 'Name'
 
     sampling: {
