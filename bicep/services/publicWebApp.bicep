@@ -75,7 +75,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
 
 // Module Resources
 module webApp 'publicWebApp/webApp.bicep' = {
-  name: '${deployment().name}-webApp'
+  name: '${deployment().name}-webapp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -97,7 +97,7 @@ module webApp 'publicWebApp/webApp.bicep' = {
 }
 
 module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${deployment().name}-publicWebAppKeyVaultRoleAssignment'
+  name: '${deployment().name}-kvwebapprole'
 
   params: {
     parKeyVaultName: parKeyVaultName
@@ -107,7 +107,7 @@ module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
 }
 
 module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementsubscription:latest' = {
-  name: '${deployment().name}-apiManagementSubscription'
+  name: '${deployment().name}-apimsubscription'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
@@ -124,7 +124,7 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
 }
 
 module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoorendpoint:latest' = {
-  name: '${deployment().name}-frontDoorEndpoint'
+  name: '${deployment().name}-webappfdendpoint'
   scope: resourceGroup(parFrontDoorSubscriptionId, parFrontDoorResourceGroupName)
 
   params: {
@@ -142,7 +142,7 @@ module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoor
 }
 
 resource webTest 'Microsoft.Insights/webtests@2022-06-15' = {
-  name: '${deployment().name}-webTest'
+  name: '${deployment().name}-webtest'
   location: parLocation
   tags: union(parTags, {
       'hidden-link:${appInsights.id}': 'Resource'

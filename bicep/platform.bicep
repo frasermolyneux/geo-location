@@ -44,7 +44,7 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
 }
 
 module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' = {
-  name: '${deployment().name}-keyVault'
+  name: '${deployment().name}-keyvault'
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
     parKeyVaultName: varKeyVaultName
@@ -65,7 +65,7 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 module keyVaultSecretUserRoleAssignmentApim 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${deployment().name}-kvSecretUserRoleAssignmentApim'
+  name: '${deployment().name}-kvapimrole'
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
@@ -90,7 +90,7 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
 }
 
 module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
-  name: '${deployment().name}-apiManagementLogger'
+  name: '${deployment().name}-apimlogger'
   scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)
 
   params: {

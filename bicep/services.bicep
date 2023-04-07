@@ -28,7 +28,7 @@ var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 
 module lookupWebApi 'services/lookupWebApi.bicep' = {
-  name: '${deployment().name}-lookupWebApi'
+  name: '${deployment().name}-webapi'
   params: {
     parEnvironment: parEnvironment
     parEnvironmentUniqueId: varEnvironmentUniqueId
@@ -53,7 +53,7 @@ module lookupWebApi 'services/lookupWebApi.bicep' = {
 }
 
 module publicWebApp 'services/publicWebApp.bicep' = {
-  name: '${deployment().name}-publicWebApp'
+  name: '${deployment().name}-webapp'
   params: {
     parEnvironment: parEnvironment
     parEnvironmentUniqueId: varEnvironmentUniqueId

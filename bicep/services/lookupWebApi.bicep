@@ -67,7 +67,7 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 
 // Module Resources
 module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
-  name: '${deployment().name}-appDataStorage'
+  name: '${deployment().name}-appdata'
 
   params: {
     parDeploymentPrefix: deployment().name
@@ -78,7 +78,7 @@ module appDataStorage 'lookupWebApi/appDataStorage.bicep' = {
 }
 
 module webApp 'lookupWebApi/webApp.bicep' = {
-  name: '${deployment().name}-webApp'
+  name: '${deployment().name}-webapp'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parWebAppsResourceGroupName)
 
   params: {
@@ -98,7 +98,7 @@ module webApp 'lookupWebApi/webApp.bicep' = {
 }
 
 module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${deployment().name}-lookupWebApiKeyVaultRoleAssignment'
+  name: '${deployment().name}-kvwebapirole'
 
   params: {
     parKeyVaultName: parKeyVaultName
@@ -108,7 +108,7 @@ module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
 }
 
 module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
-  name: '${deployment().name}-apiManagementApi'
+  name: '${deployment().name}-api'
   scope: resourceGroup(parStrategicServicesSubscriptionId, parApiManagementResourceGroupName)
 
   params: {
@@ -126,7 +126,7 @@ module apiManagementApi 'lookupWebApi/apiManagementApi.bicep' = {
 }
 
 module frontDoorEndpoint 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/frontdoorendpoint:latest' = {
-  name: '${deployment().name}-frontDoorEndpoint'
+  name: '${deployment().name}-webapifdendpoint'
   scope: resourceGroup(parFrontDoorSubscriptionId, parFrontDoorResourceGroupName)
 
   params: {
