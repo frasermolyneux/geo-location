@@ -17,7 +17,7 @@
 	<PackageReference Include="Microsoft.Identity.Web" Version="2.12.4" />
 	<PackageReference Include="MxIO.ApiClient.WebExtensions" Version="1.0.20234.3221" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.8" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.9" />
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
