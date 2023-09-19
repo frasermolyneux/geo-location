@@ -8,7 +8,8 @@ schedules:
       include:
         - main
 
-pool: "Dedicated"
+pool:
+  vmImage: ubuntu-latest
 
 resources:
   repositories:
