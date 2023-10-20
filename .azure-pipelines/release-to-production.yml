@@ -18,9 +18,9 @@ resources:
 variables:
   buildConfiguration: "Release"
   ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-    nugetPackageVersion: "1.0.$(Build.BuildNumber)"
+    nugetPackageVersion: "1.1.$(Build.BuildNumber)"
   ${{ else }}:
-    nugetPackageVersion: "1.0.$(Build.BuildNumber)-preview"
+    nugetPackageVersion: "1.1.$(Build.BuildNumber)-preview"
 
 stages:
   - stage: build
