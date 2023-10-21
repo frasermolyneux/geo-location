@@ -74,5 +74,11 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             apiResponseDto?.Errors.Should().NotBeNullOrEmpty();
             apiResponseDto?.Errors.First().Should().Be("Hostname is a loopback or local address, geo location data is unavailable");
         }
+
+        [TearDown]
+        public void Cleanup()
+        {
+            geoLookupController?.Dispose();
+        }
     }
 }

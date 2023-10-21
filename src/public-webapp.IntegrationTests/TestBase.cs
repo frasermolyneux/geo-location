@@ -49,6 +49,7 @@ namespace MX.GeoLocation.PublicWebApp.IntegrationTests
             {
                 driver.Quit();
             }
+            driver?.Dispose();
         }
     }
 }
