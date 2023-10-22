@@ -41,6 +41,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
   name: parAppServicePlanName
 }
 
+resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
+  name: parAppInsightsName
+}
+
 // Existing Out-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: parApiManagementName
@@ -74,11 +78,11 @@ resource webApp 'Microsoft.Web/sites@2020-06-01' = {
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: '@Microsoft.KeyVault(VaultName=${parKeyVaultName};SecretName=${parAppInsightsName}-instrumentationkey)'
+          value: appInsights.properties.InstrumentationKey
         }
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: '@Microsoft.KeyVault(VaultName=${parKeyVaultName};SecretName=${parAppInsightsName}-connectionstring)'
+          value: appInsights.properties.ConnectionString
         }
         {
           name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
