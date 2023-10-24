@@ -16,14 +16,14 @@ param parInstance string
 @description('The name of the key vault.')
 param parKeyVaultName string
 
-@description('The name of the application insights resource.')
-param parAppInsightsName string
-
 @description('The name of the application data storage account.')
 param parAppDataStorageAccountName string
 
 @description('The name of the application service plan.')
 param parAppServicePlanName string
+
+@description('The app insights reference')
+param parAppInsightsRef object
 
 @description('The tags to apply to the resources.')
 param parTags object
@@ -36,8 +36,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
   name: parAppServicePlanName
 }
 
+// Existing Out-Of-Scope Resources
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
-  name: parAppInsightsName
+  name: parAppInsightsRef.Name
+  scope: resourceGroup(parAppInsightsRef.SubscriptionId, parAppInsightsRef.ResourceGroupName)
 }
 
 // Module Resources

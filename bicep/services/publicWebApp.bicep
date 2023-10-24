@@ -60,6 +60,7 @@ param parTags object
 
 // Variables
 var varWorkloadName = 'app-geolocation-web-${parEnvironment}-${parInstance}-${parEnvironmentUniqueId}'
+var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 
 // Existing Out-Of-Scope Resources
 @description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
@@ -85,11 +86,16 @@ module webApp 'publicWebApp/webApp.bicep' = {
     parInstance: parInstance
 
     parKeyVaultName: parKeyVaultName
-    parAppInsightsName: parAppInsightsName
     parApiManagementSubscriptionId: parStrategicServicesSubscriptionId
     parApiManagementResourceGroupName: parApiManagementResourceGroupName
     parApiManagementName: parApiManagementName
     parAppServicePlanName: parAppServicePlanName
+
+    parAppInsightsRef: {
+      Name: varAppInsightsName
+      SubscriptionId: subscription().id
+      ResourceGroupName: resourceGroup().name
+    }
 
     parTags: parTags
   }
