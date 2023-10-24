@@ -94,7 +94,7 @@ module webApp 'lookupWebApi/webApp.bicep' = {
 
     parAppInsightsRef: {
       Name: varAppInsightsName
-      SubscriptionId: subscription().id
+      SubscriptionId: subscription().subscriptionId
       ResourceGroupName: resourceGroup().name
     }
 
