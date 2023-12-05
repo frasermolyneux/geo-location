@@ -12,7 +12,7 @@
 	<PackageReference Include="Azure.Data.Tables" Version="12.8.2" />
 	<PackageReference Include="Azure.Identity" Version="1.10.4" />
 	<PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
-	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
+	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
 	<PackageReference Include="Microsoft.Identity.Web" Version="2.16.0" />
 	<PackageReference Include="MxIO.ApiClient.WebExtensions" Version="1.1.49.1" />
