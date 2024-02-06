@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <RootNamespace>MX.GeoLocation.PublicWebApp.IntegrationTests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -11,10 +11,10 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="NUnit" Version="4.0.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
-    <PackageReference Include="NUnit.Analyzers" Version="3.10.0">
+    <PackageReference Include="NUnit.Analyzers" Version="4.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -22,10 +22,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="Selenium.Support" Version="4.15.0" />
-	<PackageReference Include="Selenium.WebDriver" Version="4.16.1" />
-	<PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="120.0.6099.7100" />
-	<PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.33.0" />
+	<PackageReference Include="Selenium.Support" Version="4.17.0" />
+	<PackageReference Include="Selenium.WebDriver" Version="4.17.0" />
+	<PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="121.0.6167.8500" />
+	<PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.34.0" />
 	<PackageReference Include="WebDriverManager" Version="2.17.1" />
   </ItemGroup>
 
