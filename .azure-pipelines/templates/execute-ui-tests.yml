@@ -20,9 +20,9 @@ stages:
           - pwsh: Invoke-WebRequest -Uri ${{ parameters.siteUrl }} -MaximumRetryCount 10 -RetryIntervalSec 5
 
           - task: UseDotNet@2
-            displayName: "Use .NET SDK 7.x"
+            displayName: "Use .NET SDK 8.x"
             inputs:
-              version: "7.x"
+              version: "8.x"
 
           - task: DotNetCoreCLI@2
             displayName: "Build the project - Release"
