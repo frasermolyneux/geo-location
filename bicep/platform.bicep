@@ -80,7 +80,6 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
   scope: resourceGroup(defaultResourceGroup.name)
   params: {
     parAppInsightsName: varAppInsightsName
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
     parLocation: parLocation
     parLoggingSubscriptionId: parLogging.SubscriptionId
     parLoggingResourceGroupName: parLogging.WorkspaceResourceGroupName
@@ -95,10 +94,12 @@ module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimana
 
   params: {
     parApiManagementName: parStrategicServices.ApiManagementName
-    parWorkloadSubscriptionId: subscription().subscriptionId
-    parWorkloadResourceGroupName: defaultResourceGroup.name
-    parAppInsightsName: appInsights.outputs.outAppInsightsName
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
+
+    parAppInsightsRef: {
+      Name: varAppInsightsName
+      SubscriptionId: subscription().subscriptionId
+      ResourceGroupName: defaultResourceGroup.name
+    }
   }
 
   dependsOn: [
