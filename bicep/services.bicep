@@ -72,6 +72,20 @@ resource apiManagement 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
   }
 }
 
+module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
+  name: '${deployment().name}-apimlogger'
+
+  params: {
+    parApiManagementName: apiManagement.name
+
+    parAppInsightsRef: {
+      Name: varAppInsightsName
+      SubscriptionId: subscription().subscriptionId
+      ResourceGroupName: resourceGroup().name
+    }
+  }
+}
+
 module lookupWebApi 'services/lookupWebApi.bicep' = {
   name: '${deployment().name}-webapi'
   params: {
