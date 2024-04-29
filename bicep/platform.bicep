@@ -9,29 +9,11 @@ param parLocation string
 @description('The instance name (e.g. 01, 02, 03, etc.)')
 param parInstance string
 
-@description('The logging workspace details (subscriptionId, resourceGroupName, workspaceName)')
-param parLogging object
-
-@description('The strategic services details (subscriptionId, resourceGroupName, apiManagementName)')
-param parStrategicServices object
-
 @description('The tags to apply to the resources')
 param parTags object
 
-@description('The key vault create mode (recover, default)')
-param parKeyVaultCreateMode string = 'recover'
-
 // Variables
-var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
-
 var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
-var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
-
-// Existing Out-Of-Scope Resources
-resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
-  name: parStrategicServices.ApiManagementName
-  scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)
-}
 
 // Module Resources
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -41,38 +23,3 @@ resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = 
 
   properties: {}
 }
-
-module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' = {
-  name: '${deployment().name}-keyvault'
-  scope: resourceGroup(defaultResourceGroup.name)
-  params: {
-    parKeyVaultName: varKeyVaultName
-    parLocation: parLocation
-
-    parKeyVaultCreateMode: parKeyVaultCreateMode
-
-    parEnabledForRbacAuthorization: true
-
-    parTags: parTags
-  }
-}
-
-@description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
-resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
-  scope: subscription()
-  name: '4633458b-17de-408a-b874-0445c86b69e6'
-}
-
-module keyVaultSecretUserRoleAssignmentApim 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${deployment().name}-kvapimrole'
-  scope: resourceGroup(defaultResourceGroup.name)
-
-  params: {
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
-    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
-    parPrincipalId: apiManagement.identity.principalId
-  }
-}
-
-// Outputs
-output keyVaultName string = keyVault.outputs.outKeyVaultName

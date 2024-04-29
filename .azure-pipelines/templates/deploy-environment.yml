@@ -40,52 +40,12 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
-                      $isDeleted = $deletedKeyVaults | where {$_ -match "rg-platform-vault-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
-
-                      $keyVaultCreateMode = "default"
-                      if ($isDeleted -ne $null) {
-                        # To allow the environments to be torn-down and re-created, the Key Vault Create Mode must be set to 'recover'.
-                        $keyVaultCreateMode = "recover"
-                      }
-
                       $deploymentName = "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
                       az deployment sub create `
                         --name $deploymentName `
                         --template-file bicep/platform.bicep `
                         --location $config.parameters.parLocation.value `
-                        --parameters @params/platform.${{ parameters.environmentName }}.json `
-                          parKeyVaultCreateMode=$keyVaultCreateMode
-
-                - task: AzureCLI@2
-                  displayName: CreateAppRegistrations
-                  inputs:
-                    azureSubscription: ${{ parameters.azureSubscription }}
-                    scriptType: "pscore"
-                    scriptLocation: "inlineScript"
-                    inlineScript: |
-                      $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
-
-                      . "./scripts/CreateAppRegistration.ps1" `
-                          -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
-                          -appRoles "lookup-api-approles.json"
-
-                - task: AzureCLI@2
-                  displayName: CreateAppRegistrationsCredentials
-                  inputs:
-                    azureSubscription: ${{ parameters.azureSubscription }}
-                    scriptType: "pscore"
-                    scriptLocation: "inlineScript"
-                    inlineScript: |
-                      $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
-
-                      $keyVaultName = az deployment sub show --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.keyVaultName.value --output tsv
-
-                      . "./scripts/CreateAppRegistrationCredential.ps1" `
-                        -keyVaultName $keyVaultName `
-                        -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
-                        -secretPrefix "geolocation-api-${{ parameters.environmentName }}" `
-                        -secretDisplayName 'publicwebapp'
+                        --parameters @params/platform.${{ parameters.environmentName }}.json
 
                 - task: AzureCLI@2
                   displayName: deploy_${{ parameters.environmentName }}_services_bicep
@@ -100,11 +60,51 @@ stages:
                       $deploymentName = "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
                       $resourceGroupName = "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"
 
+                      $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
+                      $isDeleted = $deletedKeyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
+
+                      $keyVaultCreateMode = "default"
+                      if ($isDeleted -ne $null) {
+                        # To allow the environments to be torn-down and re-created, the Key Vault Create Mode must be set to 'recover'.
+                        $keyVaultCreateMode = "recover"
+                      }
+
                       az deployment group create `
                         --name  $deploymentName `
                         --resource-group $resourceGroupName `
                         --template-file bicep/services.bicep `
-                        --parameters @params/services.${{ parameters.environmentName }}.json
+                        --parameters @params/services.${{ parameters.environmentName }}.json `
+                          parKeyVaultCreateMode=$keyVaultCreateMode
+
+                - task: AzureCLI@2
+                  displayName: CreateAppRegistrations
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+                      . "./scripts/CreateAppRegistration.ps1" `
+                          -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
+                          -appRoles "lookup-api-approles.json"
+
+                - task: AzureCLI@2
+                  displayName: CreateAppRegistrationsCredentials
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+                      $keyVaultName = az deployment sub show --name "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.outKeyVaultName.value --output tsv
+
+                      . "./scripts/CreateAppRegistrationCredential.ps1" `
+                        -keyVaultName $keyVaultName `
+                        -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
+                        -secretPrefix "geolocation-api-${{ parameters.environmentName }}" `
+                        -secretDisplayName 'publicwebapp'
 
                 - task: AzureCLI@2
                   name: deploy_outputs
