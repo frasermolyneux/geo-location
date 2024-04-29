@@ -26,7 +26,6 @@ var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInst
 
 var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
-var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 
 // Existing Out-Of-Scope Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
@@ -73,38 +72,6 @@ module keyVaultSecretUserRoleAssignmentApim 'br:acrty7og2i6qpv3s.azurecr.io/bice
     parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
     parPrincipalId: apiManagement.identity.principalId
   }
-}
-
-module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:latest' = {
-  name: '${deployment().name}-appInsights'
-  scope: resourceGroup(defaultResourceGroup.name)
-  params: {
-    parAppInsightsName: varAppInsightsName
-    parLocation: parLocation
-    parLoggingSubscriptionId: parLogging.SubscriptionId
-    parLoggingResourceGroupName: parLogging.WorkspaceResourceGroupName
-    parLoggingWorkspaceName: parLogging.WorkspaceName
-    parTags: parTags
-  }
-}
-
-module apiManagementLogger 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementlogger:latest' = {
-  name: '${deployment().name}-apimlogger'
-  scope: resourceGroup(parStrategicServices.SubscriptionId, parStrategicServices.ApiManagementResourceGroupName)
-
-  params: {
-    parApiManagementName: parStrategicServices.ApiManagementName
-
-    parAppInsightsRef: {
-      Name: varAppInsightsName
-      SubscriptionId: subscription().subscriptionId
-      ResourceGroupName: defaultResourceGroup.name
-    }
-  }
-
-  dependsOn: [
-    keyVaultSecretUserRoleAssignmentApim
-  ]
 }
 
 // Outputs
