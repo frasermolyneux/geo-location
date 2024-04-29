@@ -85,9 +85,14 @@ resource apiManagement 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
     capacity: 0
     name: 'Consumption'
   }
+
   properties: {
     publisherEmail: 'admin@molyneux.io'
     publisherName: 'Molyneux.IO'
+  }
+
+  identity: {
+    type: 'SystemAssigned'
   }
 }
 
