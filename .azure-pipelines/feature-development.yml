@@ -100,6 +100,12 @@ stages:
           environment: geo-location-Production
           environmentName: "prd"
 
+  - stage: push_nuget_packages
+    jobs:
+      - template: jobs/push-nuget-packages.yml@ado-pipeline-templates
+        parameters:
+          artifactName: "nuget-packages"
+
   - template: templates/deploy-environment.yml
     parameters:
       azureSubscription: "spn-geo-location-development"
