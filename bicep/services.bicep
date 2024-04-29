@@ -25,7 +25,21 @@ param parTags object
 var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
 
 var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
+var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
+
+resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
+  name: varAppServicePlanName
+  location: parLocation
+
+  sku: {
+    name: 'B1'
+    tier: 'Basic'
+  }
+
+  kind: 'linux'
+  tags: parTags
+}
 
 module lookupWebApi 'services/lookupWebApi.bicep' = {
   name: '${deployment().name}-webapi'
