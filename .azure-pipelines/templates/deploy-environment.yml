@@ -32,20 +32,20 @@ stages:
                 - checkout: self
 
                 - task: AzureCLI@2
-                  displayName: deploy_${{ parameters.environmentName }}_platform_bicep
+                  displayName: deploy_${{ parameters.environmentName }}_bicep
                   inputs:
                     azureSubscription: ${{ parameters.azureSubscription }}
                     scriptType: "pscore"
                     scriptLocation: "inlineScript"
                     inlineScript: |
-                      $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deploymentName = "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
+                      $deploymentName = "geolocation-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
                       az deployment sub create `
                         --name $deploymentName `
-                        --template-file bicep/platform.bicep `
+                        --template-file bicep/main.bicep `
                         --location $config.parameters.parLocation.value `
-                        --parameters @params/platform.${{ parameters.environmentName }}.json
+                        --parameters @params/${{ parameters.environmentName }}.json
 
                 - task: AzureCLI@2
                   displayName: deploy_${{ parameters.environmentName }}_services_bicep

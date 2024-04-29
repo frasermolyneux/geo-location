@@ -30,13 +30,13 @@ jobs:
                 scriptType: "pscore"
                 scriptLocation: "inlineScript"
                 inlineScript: |
-                  $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                  $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   az deployment sub validate `
-                    --name 'geolocationPlatform${{ parameters.environmentName }}' `
-                    --template-file ./bicep/platform.bicep `
+                    --name 'geolocation${{ parameters.environmentName }}' `
+                    --template-file ./bicep/main.bicep `
                     --location $config.parameters.parLocation.value `
-                    --parameters params/platform.${{ parameters.environmentName }}.json
+                    --parameters params/${{ parameters.environmentName }}.json
 
                   $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
                   $existing = $keyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
@@ -57,13 +57,13 @@ jobs:
                 scriptType: "pscore"
                 scriptLocation: "inlineScript"
                 inlineScript: |
-                  $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                  $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                   az deployment sub what-if `
-                    --name 'geolocationPlatform${{ parameters.environmentName }}' `
-                    --template-file ./bicep/platform.bicep `
+                    --name 'geolocation${{ parameters.environmentName }}' `
+                    --template-file ./bicep/main.bicep `
                     --location $config.parameters.parLocation.value `
-                    --parameters @params/platform.${{ parameters.environmentName }}.json
+                    --parameters @params/${{ parameters.environmentName }}.json
 
                   $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
                   $existing = $keyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
