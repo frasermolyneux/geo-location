@@ -79,7 +79,7 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/platform.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $keyVaultName = az deployment sub show --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.keyVaultName.value
+                      $keyVaultName = az deployment sub show --name "geolocation-platform-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.keyVaultName.value --output tsv
 
                       . "./scripts/CreateAppRegistrationCredential.ps1" `
                         -keyVaultName $keyVaultName `
