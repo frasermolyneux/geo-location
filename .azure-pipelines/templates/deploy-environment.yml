@@ -98,10 +98,11 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $keyVaultName = az deployment sub show --name "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" --query properties.outputs.outKeyVaultName.value --output tsv
+                      $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
+                        --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
 
                       . "./scripts/CreateAppRegistrationCredential.ps1" `
-                        -keyVaultName $keyVaultName `
+                        -keyVaultName $deploymentOutput.properties.outputs.outKeyVaultName.value `
                         -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
                         -secretPrefix "geolocation-api-${{ parameters.environmentName }}" `
                         -secretDisplayName 'publicwebapp'
