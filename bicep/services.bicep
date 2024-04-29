@@ -9,6 +9,9 @@ param parLocation string
 @description('The instance name (e.g. 01, 02, 03, etc.')
 param parInstance string
 
+@description('The logging workspace details (subscriptionId, resourceGroupName, workspaceName)')
+param parLogging object
+
 @description('The Front Door configuration')
 param parFrontDoor object
 
@@ -26,7 +29,21 @@ var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInst
 
 var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
 var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
+var varApiManagementName = 'apim-geolocation-${parEnvironment}-${parLocation}-${varEnvironmentUniqueId}'
 var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
+
+module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:latest' = {
+  name: '${deployment().name}-appInsights'
+
+  params: {
+    parAppInsightsName: varAppInsightsName
+    parLocation: parLocation
+    parLoggingSubscriptionId: parLogging.SubscriptionId
+    parLoggingResourceGroupName: parLogging.WorkspaceResourceGroupName
+    parLoggingWorkspaceName: parLogging.WorkspaceName
+    parTags: parTags
+  }
+}
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   name: varAppServicePlanName
@@ -39,6 +56,20 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
 
   kind: 'linux'
   tags: parTags
+}
+
+resource apiManagement 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
+  name: varApiManagementName
+  location: parLocation
+
+  sku: {
+    capacity: 0
+    name: 'Consumption'
+  }
+  properties: {
+    publisherEmail: 'admin@molyneux.io'
+    publisherName: 'Molyneux.IO'
+  }
 }
 
 module lookupWebApi 'services/lookupWebApi.bicep' = {
