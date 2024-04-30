@@ -66,10 +66,10 @@ module appDataStorage 'appDataStorage.bicep' = {
   }
 }
 
-resource webApp 'Microsoft.Web/sites@2020-06-01' = {
+resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   name: varWebAppName
   location: parLocation
-  kind: 'app'
+  kind: 'app,linux'
   tags: parTags
 
   identity: {

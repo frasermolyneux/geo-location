@@ -73,10 +73,10 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
   }
 }
 
-resource webApp 'Microsoft.Web/sites@2020-06-01' = {
+resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   name: varWebAppName
   location: parLocation
-  kind: 'app'
+  kind: 'app,linux'
   tags: parTags
 
   identity: {
