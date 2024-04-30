@@ -27,6 +27,6 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
 // Outputs
 output outAppServicePlanRef object = {
   Name: appServicePlan.name
-  ResourceGroup: resourceGroup().name
-  Subscription: subscription().subscriptionId
+  ResourceGroupName: resourceGroup().name
+  SubscriptionId: subscription().subscriptionId
 }

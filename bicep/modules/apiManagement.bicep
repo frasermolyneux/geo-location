@@ -35,6 +35,6 @@ resource apiManagement 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
 // Outputs
 output outApiManagementRef object = {
   Name: apiManagement.name
-  ResourceGroup: resourceGroup().name
-  Subscription: subscription().subscriptionId
+  ResourceGroupName: resourceGroup().name
+  SubscriptionId: subscription().subscriptionId
 }
