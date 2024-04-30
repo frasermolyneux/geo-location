@@ -36,19 +36,9 @@ jobs:
                     --name 'geolocation${{ parameters.environmentName }}' `
                     --template-file ./bicep/main.bicep `
                     --location $config.parameters.parLocation.value `
-                    --parameters params/${{ parameters.environmentName }}.json
-
-                  $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
-                  $existing = $keyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
-
-                  if ($null -ne $existing) { 
-                    az deployment group validate `
-                      --name 'geolocationServices${{ parameters.environmentName }}' `
-                      --resource-group "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
-                      --template-file ./bicep/services.bicep `
-                      --parameters @params/services.${{ parameters.environmentName }}.json `
+                    --parameters params/${{ parameters.environmentName }}.json `
                         parKeyVaultCreateMode='recover'
-                  }
+
 
             - task: AzureCLI@2
               name: RunWhatIfDeploy
@@ -63,16 +53,5 @@ jobs:
                     --name 'geolocation${{ parameters.environmentName }}' `
                     --template-file ./bicep/main.bicep `
                     --location $config.parameters.parLocation.value `
-                    --parameters @params/${{ parameters.environmentName }}.json
-
-                  $keyVaults = az keyvault list --query '[].id' | ConvertFrom-Json
-                  $existing = $keyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
-
-                  if ($null -ne $existing) { 
-                    az deployment group what-if `
-                      --name 'geolocationServices${{ parameters.environmentName }}' `
-                      --resource-group "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)" `
-                      --template-file ./bicep/services.bicep `
-                      --parameters params/services.${{ parameters.environmentName }}.json `
+                    --parameters @params/${{ parameters.environmentName }}.json `
                         parKeyVaultCreateMode='recover'
-                  }

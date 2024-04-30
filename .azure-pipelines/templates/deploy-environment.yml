@@ -41,25 +41,6 @@ stages:
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                       $deploymentName = "geolocation-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
-                      az deployment sub create `
-                        --name $deploymentName `
-                        --template-file bicep/main.bicep `
-                        --location $config.parameters.parLocation.value `
-                        --parameters @params/${{ parameters.environmentName }}.json
-
-                - task: AzureCLI@2
-                  displayName: deploy_${{ parameters.environmentName }}_services_bicep
-                  inputs:
-                    azureSubscription: ${{ parameters.azureSubscription }}
-                    scriptType: "pscore"
-                    scriptLocation: "inlineScript"
-                    addSpnToEnvironment: true
-                    inlineScript: |
-                      $config = (Get-Content params/services.${{ parameters.environmentName }}.json | ConvertFrom-Json)
-
-                      $deploymentName = "geolocation-services-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
-                      $resourceGroupName = "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"
-
                       $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
                       $isDeleted = $deletedKeyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
 
@@ -69,11 +50,11 @@ stages:
                         $keyVaultCreateMode = "recover"
                       }
 
-                      az deployment group create `
-                        --name  $deploymentName `
-                        --resource-group $resourceGroupName `
-                        --template-file bicep/services.bicep `
-                        --parameters @params/services.${{ parameters.environmentName }}.json `
+                      az deployment sub create `
+                        --name $deploymentName `
+                        --template-file bicep/main.bicep `
+                        --location $config.parameters.parLocation.value `
+                        --parameters @params/${{ parameters.environmentName }}.json `
                           parKeyVaultCreateMode=$keyVaultCreateMode
 
                 - task: AzureCLI@2
