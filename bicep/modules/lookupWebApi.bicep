@@ -257,7 +257,7 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = 
       <set-backend-service backend-id="{{geolocation-active-backend}}" />
       <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="none" />
       <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="JWT validation was unsuccessful" require-expiration-time="true" require-scheme="Bearer" require-signed-tokens="true">
-          <openid-config url="${{tenant-login-url}}{{tenant-id}}/v2.0/.well-known/openid-configuration" />
+          <openid-config url="{{tenant-login-url}}{{tenant-id}}/v2.0/.well-known/openid-configuration" />
           <audiences>
               <audience>{{geolocation-api-audience}}</audience>
           </audiences>
