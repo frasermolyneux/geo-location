@@ -79,7 +79,7 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
+                      $deploymentOutput = (az deployment group show --name "geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
                         --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
 
                       . "./scripts/CreateAppRegistrationCredential.ps1" `
@@ -97,7 +97,7 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
+                      $deploymentOutput = (az deployment group show --name "geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
                         --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
 
                       echo "##vso[task.setvariable variable=webAppIdentityPrincipalId]$($deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value)"
@@ -121,7 +121,7 @@ stages:
                       $apiSpn = (az rest -m GET -u https://graph.microsoft.com/v1.0/servicePrincipals/$resourceId) | ConvertFrom-Json
                       $appRoleId = ($apiSpn.appRoles | Where-Object { $_.displayName -eq "LookupApiUser" }).id
 
-                      $deploymentOutput = (az deployment group show --name "geolocation-services-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
+                      $deploymentOutput = (az deployment group show --name "geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)" `
                         --resource-group "rg-geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
 
                       $principalId = $deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value
