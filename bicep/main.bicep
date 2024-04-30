@@ -155,3 +155,4 @@ output outWebAppIdentityPrincipalId string = publicWebApp.outputs.outWebAppIdent
 output outResourceGroupName string = defaultResourceGroup.name
 output outWebAppName string = publicWebApp.outputs.outWebAppName
 output outWebApiName string = lookupWebApi.outputs.outWebAppName
+output outKeyVaultName string = keyVault.outputs.outKeyVaultName
