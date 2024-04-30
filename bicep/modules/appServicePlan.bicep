@@ -21,6 +21,11 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
   }
 
   kind: 'linux'
+
+  properties: {
+    reserved: true
+  }
+
   tags: parTags
 }
 
