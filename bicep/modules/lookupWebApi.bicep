@@ -310,3 +310,7 @@ resource apiDiagnostics 'Microsoft.ApiManagement/service/apis/diagnostics@2021-0
     verbosity: 'information'
   }
 }
+
+// Outputs
+output outWebAppIdentityPrincipalId string = webApp.identity.principalId
+output outWebAppName string = webApp.name

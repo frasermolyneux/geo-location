@@ -149,3 +149,9 @@ module publicWebApp 'modules/publicWebApp.bicep' = {
     parTags: parTags
   }
 }
+
+// Outputs
+output outWebAppIdentityPrincipalId string = publicWebApp.outputs.outWebAppIdentityPrincipalId
+output outResourceGroupName string = defaultResourceGroup.name
+output outWebAppName string = publicWebApp.outputs.outWebAppName
+output outWebApiName string = lookupWebApi.outputs.outWebAppName

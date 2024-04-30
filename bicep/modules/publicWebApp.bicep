@@ -143,3 +143,7 @@ module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
     parPrincipalId: webApp.identity.principalId
   }
 }
+
+// Outputs
+output outWebAppIdentityPrincipalId string = webApp.identity.principalId
+output outWebAppName string = webApp.name
