@@ -223,6 +223,28 @@ resource api 'Microsoft.ApiManagement/service/apis@2021-08-01' = {
   }
 }
 
+resource tenantIdNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
+  name: 'tenant-id'
+  parent: apiManagement
+
+  properties: {
+    displayName: 'tenant-id'
+    value: tenant().tenantId
+    secret: false
+  }
+}
+
+resource tenantLoginUrlNamedValue 'Microsoft.ApiManagement/service/namedValues@2021-08-01' = {
+  name: 'tenant-login-url'
+  parent: apiManagement
+
+  properties: {
+    displayName: 'tenant-login-url'
+    value: environment().authentication.loginEndpoint
+    secret: false
+  }
+}
+
 resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = {
   name: 'policy'
   parent: api
@@ -235,7 +257,7 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = 
       <set-backend-service backend-id="{{geolocation-active-backend}}" />
       <cache-lookup vary-by-developer="false" vary-by-developer-groups="false" downstream-caching-type="none" />
       <validate-jwt header-name="Authorization" failed-validation-httpcode="401" failed-validation-error-message="JWT validation was unsuccessful" require-expiration-time="true" require-scheme="Bearer" require-signed-tokens="true">
-          <openid-config url="{{tenant-login-url}}{{tenant-id}}/v2.0/.well-known/openid-configuration" />
+          <openid-config url="${{tenant-login-url}}{{tenant-id}}/v2.0/.well-known/openid-configuration" />
           <audiences>
               <audience>{{geolocation-api-audience}}</audience>
           </audiences>
