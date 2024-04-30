@@ -285,6 +285,8 @@ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-08-01' = 
   dependsOn: [
     apiActiveBackendNamedValue
     apiAudienceNamedValue
+    tenantIdNamedValue
+    tenantLoginUrlNamedValue
   ]
 }
 
