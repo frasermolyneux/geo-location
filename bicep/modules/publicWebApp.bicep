@@ -123,7 +123,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'apim_subscription_key'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${apiManagement.name}-app-geolocation-web-${parEnvironment}-${parInstance}-${varEnvironmentUniqueId}-geolocation-subscription-apikey)'
+          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${apiManagementSubscription.outputs.outSubscriptionName}-api-key-primary)'
         }
         {
           name: 'geolocation_api_application_audience'
