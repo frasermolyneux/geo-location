@@ -40,6 +40,7 @@ module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' =
         consumerPricipalId: parExternalApiConsumer.PrincipalId
       }
     )
+    parKeyVaultCreateMode: 'default'
   }
 }
 

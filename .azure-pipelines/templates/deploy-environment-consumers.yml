@@ -1,0 +1,43 @@
+parameters:
+  - name: azureSubscription
+    type: string
+  - name: environment
+    type: string
+  - name: environmentName
+    type: string
+
+stages:
+  - stage: deploy_${{ parameters.environmentName }}
+    jobs:
+      - deployment: deploy_${{ parameters.environmentName }}
+        environment: ${{ parameters.environment }}
+
+        variables:
+          - name: SITE_URL
+            value: "${{ parameters.siteUrl }}"
+
+        workspace:
+          clean: all
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: AzureCLI@2
+                  displayName: deploy_${{ parameters.environmentName }}_bicep
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+                      $deploymentName = "geolocationconsumers-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
+
+                      az deployment sub create `
+                        --name $deploymentName `
+                        --template-file bicep/apiConsumers.bicep `
+                        --location $config.parameters.parLocation.value `
+                        --parameters @params/apiConsumers.${{ parameters.environmentName }}.json

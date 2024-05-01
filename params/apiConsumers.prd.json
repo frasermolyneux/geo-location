@@ -11,21 +11,6 @@
         "parInstance": {
             "value": "01"
         },
-        "parLogging": {
-            "value": {
-                "SubscriptionId": "d68448b0-9947-46d7-8771-baa331a3063a",
-                "WorkspaceResourceGroupName": "rg-platform-logging-prd-uksouth-01",
-                "WorkspaceName": "log-platform-prd-uksouth-01"
-            }
-        },
-        "parDns": {
-            "value": {
-                "SubscriptionId": "db34f572-8b71-40d6-8f99-f29a27612144",
-                "DnsResourceGroupName": "rg-platform-dns-prd-uksouth-01",
-                "PublicWebAppDnsPrefix": "www",
-                "ParentDnsName": "geo-location.net"
-            }
-        },
         "parTags": {
             "value": {
                 "Environment": "prd",
@@ -33,6 +18,18 @@
                 "DeployedBy": "AzDo-Bicep",
                 "Git": "https://github.com/frasermolyneux/geo-location"
             }
+        },
+        "parExternalApiConsumers": {
+            "value": [
+                {
+                    "Workload": "portal-web-prd",
+                    "PrincipalId": "d71988af-320f-43d2-8151-7a6e673e325d"
+                },
+                {
+                    "Workload": "portal-repo-func-prd",
+                    "PrincipalId": "ef07e52a-24fe-4725-a8f7-a5dc6d3ad3f8"
+                }
+            ]
         }
     }
 }

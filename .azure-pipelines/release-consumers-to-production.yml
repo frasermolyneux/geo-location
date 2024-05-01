@@ -1,0 +1,45 @@
+trigger:
+  branches:
+    include:
+      - "main"
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: ado-pipeline-templates
+      type: github
+      name: frasermolyneux/ado-pipeline-templates
+      endpoint: github.com_frasermolyneux
+
+stages:
+  - stage: validate
+    jobs:
+      - template: templates/bicep-environment-validation.yml
+        parameters:
+          dependsOn: [bicep_linter]
+          azureSubscription: "spn-geo-location-development"
+          environment: geo-location-Development
+          environmentName: "dev"
+
+      - template: templates/bicep-environment-validation.yml
+        parameters:
+          dependsOn: [bicep_linter]
+          azureSubscription: "spn-geo-location-production"
+          environment: geo-location-Production
+          environmentName: "prd"
+
+  - template: templates/deploy-environment-consumers.yml
+    parameters:
+      azureSubscription: "spn-geo-location-development"
+      environment: geo-location-Development
+      environmentName: "dev"
+
+  - template: templates/deploy-environment-consumers.yml
+    parameters:
+      azureSubscription: "spn-geo-location-production"
+      environment: geo-location-Production
+      environmentName: "prd"
