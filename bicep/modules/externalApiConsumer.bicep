@@ -27,7 +27,7 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 }
 
 module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' = {
-  name: '${deployment().name}-${parExternalApiConsumer.Workload}-kv'
+  name: '${parExternalApiConsumer.Workload}-kv'
 
   params: {
     parKeyVaultName: varKeyVaultName
@@ -51,7 +51,7 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 module keyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${deployment().name}-kvrole'
+  name: '${parExternalApiConsumer.Workload}-kvrole'
 
   params: {
     parKeyVaultName: keyVault.name
@@ -61,7 +61,7 @@ module keyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyv
 }
 
 module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementsubscription:latest' = {
-  name: '${deployment().name}-apimsubscription'
+  name: '${parExternalApiConsumer.Workload}-apimsubscription'
   scope: resourceGroup(parApiManagementRef.SubscriptionId, parApiManagementRef.ResourceGroupName)
 
   params: {
