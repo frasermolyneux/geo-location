@@ -5,8 +5,6 @@ parameters:
     type: string
   - name: environmentName
     type: string
-  - name: webAppsAzureSubscription
-    type: string
   - name: webAppsEnvironment
     type: string
   - name: siteUrl
@@ -133,7 +131,7 @@ stages:
                 - task: AzureRmWebAppDeployment@4
                   retryCountOnTaskFailure: 3
                   inputs:
-                    azureSubscription: ${{ parameters.webAppsAzureSubscription }}
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     webAppName: $(webApiName)
                     resourceGroupName: $(webAppsResourceGroupName)
                     packageForLinux: "$(Pipeline.Workspace)/lookup-webapi/lookup-webapi.zip"
@@ -141,7 +139,7 @@ stages:
                 - task: AzureRmWebAppDeployment@4
                   retryCountOnTaskFailure: 3
                   inputs:
-                    azureSubscription: ${{ parameters.webAppsAzureSubscription }}
+                    azureSubscription: ${{ parameters.azureSubscription }}
                     webAppName: $(webAppName)
                     resourceGroupName: $(webAppsResourceGroupName)
                     packageForLinux: "$(Pipeline.Workspace)/public-webapp/public-webapp.zip"

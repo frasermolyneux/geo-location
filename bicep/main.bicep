@@ -146,6 +146,7 @@ module publicWebApp 'modules/publicWebApp.bicep' = {
     }
     parAppServicePlanRef: appServicePlan.outputs.outAppServicePlanRef
     parApiManagementRef: apiManagement.outputs.outApiManagementRef
+    parDns: parDns
     parTags: parTags
   }
 }

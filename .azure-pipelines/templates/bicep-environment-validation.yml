@@ -39,6 +39,12 @@ jobs:
                     --parameters params/${{ parameters.environmentName }}.json `
                         parKeyVaultCreateMode='recover'
 
+                  az deployment sub validate `
+                    --name 'geolocationconsumers${{ parameters.environmentName }}' `
+                    --template-file ./bicep/apiConsumers.bicep `
+                    --location $config.parameters.parLocation.value `
+                    --parameters params/apiConsumers.${{ parameters.environmentName }}.json
+
 
             - task: AzureCLI@2
               name: RunWhatIfDeploy
@@ -55,3 +61,9 @@ jobs:
                     --location $config.parameters.parLocation.value `
                     --parameters @params/${{ parameters.environmentName }}.json `
                         parKeyVaultCreateMode='recover'
+
+                  az deployment sub what-if `
+                    --name 'geolocationconsumers${{ parameters.environmentName }}' `
+                    --template-file ./bicep/apiConsumers.bicep `
+                    --location $config.parameters.parLocation.value `
+                    --parameters @params/apiConsumers.${{ parameters.environmentName }}.json
