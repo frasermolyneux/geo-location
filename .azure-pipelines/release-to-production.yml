@@ -108,7 +108,6 @@ stages:
       azureSubscription: "spn-geo-location-development"
       environment: geo-location-Development
       environmentName: "dev"
-      webAppsAzureSubscription: "spn-geo-location-development"
       webAppsEnvironment: geo-location-Development
       siteUrl: "https://dev.geo-location.net"
 
@@ -117,6 +116,5 @@ stages:
       azureSubscription: "spn-geo-location-production"
       environment: geo-location-Production
       environmentName: "prd"
-      webAppsAzureSubscription: "spn-geo-location-productionwebapps"
       webAppsEnvironment: geo-location-ProductionWebApps
       siteUrl: "https://www.geo-location.net"
