@@ -33,6 +33,18 @@
                 "DeployedBy": "AzDo-Bicep",
                 "Git": "https://github.com/frasermolyneux/geo-location"
             }
+        },
+        "parExternalApiConsumers": {
+            "value": [
+                {
+                    "Workload": "portal-web-prd",
+                    "PrincipalId": "d71988af-320f-43d2-8151-7a6e673e325d"
+                },
+                {
+                    "Workload": "portal-repo-func-prd",
+                    "PrincipalId": "ef07e52a-24fe-4725-a8f7-a5dc6d3ad3f8"
+                }
+            ]
         }
     }
 }

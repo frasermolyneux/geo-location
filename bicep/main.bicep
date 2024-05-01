@@ -18,6 +18,9 @@ param parDns object
 @description('The tags to apply to the resources')
 param parTags object
 
+@description('The external api consumers')
+param parExternalApiConsumers array = []
+
 @description('The key vault create mode (recover, default)')
 param parKeyVaultCreateMode string = 'recover'
 
@@ -149,6 +152,19 @@ module publicWebApp 'modules/publicWebApp.bicep' = {
     parTags: parTags
   }
 }
+
+module externalApiConsumer 'modules/externalApiConsumer.bicep' = [
+  for consumer in parExternalApiConsumers: {
+    name: '${deployment().name}-${consumer.Workload}'
+    scope: resourceGroup(defaultResourceGroup.name)
+
+    params: {
+      parLocation: parLocation
+      parExternalApiConsumer: consumer
+      parApiManagementRef: apiManagement.outputs.outApiManagementRef
+    }
+  }
+]
 
 // Outputs
 output outWebAppIdentityPrincipalId string = publicWebApp.outputs.outWebAppIdentityPrincipalId
