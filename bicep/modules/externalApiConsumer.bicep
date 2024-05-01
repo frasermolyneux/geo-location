@@ -54,7 +54,7 @@ module keyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyv
   name: '${parExternalApiConsumer.Workload}-kvrole'
 
   params: {
-    parKeyVaultName: keyVault.name
+    parKeyVaultName: keyVault.outputs.outKeyVaultName
     parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
     parPrincipalId: parExternalApiConsumer.PrincipalId
   }
@@ -70,7 +70,7 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
     parWorkloadSubscriptionId: subscription().subscriptionId
     parWorkloadResourceGroupName: resourceGroup().name
     parWorkloadName: parExternalApiConsumer.Workload
-    parKeyVaultName: keyVault.name
+    parKeyVaultName: keyVault.outputs.outKeyVaultName
     parSubscriptionScopeIdentifier: 'geolocation'
     parSubscriptionScope: '/apis/geolocation-api'
     parTags: parTags
