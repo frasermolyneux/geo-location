@@ -12,10 +12,6 @@ stages:
       - deployment: deploy_${{ parameters.environmentName }}
         environment: ${{ parameters.environment }}
 
-        variables:
-          - name: SITE_URL
-            value: "${{ parameters.siteUrl }}"
-
         workspace:
           clean: all
 
