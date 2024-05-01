@@ -159,6 +159,15 @@ module webAppDns 'dnsWebApp.bicep' = {
   }
 }
 
+resource customDomain 'Microsoft.Web/sites/hostNameBindings@2023-01-01' = {
+  name: '${parDns.Subdomain}.${parDns.Domain}'
+  parent: webApp
+
+  properties: {
+    siteName: webApp.name
+  }
+}
+
 // Outputs
 output outWebAppIdentityPrincipalId string = webApp.identity.principalId
 output outWebAppName string = webApp.name
