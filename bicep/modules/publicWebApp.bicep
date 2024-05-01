@@ -22,6 +22,9 @@ param parAppServicePlanRef object
 @description('The api management Ref')
 param parApiManagementRef object
 
+@description('The dns configuration object')
+param parDns object
+
 @description('The tags to apply to the resources.')
 param parTags object = resourceGroup().tags
 
@@ -141,6 +144,18 @@ module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
     parKeyVaultName: keyVault.name
     parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
     parPrincipalId: webApp.identity.principalId
+  }
+}
+
+module webAppDns 'dnsWebApp.bicep' = {
+  name: '${deployment().name}-dns'
+  scope: resourceGroup(parDns.SubscriptionId, parDns.ResourceGroupName)
+
+  params: {
+    parDns: parDns
+    parWebAppHostname: webApp.properties.defaultHostName
+    parDomainAuthCode: webApp.properties.customDomainVerificationId
+    parTags: parTags
   }
 }
 
