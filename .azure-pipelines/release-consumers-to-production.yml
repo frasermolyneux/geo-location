@@ -18,6 +18,11 @@ resources:
 stages:
   - stage: validate
     jobs:
+      - template: jobs/bicep-lint-code.yml@ado-pipeline-templates
+        parameters:
+          jobName: "bicep_linter"
+          azureSubscription: "spn-geo-location-development"
+          
       - template: templates/bicep-environment-validation.yml
         parameters:
           dependsOn: [bicep_linter]
