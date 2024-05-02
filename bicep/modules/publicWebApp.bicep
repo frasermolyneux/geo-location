@@ -166,6 +166,10 @@ resource customDomain 'Microsoft.Web/sites/hostNameBindings@2023-01-01' = {
   properties: {
     siteName: webApp.name
   }
+
+  dependsOn: [
+    webAppDns
+  ]
 }
 
 // Outputs
