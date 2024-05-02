@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
+using System.Runtime.InteropServices;
 
 namespace MX.GeoLocation.PublicWebApp.IntegrationTests
 {
@@ -37,9 +38,37 @@ namespace MX.GeoLocation.PublicWebApp.IntegrationTests
         }
 
         [SetUp]
-        public void Setup()
+        public async Task Setup()
         {
+            await WarmUp();
+
             PageFactory.HomePage.GoToPage();
+        }
+
+        private async Task WarmUp()
+        {
+            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://localhost:7201";
+            url = url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
+
+            using (HttpClient client = new HttpClient() { BaseAddress = new Uri(url)})
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    try
+                    {
+                        Console.WriteLine($"Performing warmup request to {url}");
+                        await client.GetAsync("/");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Error performing warmup request");
+                        Console.WriteLine(ex);
+
+                        // Sleep for five seconds before trying again.
+                        Thread.Sleep(5000);
+                    }
+                }
+            }
         }
 
         [OneTimeTearDown]
