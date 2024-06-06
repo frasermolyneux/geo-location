@@ -28,7 +28,7 @@ stages:
                     scriptType: "pscore"
                     scriptLocation: "inlineScript"
                     inlineScript: |
-                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                      $config = (Get-Content params/apiConsumers.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                       $deploymentName = "geolocationconsumers-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
 
@@ -45,7 +45,7 @@ stages:
                     scriptType: "pscore"
                     scriptLocation: "inlineScript"
                     inlineScript: |
-                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                      $config = (Get-Content params/apiConsumers.${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                       $apiName = "geolocation-api-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)"
                       $apiId = (az ad app list --filter "displayName eq '$apiName'" --query '[].appId') | ConvertFrom-Json
