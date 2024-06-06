@@ -37,3 +37,23 @@ stages:
                         --template-file bicep/apiConsumers.bicep `
                         --location $config.parameters.parLocation.value `
                         --parameters @params/apiConsumers.${{ parameters.environmentName }}.json
+
+                - task: AzureCLI@2
+                  displayName: SetAppRolesForConsumers
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+                      $apiName = "geolocation-api-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)"
+                      $apiId = (az ad app list --filter "displayName eq '$apiName'" --query '[].appId') | ConvertFrom-Json
+                      $resourceId = (az ad sp list --filter "appId eq '$apiId'" --query '[0].id') | ConvertFrom-Json
+                      $apiSpn = (az rest -m GET -u https://graph.microsoft.com/v1.0/servicePrincipals/$resourceId) | ConvertFrom-Json
+                      $appRoleId = ($apiSpn.appRoles | Where-Object { $_.displayName -eq "LookupApiUser" }).id
+
+                      $config.parameters.parExternalApiConsumers.value | ForEach-Object {
+                        Write-Host "Granting app role to principal: $($_.PrincipalId)"
+                        . "./scripts/GrantPrincipalAppRole.ps1" -principalId $_.PrincipalId -resourceId $resourceId -appRoleId $appRoleId
+                      }
