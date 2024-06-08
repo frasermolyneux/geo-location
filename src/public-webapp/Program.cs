@@ -39,6 +39,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSession();
 
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -60,5 +62,6 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapHealthChecks("/api/health").AllowAnonymous();
 
 app.Run();
