@@ -142,6 +142,14 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
           name: 'appdata_storage_connectionstring'
           value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${appDataStorage.outputs.outStorageAccountName}-connectionstring)'
         }
+        {
+          name: 'APPINSIGHTS_PROFILERFEATURE_VERSION'
+          value: '1.0.0'
+        }
+        {
+          name: 'DiagnosticServices_EXTENSION_VERSION'
+          value: '~3'
+        }
       ]
     }
   }

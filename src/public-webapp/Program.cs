@@ -18,6 +18,7 @@ builder.Services.Configure<TelemetryConfiguration>(telemetryConfiguration =>
     double fixedSamplingPercentage = 50;
     builder.UseSampling(fixedSamplingPercentage);
 });
+builder.Services.AddServiceProfiler();
 
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
 {

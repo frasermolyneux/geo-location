@@ -132,6 +132,14 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
           name: 'geolocation_api_application_audience'
           value: 'api://geolocation-api-${parEnvironment}-${parInstance}'
         }
+        {
+          name: 'APPINSIGHTS_PROFILERFEATURE_VERSION'
+          value: '1.0.0'
+        }
+        {
+          name: 'DiagnosticServices_EXTENSION_VERSION'
+          value: '~3'
+        }
       ]
     }
   }
