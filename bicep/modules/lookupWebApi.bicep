@@ -157,6 +157,18 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   }
 }
 
+module webTest 'webTest.bicep' = {
+  name: '${deployment().name}-webtest'
+
+  params: {
+    parWebAppName: webApp.name
+    parLocation: parLocation
+    parTestUrl: 'https://${webApp.properties.defaultHostName}/api/health'
+    parAppInsightsRef: parAppInsightsRef
+    parTags: parTags
+  }
+}
+
 module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
   name: '${deployment().name}-kvwebapirole'
 
