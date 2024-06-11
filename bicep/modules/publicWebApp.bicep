@@ -99,6 +99,8 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
       netFrameworkVersion: '8.0'
       minTlsVersion: '1.2'
 
+      healthCheckPath: '/api/health'
+
       appSettings: [
         {
           name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
