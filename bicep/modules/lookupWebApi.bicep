@@ -157,7 +157,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   }
 }
 
-module webTest 'webTest.bicep' = {
+module webTest 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/webtest:latest' = {
   name: '${deployment().name}-webtest'
 
   params: {
