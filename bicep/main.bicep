@@ -56,12 +56,16 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
-    parAppInsightsName: varAppInsightsName
-    parLocation: parLocation
-    parLoggingSubscriptionId: parLogging.SubscriptionId
-    parLoggingResourceGroupName: parLogging.WorkspaceResourceGroupName
-    parLoggingWorkspaceName: parLogging.WorkspaceName
-    parTags: parTags
+    appInsightsName: varAppInsightsName
+
+    logAnalyticsWorkspaceRef: {
+      Name: parLogging.WorkspaceName
+      ResourceGroupName: parLogging.WorkspaceResourceGroupName
+      SubscriptionId: parLogging.SubscriptionId
+    }
+
+    location: parLocation
+    tags: parTags
   }
 }
 
@@ -111,7 +115,7 @@ module lookupWebApi 'modules/lookupWebApi.bicep' = {
       SubscriptionId: subscription().subscriptionId
     }
     parAppInsightsRef: {
-      Name: appInsights.outputs.outAppInsightsName
+      Name: appInsights.outputs.appInsightsRef.Name
       ResourceGroupName: defaultResourceGroup.name
       SubscriptionId: subscription().subscriptionId
     }
@@ -135,7 +139,7 @@ module publicWebApp 'modules/publicWebApp.bicep' = {
       SubscriptionId: subscription().subscriptionId
     }
     parAppInsightsRef: {
-      Name: appInsights.outputs.outAppInsightsName
+      Name: appInsights.outputs.appInsightsRef.Name
       ResourceGroupName: defaultResourceGroup.name
       SubscriptionId: subscription().subscriptionId
     }
