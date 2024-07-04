@@ -9,8 +9,8 @@ param parLocation string
 @description('The instance name (e.g. 01, 02, 03, etc.)')
 param parInstance string
 
-@description('The logging workspace details (subscriptionId, resourceGroupName, workspaceName)')
-param parLogging object
+@description('The log analytics workspace reference')
+param parLogAnalyticsWorkspaceRef object
 
 @description('The dns configuration object')
 param parDns object
@@ -57,13 +57,7 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
 
   params: {
     appInsightsName: varAppInsightsName
-
-    logAnalyticsWorkspaceRef: {
-      Name: parLogging.WorkspaceName
-      ResourceGroupName: parLogging.WorkspaceResourceGroupName
-      SubscriptionId: parLogging.SubscriptionId
-    }
-
+    logAnalyticsWorkspaceRef: parLogAnalyticsWorkspaceRef
     location: parLocation
     tags: parTags
   }
