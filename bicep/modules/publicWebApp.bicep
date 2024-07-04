@@ -61,18 +61,13 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
 // Module Resources
 module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementsubscription:latest' = {
   name: '${deployment().name}-apimsubscription'
-  scope: resourceGroup(parApiManagementRef.SubscriptionId, parApiManagementRef.ResourceGroupName)
 
   params: {
-    parDeploymentPrefix: deployment().name
-    parApiManagementName: apiManagement.name
-    parWorkloadSubscriptionId: subscription().subscriptionId
-    parWorkloadResourceGroupName: resourceGroup().name
-    parWorkloadName: varWebAppName
-    parKeyVaultName: keyVault.name
-    parSubscriptionScopeIdentifier: 'geolocation'
-    parSubscriptionScope: '/apis/geolocation-api'
-    parTags: parTags
+    apiManagementName: apiManagement.name
+    subscriptionName: varWebAppName
+    apiScope: '/apis/geolocation-api'
+    keyVaultName: keyVault.name
+    tags: parTags
   }
 }
 

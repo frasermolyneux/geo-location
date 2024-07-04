@@ -33,13 +33,10 @@ module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' =
     parKeyVaultName: varKeyVaultName
     parLocation: parLocation
     parEnabledForRbacAuthorization: true
-    parTags: union(
-      parTags,
-      {
-        consumerWorkload: parExternalApiConsumer.Workload
-        consumerPricipalId: parExternalApiConsumer.PrincipalId
-      }
-    )
+    parTags: union(parTags, {
+      consumerWorkload: parExternalApiConsumer.Workload
+      consumerPricipalId: parExternalApiConsumer.PrincipalId
+    })
     parKeyVaultCreateMode: 'default'
   }
 }
@@ -62,17 +59,12 @@ module keyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyv
 
 module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementsubscription:latest' = {
   name: '${parExternalApiConsumer.Workload}-apimsubscription'
-  scope: resourceGroup(parApiManagementRef.SubscriptionId, parApiManagementRef.ResourceGroupName)
 
   params: {
-    parDeploymentPrefix: deployment().name
-    parApiManagementName: apiManagement.name
-    parWorkloadSubscriptionId: subscription().subscriptionId
-    parWorkloadResourceGroupName: resourceGroup().name
-    parWorkloadName: parExternalApiConsumer.Workload
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
-    parSubscriptionScopeIdentifier: 'geolocation'
-    parSubscriptionScope: '/apis/geolocation-api'
-    parTags: parTags
+    apiManagementName: apiManagement.name
+    subscriptionName: parExternalApiConsumer.Workload
+    apiScope: '/apis/geolocation-api'
+    keyVaultName: keyVault.outputs.outKeyVaultName
+    tags: parTags
   }
 }
