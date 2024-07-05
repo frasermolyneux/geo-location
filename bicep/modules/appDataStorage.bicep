@@ -44,10 +44,10 @@ module keyVaultSecret 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultsecr
   name: '${storageAccount.name}-kvsecret'
 
   params: {
-    parKeyVaultName: parKeyVaultName
-    parSecretName: '${storageAccount.name}-connectionstring'
-    parSecretValue: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
-    parTags: parTags
+    keyVaultName: parKeyVaultName
+    secretName: '${storageAccount.name}-connectionstring'
+    secretValue: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
+    tags: parTags
   }
 }
 
