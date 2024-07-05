@@ -64,7 +64,7 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
 
   params: {
     apiManagementName: apiManagement.name
-    subscriptionName: varWebAppName
+    workloadName: varWebAppName
     apiScope: 'geolocation-api'
     keyVaultName: keyVault.name
     tags: parTags
@@ -123,7 +123,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'apim_subscription_key'
-          value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${apiManagementSubscription.name}-geolocation-api-api-key-primary)'
+          value: '@Microsoft.KeyVault(SecretUri=${apiManagementSubscription.outputs.primaryKeySecretRef.secretUri})'
         }
         {
           name: 'geolocation_api_application_audience'
