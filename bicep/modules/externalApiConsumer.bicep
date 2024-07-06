@@ -33,7 +33,7 @@ module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' =
     keyVaultName: varKeyVaultName
     keyVaultCreateMode: 'default'
     location: parLocation
-    parTags: union(parTags, {
+    tags: union(parTags, {
       consumerWorkload: parExternalApiConsumer.Workload
       consumerPricipalId: parExternalApiConsumer.PrincipalId
     })
