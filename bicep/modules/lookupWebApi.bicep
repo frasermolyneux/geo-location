@@ -118,7 +118,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'AzureAd__Instance'
-          value: environment().authentication.loginEndpoint
+          value: az.environment().authentication.loginEndpoint
         }
         {
           name: 'AzureAd__ClientId'
@@ -262,7 +262,7 @@ resource tenantLoginUrlNamedValue 'Microsoft.ApiManagement/service/namedValues@2
 
   properties: {
     displayName: 'tenant-login-url'
-    value: environment().authentication.loginEndpoint
+    value: az.environment().authentication.loginEndpoint
     secret: false
   }
 }
