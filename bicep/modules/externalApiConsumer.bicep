@@ -30,14 +30,13 @@ module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' =
   name: '${parExternalApiConsumer.Workload}-kv'
 
   params: {
-    parKeyVaultName: varKeyVaultName
-    parLocation: parLocation
-    parEnabledForRbacAuthorization: true
+    keyVaultName: varKeyVaultName
+    keyVaultCreateMode: 'default'
+    location: parLocation
     parTags: union(parTags, {
       consumerWorkload: parExternalApiConsumer.Workload
       consumerPricipalId: parExternalApiConsumer.PrincipalId
     })
-    parKeyVaultCreateMode: 'default'
   }
 }
 
