@@ -1,46 +1,46 @@
 targetScope = 'subscription'
 
 // Parameters
-@description('The environment name (e.g. dev, test, prod)')
-param parEnvironment string
+@description('The environment for the resources')
+param environment string
 
-@description('The location of the resource group and resources')
-param parLocation string
+@description('The location to deploy the resources')
+param location string
 
 @description('The instance name (e.g. 01, 02, 03, etc.)')
-param parInstance string
+param instance string
 
 @description('The tags to apply to the resources')
-param parTags object
+param tags object
 
 @description('The external api consumers')
-param parExternalApiConsumers array = []
+param externalApiConsumers array = []
 
 // Variables
-var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
-var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
-var varApiManagementName = 'apim-geolocation-${parEnvironment}-${parLocation}-${varEnvironmentUniqueId}'
+var environmentUniqueId = uniqueString('geolocation', environment, instance)
+var resourceGroupName = 'rg-geolocation-${environment}-${location}-${instance}'
+var varApiManagementName = 'apim-geolocation-${environment}-${location}-${environmentUniqueId}'
 
 // Module Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
   name: varApiManagementName
-  scope: resourceGroup(varResourceGroupName)
+  scope: resourceGroup(resourceGroupName)
 }
 
 module externalApiConsumer 'modules/externalApiConsumer.bicep' = [
-  for consumer in parExternalApiConsumers: {
+  for consumer in externalApiConsumers: {
     name: '${deployment().name}-${consumer.Workload}'
-    scope: resourceGroup(varResourceGroupName)
+    scope: resourceGroup(resourceGroupName)
 
     params: {
-      parLocation: parLocation
-      parExternalApiConsumer: consumer
-      parApiManagementRef: {
+      location: location
+      externalApiConsumer: consumer
+      apiManagementRef: {
         Name: apiManagement.name
-        ResourceGroupName: varResourceGroupName
+        ResourceGroupName: resourceGroupName
         SubscriptionId: subscription().subscriptionId
       }
-      parTags: parTags
+      tags: tags
     }
   }
 ]

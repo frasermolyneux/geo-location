@@ -2,18 +2,18 @@ targetScope = 'resourceGroup'
 
 // Parameters
 @description('The app service plan name')
-param parAppServicePlanName string
+param appServicePlanName string
 
-@description('The location of the resource group.')
-param parLocation string = resourceGroup().location
+@description('The location to deploy the resources')
+param location string = resourceGroup().location
 
 @description('The tags to apply to the resources.')
-param parTags object = resourceGroup().tags
+param tags object = resourceGroup().tags
 
 // Module Resources
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
-  name: parAppServicePlanName
-  location: parLocation
+  name: appServicePlanName
+  location: location
 
   sku: {
     name: 'B1'
@@ -26,7 +26,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-01-01' = {
     reserved: true
   }
 
-  tags: parTags
+  tags: tags
 }
 
 // Outputs

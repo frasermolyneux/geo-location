@@ -38,9 +38,9 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deploymentName = "geolocation-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)"
+                      $deploymentName = "geolocation-${{ parameters.environmentName }}-$($config.parameters.instance.value)"
                       $deletedKeyVaults = az keyvault list-deleted --query '[].properties.vaultId' | ConvertFrom-Json
-                      $isDeleted = $deletedKeyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.parLocation.value)-$($config.parameters.parInstance.value)"}
+                      $isDeleted = $deletedKeyVaults | where {$_ -match "rg-geolocation-${{ parameters.environmentName }}-$($config.parameters.location.value)-$($config.parameters.instance.value)"}
 
                       $keyVaultCreateMode = "default"
                       if ($isDeleted -ne $null) {
@@ -51,9 +51,9 @@ stages:
                       az deployment sub create `
                         --name $deploymentName `
                         --template-file bicep/main.bicep `
-                        --location $config.parameters.parLocation.value `
+                        --location $config.parameters.location.value `
                         --parameters @params/${{ parameters.environmentName }}.json `
-                          parKeyVaultCreateMode=$keyVaultCreateMode
+                          keyVaultCreateMode=$keyVaultCreateMode
 
                 - task: AzureCLI@2
                   displayName: CreateAppRegistrations
@@ -65,7 +65,7 @@ stages:
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
                       . "./scripts/CreateAppRegistration.ps1" `
-                          -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
+                          -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.instance.value)" `
                           -appRoles "lookup-api-approles.json"
 
                 - task: AzureCLI@2
@@ -77,11 +77,11 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deploymentOutput = (az deployment sub show --name "geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
+                      $deploymentOutput = (az deployment sub show --name "geolocation-$($config.parameters.environment.value)-$($config.parameters.instance.value)") | ConvertFrom-Json
 
                       . "./scripts/CreateAppRegistrationCredential.ps1" `
                         -keyVaultName $deploymentOutput.properties.outputs.outKeyVaultName.value `
-                        -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.parInstance.value)" `
+                        -applicationName "geolocation-api-${{ parameters.environmentName }}-$($config.parameters.instance.value)" `
                         -secretPrefix "geolocation-api-${{ parameters.environmentName }}" `
                         -secretDisplayName 'publicwebapp'
 
@@ -94,10 +94,10 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $deploymentOutput = (az deployment sub show --name "geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
+                      $deploymentOutput = (az deployment sub show --name "geolocation-$($config.parameters.environment.value)-$($config.parameters.instance.value)") | ConvertFrom-Json
 
-                      echo "##vso[task.setvariable variable=webAppIdentityPrincipalId]$($deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value)"
-                      echo "##vso[task.setvariable variable=webAppName]$($deploymentOutput.properties.outputs.outWebAppName.value)"
+                      echo "##vso[task.setvariable variable=webAppIdentityPrincipalId]$($deploymentOutput.properties.outputs.webAppIdentityPrincipalId.value)"
+                      echo "##vso[task.setvariable variable=webAppName]$($deploymentOutput.properties.outputs.webAppName.value)"
                       echo "##vso[task.setvariable variable=webApiName]$($deploymentOutput.properties.outputs.outWebApiName.value)"
 
                       echo "##vso[task.setvariable variable=webAppsResourceGroupName]$($deploymentOutput.properties.outputs.outResourceGroupName.value)"
@@ -111,15 +111,15 @@ stages:
                     inlineScript: |
                       $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
 
-                      $apiName = "geolocation-api-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)"
+                      $apiName = "geolocation-api-$($config.parameters.environment.value)-$($config.parameters.instance.value)"
                       $apiId = (az ad app list --filter "displayName eq '$apiName'" --query '[].appId') | ConvertFrom-Json
                       $resourceId = (az ad sp list --filter "appId eq '$apiId'" --query '[0].id') | ConvertFrom-Json
                       $apiSpn = (az rest -m GET -u https://graph.microsoft.com/v1.0/servicePrincipals/$resourceId) | ConvertFrom-Json
                       $appRoleId = ($apiSpn.appRoles | Where-Object { $_.displayName -eq "LookupApiUser" }).id
 
-                      $deploymentOutput = (az deployment sub show --name "geolocation-$($config.parameters.parEnvironment.value)-$($config.parameters.parInstance.value)") | ConvertFrom-Json
+                      $deploymentOutput = (az deployment sub show --name "geolocation-$($config.parameters.environment.value)-$($config.parameters.instance.value)") | ConvertFrom-Json
 
-                      $principalId = $deploymentOutput.properties.outputs.outWebAppIdentityPrincipalId.value
+                      $principalId = $deploymentOutput.properties.outputs.webAppIdentityPrincipalId.value
                       . "./scripts/GrantPrincipalAppRole.ps1" -principalId $principalId -resourceId $resourceId -appRoleId $appRoleId
 
                 - download: current

@@ -1,41 +1,37 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-@description('The location of the resource group.')
-param parLocation string = resourceGroup().location
+@description('The location to deploy the resources')
+param location string = resourceGroup().location
 
 @description('The external api consumer object')
-param parExternalApiConsumer object
+param externalApiConsumer object
 
-@description('The api management Ref')
-param parApiManagementRef object
+@description('A reference to the api management resource')
+param apiManagementRef object
 
 @description('The tags to apply to the resources.')
-param parTags object = resourceGroup().tags
+param tags object = resourceGroup().tags
 
 // Variables
-var varEnvironmentUniqueId = uniqueString(
-  'geolocation',
-  parExternalApiConsumer.Workload,
-  parExternalApiConsumer.PrincipalId
-)
-var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
+var environmentUniqueId = uniqueString('geolocation', externalApiConsumer.Workload, externalApiConsumer.PrincipalId)
+var keyVaultName = 'kv-${environmentUniqueId}-${location}'
 
 // Module Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
-  name: parApiManagementRef.Name
+  name: apiManagementRef.Name
 }
 
 module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' = {
-  name: '${parExternalApiConsumer.Workload}-kv'
+  name: '${externalApiConsumer.Workload}-kv'
 
   params: {
-    keyVaultName: varKeyVaultName
+    keyVaultName: keyVaultName
     keyVaultCreateMode: 'default'
-    location: parLocation
-    tags: union(parTags, {
-      consumerWorkload: parExternalApiConsumer.Workload
-      consumerPricipalId: parExternalApiConsumer.PrincipalId
+    location: location
+    tags: union(tags, {
+      consumerWorkload: externalApiConsumer.Workload
+      consumerPricipalId: externalApiConsumer.PrincipalId
     })
   }
 }
@@ -47,23 +43,23 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 module keyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
-  name: '${parExternalApiConsumer.Workload}-kvrole'
+  name: '${externalApiConsumer.Workload}-kvrole'
 
   params: {
     keyVaultName: keyVault.outputs.keyVaultRef.name
-    principalId: parExternalApiConsumer.PrincipalId
+    principalId: externalApiConsumer.PrincipalId
     roleDefinitionId: keyVaultSecretUserRoleDefinition.id
   }
 }
 
 module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/apimanagementsubscription:latest' = {
-  name: '${parExternalApiConsumer.Workload}-apimsubscription'
+  name: '${externalApiConsumer.Workload}-apimsubscription'
 
   params: {
     apiManagementName: apiManagement.name
-    workloadName: parExternalApiConsumer.Workload
+    workloadName: externalApiConsumer.Workload
     apiScope: 'geolocation-api'
     keyVaultName: keyVault.outputs.keyVaultRef.name
-    tags: parTags
+    tags: tags
   }
 }

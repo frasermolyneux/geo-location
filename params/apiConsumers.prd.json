@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "parEnvironment": {
+        "environment": {
             "value": "prd"
         },
-        "parLocation": {
+        "location": {
             "value": "uksouth"
         },
-        "parInstance": {
+        "instance": {
             "value": "01"
         },
-        "parTags": {
+        "tags": {
             "value": {
                 "Environment": "prd",
                 "Workload": "geolocation",
@@ -19,7 +19,7 @@
                 "Git": "https://github.com/frasermolyneux/geo-location"
             }
         },
-        "parExternalApiConsumers": {
+        "externalApiConsumers": {
             "value": [
                 {
                     "Workload": "portal-web-prd",

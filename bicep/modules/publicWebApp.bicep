@@ -1,36 +1,36 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-@description('The environment name (e.g. dev, test, prod)')
-param parEnvironment string
+@description('The environment for the resources')
+param environment string
 
-@description('The location of the resource group.')
-param parLocation string = resourceGroup().location
+@description('The location to deploy the resources')
+param location string = resourceGroup().location
 
 @description('The instance name (e.g. 01, 02, 03)')
-param parInstance string
+param instance string
 
-@description('The name of the key vault.')
-param parKeyVaultRef object
+@description('A reference to the key vault resource')
+param keyVaultRef object
 
-@description('The app insights reference')
-param parAppInsightsRef object
+@description('A reference to the app insights resource')
+param appInsightsRef object
 
-@description('The app service plan Ref')
-param parAppServicePlanRef object
+@description('A reference to the app service plan resource')
+param appServicePlanRef object
 
-@description('The api management Ref')
-param parApiManagementRef object
+@description('A reference to the api management resource')
+param apiManagementRef object
 
 @description('The dns configuration object')
-param parDns object
+param dns object
 
 @description('The tags to apply to the resources.')
-param parTags object = resourceGroup().tags
+param tags object = resourceGroup().tags
 
 // Variables
-var varEnvironmentUniqueId = uniqueString('app-geolocation-web', parEnvironment, parInstance)
-var varWebAppName = 'app-geolocation-web-${parEnvironment}-${parLocation}-${parInstance}-${varEnvironmentUniqueId}'
+var environmentUniqueId = uniqueString('app-geolocation-web', environment, instance)
+var webAppName = 'app-geolocation-web-${environment}-${location}-${instance}-${environmentUniqueId}'
 
 // Existing Resources
 @description('https://learn.microsoft.com/en-gb/azure/role-based-access-control/built-in-roles#key-vault-secrets-user')
@@ -40,22 +40,22 @@ resource keyVaultSecretUserRoleDefinition 'Microsoft.Authorization/roleDefinitio
 }
 
 resource keyVault 'Microsoft.KeyVault/vaults@2021-06-01-preview' existing = {
-  name: parKeyVaultRef.Name
-  scope: resourceGroup(parKeyVaultRef.SubscriptionId, parKeyVaultRef.ResourceGroupName)
+  name: keyVaultRef.Name
+  scope: resourceGroup(keyVaultRef.SubscriptionId, keyVaultRef.ResourceGroupName)
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' existing = {
-  name: parAppInsightsRef.Name
-  scope: resourceGroup(parAppInsightsRef.SubscriptionId, parAppInsightsRef.ResourceGroupName)
+  name: appInsightsRef.Name
+  scope: resourceGroup(appInsightsRef.SubscriptionId, appInsightsRef.ResourceGroupName)
 }
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2020-10-01' existing = {
-  name: parAppServicePlanRef.Name
-  scope: resourceGroup(parAppServicePlanRef.SubscriptionId, parAppServicePlanRef.ResourceGroupName)
+  name: appServicePlanRef.Name
+  scope: resourceGroup(appServicePlanRef.SubscriptionId, appServicePlanRef.ResourceGroupName)
 }
 
 resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' existing = {
-  name: parApiManagementRef.Name
+  name: apiManagementRef.Name
 }
 
 // Module Resources
@@ -64,18 +64,18 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
 
   params: {
     apiManagementName: apiManagement.name
-    workloadName: varWebAppName
+    workloadName: webAppName
     apiScope: 'geolocation-api'
     keyVaultName: keyVault.name
-    tags: parTags
+    tags: tags
   }
 }
 
 resource webApp 'Microsoft.Web/sites@2023-01-01' = {
-  name: varWebAppName
-  location: parLocation
+  name: webAppName
+  location: location
   kind: 'app,linux'
-  tags: parTags
+  tags: tags
 
   identity: {
     type: 'SystemAssigned'
@@ -127,7 +127,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
         }
         {
           name: 'geolocation_api_application_audience'
-          value: 'api://geolocation-api-${parEnvironment}-${parInstance}'
+          value: 'api://geolocation-api-${environment}-${instance}'
         }
         {
           name: 'APPINSIGHTS_PROFILERFEATURE_VERSION'
@@ -148,9 +148,9 @@ module webTest 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/webtest:latest' = {
   params: {
     workloadName: webApp.name
     testUrl: 'https://${webApp.properties.defaultHostName}/api/health'
-    appInsightsRef: parAppInsightsRef
-    location: parLocation
-    tags: parTags
+    appInsightsRef: appInsightsRef
+    location: location
+    tags: tags
   }
 }
 
@@ -166,18 +166,18 @@ module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
 
 module webAppDns 'dnsWebApp.bicep' = {
   name: '${deployment().name}-dns'
-  scope: resourceGroup(parDns.SubscriptionId, parDns.ResourceGroupName)
+  scope: resourceGroup(dns.SubscriptionId, dns.ResourceGroupName)
 
   params: {
-    parDns: parDns
-    parWebAppHostname: webApp.properties.defaultHostName
-    parDomainAuthCode: webApp.properties.customDomainVerificationId
-    parTags: parTags
+    dns: dns
+    webAppHostname: webApp.properties.defaultHostName
+    domainAuthCode: webApp.properties.customDomainVerificationId
+    tags: tags
   }
 }
 
 resource customDomain 'Microsoft.Web/sites/hostNameBindings@2023-01-01' = {
-  name: '${parDns.Subdomain}.${parDns.Domain}'
+  name: '${dns.Subdomain}.${dns.Domain}'
   parent: webApp
 
   properties: {
@@ -190,5 +190,5 @@ resource customDomain 'Microsoft.Web/sites/hostNameBindings@2023-01-01' = {
 }
 
 // Outputs
-output outWebAppIdentityPrincipalId string = webApp.identity.principalId
-output outWebAppName string = webApp.name
+output webAppIdentityPrincipalId string = webApp.identity.principalId
+output webAppName string = webApp.name

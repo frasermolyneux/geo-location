@@ -1,19 +1,19 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-@description('The API Management name')
-param parApiManagementName string
+@description('The api management resource name')
+param apiManagementName string
 
-@description('The location of the resource group.')
-param parLocation string = resourceGroup().location
+@description('The location to deploy the resources')
+param location string = resourceGroup().location
 
 @description('The tags to apply to the resources.')
-param parTags object = resourceGroup().tags
+param tags object = resourceGroup().tags
 
 // Module Resources
 resource apiManagement 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
-  name: parApiManagementName
-  location: parLocation
+  name: apiManagementName
+  location: location
 
   sku: {
     capacity: 0
@@ -29,7 +29,7 @@ resource apiManagement 'Microsoft.ApiManagement/service@2023-05-01-preview' = {
     type: 'SystemAssigned'
   }
 
-  tags: parTags
+  tags: tags
 }
 
 // Outputs

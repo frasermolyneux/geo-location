@@ -1,22 +1,22 @@
 targetScope = 'resourceGroup'
 
 // Parameters
-@description('The name of the Key Vault to store the secrets in.')
-param parKeyVaultName string
+@description('The key vault resource name')
+param keyVaultName string
 
-@description('The location to deploy the resources to.')
-param parLocation string = resourceGroup().location
+@description('The location to deploy the resources')
+param location string = resourceGroup().location
 
 @description('The tags to apply to all resources in this deployment.')
-param parTags object = resourceGroup().tags
+param tags object = resourceGroup().tags
 
 // Module Resources
 @description('The storage account')
 resource storageAccount 'Microsoft.Storage/storageAccounts@2019-06-01' = {
   name: 'saad${uniqueString(resourceGroup().name)}'
-  location: parLocation
+  location: location
   kind: 'StorageV2'
-  tags: parTags
+  tags: tags
 
   sku: {
     name: 'Standard_LRS'
@@ -44,10 +44,10 @@ module keyVaultSecret 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultsecr
   name: '${storageAccount.name}-kvsecret'
 
   params: {
-    keyVaultName: parKeyVaultName
+    keyVaultName: keyVaultName
     secretName: '${storageAccount.name}-connectionstring'
     secretValue: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};EndpointSuffix=${environment().suffixes.storage};AccountKey=${storageAccount.listKeys().keys[0].value}'
-    tags: parTags
+    tags: tags
   }
 }
 

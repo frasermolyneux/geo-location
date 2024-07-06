@@ -1,39 +1,39 @@
 targetScope = 'subscription'
 
-@description('The environment name (e.g. dev, test, prod)')
-param parEnvironment string
+@description('The environment for the resources')
+param environment string
 
-@description('The location of the resource group and resources')
-param parLocation string
+@description('The location to deploy the resources')
+param location string
 
 @description('The instance name (e.g. 01, 02, 03, etc.)')
-param parInstance string
+param instance string
 
-@description('The log analytics workspace reference')
-param parLogAnalyticsWorkspaceRef object
+@description('A reference to the log analytics workspace resource')
+param logAnalyticsWorkspaceRef object
 
 @description('The dns configuration object')
-param parDns object
+param dns object
 
 @description('The tags to apply to the resources')
-param parTags object
+param tags object
 
 @description('The key vault create mode (recover, default)')
-param parKeyVaultCreateMode string = 'recover'
+param keyVaultCreateMode string = 'recover'
 
 // Variables
-var varEnvironmentUniqueId = uniqueString('geolocation', parEnvironment, parInstance)
-var varResourceGroupName = 'rg-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
-var varKeyVaultName = 'kv-${varEnvironmentUniqueId}-${parLocation}'
-var varAppInsightsName = 'ai-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
-var varAppServicePlanName = 'plan-geolocation-${parEnvironment}-${parLocation}-${parInstance}'
-var varApiManagementName = 'apim-geolocation-${parEnvironment}-${parLocation}-${varEnvironmentUniqueId}'
+var environmentUniqueId = uniqueString('geolocation', environment, instance)
+var resourceGroupName = 'rg-geolocation-${environment}-${location}-${instance}'
+var keyVaultName = 'kv-${environmentUniqueId}-${location}'
+var varAppInsightsName = 'ai-geolocation-${environment}-${location}-${instance}'
+var varAppServicePlanName = 'plan-geolocation-${environment}-${location}-${instance}'
+var varApiManagementName = 'apim-geolocation-${environment}-${location}-${environmentUniqueId}'
 
 // Module Resources
 resource defaultResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' = {
-  name: varResourceGroupName
-  location: parLocation
-  tags: parTags
+  name: resourceGroupName
+  location: location
+  tags: tags
 
   properties: {}
 }
@@ -43,10 +43,10 @@ module keyVault 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvault:latest' =
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
-    keyVaultName: varKeyVaultName
-    keyVaultCreateMode: parKeyVaultCreateMode
-    location: parLocation
-    tags: parTags
+    keyVaultName: keyVaultName
+    keyVaultCreateMode: keyVaultCreateMode
+    location: location
+    tags: tags
   }
 }
 
@@ -56,9 +56,9 @@ module appInsights 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/appinsights:lat
 
   params: {
     appInsightsName: varAppInsightsName
-    logAnalyticsWorkspaceRef: parLogAnalyticsWorkspaceRef
-    location: parLocation
-    tags: parTags
+    logAnalyticsWorkspaceRef: logAnalyticsWorkspaceRef
+    location: location
+    tags: tags
   }
 }
 
@@ -67,9 +67,9 @@ module appServicePlan 'modules/appServicePlan.bicep' = {
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
-    parAppServicePlanName: varAppServicePlanName
-    parLocation: parLocation
-    parTags: parTags
+    appServicePlanName: varAppServicePlanName
+    location: location
+    tags: tags
   }
 }
 
@@ -78,9 +78,9 @@ module apiManagement 'modules/apiManagement.bicep' = {
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
-    parApiManagementName: varApiManagementName
-    parLocation: parLocation
-    parTags: parTags
+    apiManagementName: varApiManagementName
+    location: location
+    tags: tags
   }
 }
 
@@ -99,22 +99,22 @@ module lookupWebApi 'modules/lookupWebApi.bicep' = {
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
-    parEnvironment: parEnvironment
-    parLocation: parLocation
-    parInstance: parInstance
-    parKeyVaultRef: {
-      Name: varKeyVaultName
+    environment: environment
+    location: location
+    instance: instance
+    keyVaultRef: {
+      Name: keyVaultName
       ResourceGroupName: defaultResourceGroup.name
       SubscriptionId: subscription().subscriptionId
     }
-    parAppInsightsRef: {
+    appInsightsRef: {
       Name: appInsights.outputs.appInsightsRef.Name
       ResourceGroupName: defaultResourceGroup.name
       SubscriptionId: subscription().subscriptionId
     }
-    parAppServicePlanRef: appServicePlan.outputs.outAppServicePlanRef
-    parApiManagementRef: apiManagement.outputs.outApiManagementRef
-    parTags: parTags
+    appServicePlanRef: appServicePlan.outputs.outAppServicePlanRef
+    apiManagementRef: apiManagement.outputs.outApiManagementRef
+    tags: tags
   }
 }
 
@@ -123,29 +123,29 @@ module publicWebApp 'modules/publicWebApp.bicep' = {
   scope: resourceGroup(defaultResourceGroup.name)
 
   params: {
-    parEnvironment: parEnvironment
-    parLocation: parLocation
-    parInstance: parInstance
-    parKeyVaultRef: {
-      Name: varKeyVaultName
+    environment: environment
+    location: location
+    instance: instance
+    keyVaultRef: {
+      Name: keyVaultName
       ResourceGroupName: defaultResourceGroup.name
       SubscriptionId: subscription().subscriptionId
     }
-    parAppInsightsRef: {
+    appInsightsRef: {
       Name: appInsights.outputs.appInsightsRef.Name
       ResourceGroupName: defaultResourceGroup.name
       SubscriptionId: subscription().subscriptionId
     }
-    parAppServicePlanRef: appServicePlan.outputs.outAppServicePlanRef
-    parApiManagementRef: apiManagement.outputs.outApiManagementRef
-    parDns: parDns
-    parTags: parTags
+    appServicePlanRef: appServicePlan.outputs.outAppServicePlanRef
+    apiManagementRef: apiManagement.outputs.outApiManagementRef
+    dns: dns
+    tags: tags
   }
 }
 
 // Outputs
-output outWebAppIdentityPrincipalId string = publicWebApp.outputs.outWebAppIdentityPrincipalId
+output webAppIdentityPrincipalId string = publicWebApp.outputs.webAppIdentityPrincipalId
 output outResourceGroupName string = defaultResourceGroup.name
-output outWebAppName string = publicWebApp.outputs.outWebAppName
-output outWebApiName string = lookupWebApi.outputs.outWebAppName
+output webAppName string = publicWebApp.outputs.webAppName
+output outWebApiName string = lookupWebApi.outputs.webAppName
 output outKeyVaultName string = keyVault.outputs.keyVaultRef.name
