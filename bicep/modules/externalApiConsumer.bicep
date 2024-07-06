@@ -50,9 +50,9 @@ module keyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyv
   name: '${parExternalApiConsumer.Workload}-kvrole'
 
   params: {
-    parKeyVaultName: keyVault.outputs.outKeyVaultName
-    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
-    parPrincipalId: parExternalApiConsumer.PrincipalId
+    keyVaultName: keyVault.outputs.outKeyVaultName
+    principalId: parExternalApiConsumer.PrincipalId
+    roleDefinitionId: keyVaultSecretUserRoleDefinition.id
   }
 }
 

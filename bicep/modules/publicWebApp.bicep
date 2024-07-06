@@ -158,9 +158,9 @@ module publicWebAppKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/
   name: '${deployment().name}-kvwebapprole'
 
   params: {
-    parKeyVaultName: keyVault.name
-    parRoleDefinitionId: keyVaultSecretUserRoleDefinition.id
-    parPrincipalId: webApp.identity.principalId
+    keyVaultName: keyVault.name
+    principalId: webApp.identity.principalId
+    roleDefinitionId: keyVaultSecretUserRoleDefinition.id
   }
 }
 
