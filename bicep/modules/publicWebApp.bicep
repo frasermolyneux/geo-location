@@ -142,7 +142,7 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   }
 }
 
-module webTest 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/webtest:latest' = {
+module webTest 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/webtest:latest' = if (environment == 'prd') {
   name: '${deployment().name}-webtest'
 
   params: {
