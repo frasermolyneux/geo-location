@@ -91,7 +91,7 @@ stages:
 
       - template: templates/bicep-environment-validation.yml
         parameters:
-          dependsOn: [bicep_linter]
+          dependsOn: [bicep_linter, validate_bicep_against_dev_environment]
           azureSubscription: "spn-geo-location-production"
           environment: geo-location-Production
           environmentName: "prd"
@@ -116,5 +116,5 @@ stages:
       azureSubscription: "spn-geo-location-production"
       environment: geo-location-Production
       environmentName: "prd"
-      webAppsEnvironment: geo-location-ProductionWebApps
+      webAppsEnvironment: geo-location-Production
       siteUrl: "https://www.geo-location.net"

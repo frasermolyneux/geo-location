@@ -32,7 +32,7 @@ stages:
 
       - template: templates/bicep-environment-validation.yml
         parameters:
-          dependsOn: [bicep_linter]
+          dependsOn: [bicep_linter, validate_bicep_against_dev_environment]
           azureSubscription: "spn-geo-location-production"
           environment: geo-location-Production
           environmentName: "prd"
