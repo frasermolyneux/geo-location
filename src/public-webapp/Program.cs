@@ -10,20 +10,19 @@ builder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 builder.Services.AddLogging();
 builder.Services.AddMemoryCache();
 
+//https://learn.microsoft.com/en-us/azure/azure-monitor/app/sampling-classic-api#configure-sampling-settings
 builder.Services.Configure<TelemetryConfiguration>(telemetryConfiguration =>
 {
-    var builder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
-
-    // Using fixed rate sampling
-    double fixedSamplingPercentage = 50;
-    builder.UseSampling(fixedSamplingPercentage);
+    var telemetryProcessorChainBuilder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
+    telemetryProcessorChainBuilder.UseAdaptiveSampling(excludedTypes: "Exception");
+    telemetryProcessorChainBuilder.Build();
 });
-builder.Services.AddServiceProfiler();
-
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
 {
     EnableAdaptiveSampling = false,
 });
+
+builder.Services.AddServiceProfiler();
 
 builder.Services.AddControllersWithViews();
 
