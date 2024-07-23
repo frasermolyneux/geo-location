@@ -60,12 +60,20 @@ namespace MX.GeoLocation.PublicWebApp.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error(string? message)
         {
+            if (!ModelState.IsValid)
+            {
+                return View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = "An error occurred while processing your request." });
+            }
+
             return View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = message });
         }
 
         [HttpGet]
         public async Task<IActionResult> LookupAddress(string id)
         {
+            if (!ModelState.IsValid)
+                return View(new LookupAddressViewModel());
+
             if (string.IsNullOrWhiteSpace(id))
                 return View(new LookupAddressViewModel());
 
