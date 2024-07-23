@@ -1,7 +1,11 @@
-trigger:
-  branches:
-    include:
-      - "main"
+resources:
+  pipelines:
+  - pipeline: geo-location.ReleaseToProduction
+    source: geo-location.ReleaseToProduction
+    project: Personal-Public
+    trigger: true
+
+trigger: none
 
 pr: none
 
