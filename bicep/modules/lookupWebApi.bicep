@@ -157,17 +157,17 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
   }
 }
 
-module webTest 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/webtest:latest' = if (environment == 'prd') {
-  name: '${deployment().name}-webtest'
-
-  params: {
-    workloadName: webApp.name
-    testUrl: 'https://${webApp.properties.defaultHostName}/api/health'
-    appInsightsRef: appInsightsRef
-    location: location
-    tags: tags
-  }
-}
+//module webTest 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/webtest:latest' = if (environment == 'prd') {
+//  name: '${deployment().name}-webtest'
+//
+//  params: {
+//    workloadName: webApp.name
+//    testUrl: 'https://${webApp.properties.defaultHostName}/api/health'
+//    appInsightsRef: appInsightsRef
+//    location: location
+//    tags: tags
+//  }
+//}
 
 module lookupWebApiKeyVaultRoleAssignment 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/keyvaultroleassignment:latest' = {
   name: '${deployment().name}-kvwebapirole'
