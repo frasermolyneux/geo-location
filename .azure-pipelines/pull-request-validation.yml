@@ -37,7 +37,7 @@ stages:
           toolsManifestPath: "$(Build.SourcesDirectory)/.config/dotnet-tools.json"
           useCobertura: true
           buildConfiguration: $(buildConfiguration)
-          dotnetSdkVersion: "8.x"
+          dotnetSdkVersion: "9.x"
           additionalBuildSteps:
             - task: DotNetCoreCLI@2
               displayName: "Publish public-webapp project"
