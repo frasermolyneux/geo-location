@@ -1,13 +1,17 @@
 trigger:
   branches:
     include:
-      - "*"
+    - '*'
+    exclude:
+    - 'docs/*'
 
 pr:
   autoCancel: false
   branches:
     include:
-      - "*"
+    - '*'
+    exclude:
+    - 'docs/*'
 
 pool:
   vmImage: ubuntu-latest
