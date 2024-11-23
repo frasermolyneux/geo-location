@@ -26,11 +26,6 @@ variables:
 stages:
   - stage: build
     jobs:
-      #- template: jobs/dependency-check.yml@ado-pipeline-templates
-      #  parameters:
-      #    jobName: 'DependencyCheck'
-      #    failOnCVSS: 4
-
       - template: jobs/build-net-core-projects.yml@ado-pipeline-templates
         parameters:
           jobName: "BuildNetCoreProjects"
@@ -90,6 +85,10 @@ stages:
           environment: geo-location-Development
           environmentName: "dev"
 
+      - template: jobs/devops-secure-scanning.yml@ado-pipeline-templates
+        parameters:
+          dependsOn: [bicep_linter]
+        
       - template: templates/bicep-environment-validation.yml
         parameters:
           dependsOn: [bicep_linter]
