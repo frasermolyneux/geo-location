@@ -6,6 +6,12 @@
 
 <row>
     <div class="text-center">
+        <h1 class="display-4">My Custom Message: - @ViewData["CustomMessage"]</h1>
+    </div>
+</row>
+
+<row>
+    <div class="text-center">
         <h1 id="pageTitle" class="display-4">Welcome - @Model.Address</h1>
         <p>We believe you are from @Model.CityName, @Model.CountryName</p>
     </div>
@@ -98,5 +104,6 @@
         }
     </script>
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
 }

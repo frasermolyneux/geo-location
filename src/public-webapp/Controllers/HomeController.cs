@@ -29,8 +29,11 @@ namespace MX.GeoLocation.PublicWebApp.Controllers
             webHostEnvironment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index([FromQuery] string customMessage = "")
         {
+            // Add customMessage to the ViewData dictionary
+            ViewData["CustomMessage"] = customMessage;
+
             var sessionGeoLocationDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<GeoLocationDto>(UserLocationSessionKey);
 
             if (sessionGeoLocationDto != null)
