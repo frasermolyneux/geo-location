@@ -5,6 +5,7 @@ on:
 
 permissions:
   contents: read # This is required for actions/checkout
+  pull-requests: write # required by review action to post summary
 
 jobs:
   dependency-review:
@@ -16,3 +17,6 @@ jobs:
 
     - name: "Dependency Review"
       uses: actions/dependency-review-action@v4
+      with: 
+        comment-summary-in-pr: true
+        show-openssf-scorecard: true
