@@ -1,6 +1,10 @@
 name: Code Quality
 
-on: push
+on: 
+  push: 
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read # This is required for actions/checkout

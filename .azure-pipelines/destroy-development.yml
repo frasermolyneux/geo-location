@@ -2,10 +2,10 @@ trigger: none
 pr: none
 
 schedules:
-    displayName: Destroy Development
-    branches:
-      include:
-        - main
+  displayName: Destroy Development
+  branches:
+    include:
+      - main
 
 pool:
   vmImage: ubuntu-latest
