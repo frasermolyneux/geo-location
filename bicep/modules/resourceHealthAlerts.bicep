@@ -42,7 +42,7 @@ resource resourceHealthAlerts 'Microsoft.Insights/activityLogAlerts@2020-10-01' 
   location: 'global'
   properties: {
     scopes: [
-      '/subscriptions/${tenant().tenantId}/resourceGroups/${resourceGroup().name}'
+      '/subscriptions/${subscription().subscriptionId}/resourceGroups/${resourceGroup().name}'
     ]
     condition: {
       allOf: [
