@@ -18,6 +18,12 @@
                 "Name": "log-platform-prd-uksouth-01"
             }
         },
+        "actionGroupResourceGroupRef": {
+            "value": {
+                "SubscriptionId": "7760848c-794d-4a19-8cb2-52f71a21ac2b",
+                "ResourceGroupName": "rg-platform-monitoring-prd-uksouth"
+            }
+        },
         "dns": {
             "value": {
                 "SubscriptionId": "db34f572-8b71-40d6-8f99-f29a27612144",

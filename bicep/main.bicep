@@ -12,6 +12,9 @@ param instance string
 @description('A reference to the log analytics workspace resource')
 param logAnalyticsWorkspaceRef object
 
+@description('A reference to the action groups resource group')
+param actionGroupResourceGroupRef object
+
 @description('The dns configuration object')
 param dns object
 
@@ -140,6 +143,16 @@ module publicWebApp 'modules/publicWebApp.bicep' = {
     apiManagementRef: apiManagement.outputs.outApiManagementRef
     dns: dns
     tags: tags
+  }
+}
+
+module resourceHealthAlerts 'modules/resourceHealthAlerts.bicep' = {
+  name: '${deployment().name}-resourceHealthAlerts'
+  scope: resourceGroup(defaultResourceGroup.name)
+
+  params: {
+    environment: environment
+    actionGroupResourceGroupRef: actionGroupResourceGroupRef
   }
 }
 
