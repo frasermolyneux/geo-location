@@ -16,7 +16,7 @@
 	<PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" Version="2.7.3" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.3" />
 	<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.3" />
-	<PackageReference Include="Microsoft.Identity.Web" Version="3.8.0" />
+	<PackageReference Include="Microsoft.Identity.Web" Version="3.8.1" />
 	<PackageReference Include="MxIO.ApiClient.Abstractions" Version="1.1.126.1" />
 	<PackageReference Include="MxIO.ApiClient.WebExtensions" Version="1.1.126.1" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
