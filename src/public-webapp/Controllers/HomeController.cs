@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
-
+using System.Xml;
 using Microsoft.AspNetCore.Mvc;
 
 using MX.GeoLocation.GeoLocationApi.Client;
@@ -71,6 +71,18 @@ namespace MX.GeoLocation.PublicWebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> LookupAddress(string id)
         {
+            // Create a new XML payload to end to our 'new' backend service.
+            using (XmlWriter writer = XmlWriter.Create("query.xml"))
+            {
+                writer.WriteStartDocument();
+
+                // BAD: Insert user input directly into XML
+                writer.WriteRaw("<query><address>" + id + "</address></query>");
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+
             if (!ModelState.IsValid)
                 return View(new LookupAddressViewModel());
 
