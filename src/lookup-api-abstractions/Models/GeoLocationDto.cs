@@ -2,7 +2,7 @@
 
 namespace MX.GeoLocation.LookupApi.Abstractions.Models
 {
-    public class GeoLocationDto
+    public record GeoLocationDto
     {
         [JsonProperty]
         public string? Address { get; internal set; }

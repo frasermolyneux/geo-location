@@ -23,7 +23,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
         private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions()
         {
             BaseUrl = "https://google.co.uk",
-            ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            PrimaryApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             ApiAudience = "api://geolocation"
         };
 
@@ -36,7 +36,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
             fakeRestClientSingleton = A.Fake<IRestClientSingleton>();
 
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            A.CallTo(() => fakeApiTokenProvider.GetAccessToken(validGeoLocationApiClientOptions.ApiAudience)).Returns("mytoken");
+            A.CallTo(() => fakeApiTokenProvider.GetAccessTokenAsync(validGeoLocationApiClientOptions.ApiAudience, new CancellationToken())).Returns("mytoken");
 
             geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
         }
@@ -90,6 +90,15 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
 
             result.StatusCode.Should().Be(HttpStatusCode.OK);
             result.Result.Entries.Count.Should().Be(3);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (fakeRestClientSingleton is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }

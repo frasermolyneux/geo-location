@@ -21,7 +21,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Api
 
         public async Task<ApiResponseDto<GeoLocationDto>> GetGeoLocation(string hostname)
         {
-            var request = await CreateRequest($"lookup/{hostname}", Method.Get);
+            var request = await CreateRequestAsync($"lookup/{hostname}", Method.Get);
             var response = await ExecuteAsync(request);
 
             return response.ToApiResponse<GeoLocationDto>();
@@ -29,7 +29,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Api
 
         public async Task<ApiResponseDto<GeoLocationCollectionDto>> GetGeoLocations(List<string> hostnames)
         {
-            var request = await CreateRequest($"lookup", Method.Post);
+            var request = await CreateRequestAsync($"lookup", Method.Post);
             request.AddJsonBody(hostnames);
 
             var response = await ExecuteAsync(request);
@@ -39,7 +39,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Api
 
         public async Task<ApiResponseDto> DeleteMetadata(string hostname)
         {
-            var request = await CreateRequest($"lookup/{hostname}", Method.Delete);
+            var request = await CreateRequestAsync($"lookup/{hostname}", Method.Delete);
             var response = await ExecuteAsync(request);
 
             return response.ToApiResponse();

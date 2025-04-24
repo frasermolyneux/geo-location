@@ -2,7 +2,7 @@
 
 namespace MX.GeoLocation.LookupApi.Abstractions.Models
 {
-    public class GeoLocationCollectionDto : CollectionDto<GeoLocationDto>
+    public record GeoLocationCollectionDto : CollectionDto<GeoLocationDto>
     {
     }
 }

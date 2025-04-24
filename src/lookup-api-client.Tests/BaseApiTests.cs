@@ -11,7 +11,7 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
 {
     internal class BaseApiTests
     {
-        private ILogger fakeLogger;
+        private ILogger<BaseApi> fakeLogger;
         private IOptions<GeoLocationApiClientOptions> fakeOptions;
         private IApiTokenProvider fakeApiTokenProvider;
         private IRestClientSingleton fakeRestClientSingleton;
@@ -19,14 +19,14 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions()
         {
             BaseUrl = "https://google.co.uk",
-            ApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            PrimaryApiKey = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             ApiAudience = "api://geolocation"
         };
 
         [SetUp]
         public void SetUp()
         {
-            fakeLogger = A.Fake<ILogger>();
+            fakeLogger = A.Fake<ILogger<BaseApi>>();
             fakeOptions = A.Fake<IOptions<GeoLocationApiClientOptions>>();
             fakeApiTokenProvider = A.Fake<IApiTokenProvider>();
             fakeRestClientSingleton = A.Fake<IRestClientSingleton>();
@@ -40,11 +40,11 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
         {
             // Arrange
             A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            A.CallTo(() => fakeApiTokenProvider.GetAccessToken(validGeoLocationApiClientOptions.ApiAudience)).Returns("mytoken");
+            A.CallTo(() => fakeApiTokenProvider.GetAccessTokenAsync(validGeoLocationApiClientOptions.ApiAudience, new CancellationToken())).Returns("mytoken");
             var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
 
             // Act
-            var result = await baseApi.CreateRequest(resource, method);
+            var result = await baseApi.CreateRequestAsync(resource, method);
 
             // Assert
             result.Should().NotBeNull();
@@ -128,6 +128,15 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
             // Assert
             await act.Should().ThrowAsync<Exception>()
                 .WithMessage($"Failed GET to 'path/to/resource' with code '{httpStatusCode}'");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (fakeRestClientSingleton is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }
