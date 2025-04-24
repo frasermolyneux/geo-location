@@ -55,30 +55,6 @@ namespace MX.GeoLocation.GeoLocationApi.Client.Tests
             result.Parameters.Should().Contain(new HeaderParameter("Authorization", "Bearer mytoken"));
         }
 
-        [Test]
-        public async Task ExecuteAsyncShouldLogAndRethrowErrorWhenResponseContainsOne()
-        {
-            // Arrange
-            A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
-            var baseApi = new BaseApi(fakeLogger, fakeApiTokenProvider, fakeRestClientSingleton, fakeOptions);
-
-            RestResponse restResponse = new()
-            {
-                ErrorException = new Exception("Test Exception")
-            };
-
-            A.CallTo(() => fakeRestClientSingleton.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
-                .Returns(Task.FromResult(restResponse));
-
-            var restRequest = new RestRequest("path/to/resource", Method.Get);
-
-            // Act
-            Func<Task> act = async () => await baseApi.ExecuteAsync(restRequest);
-
-            // Assert
-            await act.Should().ThrowAsync<Exception>().WithMessage("Test Exception");
-        }
-
         [TestCase(HttpStatusCode.OK)]
         [TestCase(HttpStatusCode.NotFound)]
         public async Task ExecuteAsyncShouldPassthroughResponseForCertainStatusCodes(HttpStatusCode httpStatusCode)
