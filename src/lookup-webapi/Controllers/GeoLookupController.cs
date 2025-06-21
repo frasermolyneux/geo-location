@@ -39,7 +39,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         {
             if (!ValidateHostname(hostname))
             {
-                return new ApiResponseDto(HttpStatusCode.BadRequest, "The address provided is invalid. IP or DNS is acceptable.").ToHttpResult();
+                return new ApiResponseDto(HttpStatusCode.BadRequest, ["The address provided is invalid. IP or DNS is acceptable."]).ToHttpResult();
             }
 
             var response = await ((IGeoLookupApi)this).GetGeoLocation(hostname);
@@ -55,7 +55,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                 {
                     if (localOverrides.Contains(hostname))
                     {
-                        return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound, "Hostname is a loopback or local address, geo location data is unavailable");
+                        return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound);
                     }
 
                     var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
@@ -77,11 +77,11 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             }
             catch (AddressNotFoundException ex)
             {
-                return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound, ex.Message);
+                return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound);
             }
             catch (GeoIP2Exception ex)
             {
-                return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.BadRequest, ex.Message);
+                return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.BadRequest);
             }
         }
 
@@ -98,11 +98,11 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             }
             catch
             {
-                return new ApiResponseDto(HttpStatusCode.BadRequest, "Could not deserialize request body").ToHttpResult();
+                return new ApiResponseDto(HttpStatusCode.BadRequest, ["Could not deserialize request body"]).ToHttpResult();
             }
 
             if (hostnames == null)
-                return new ApiResponseDto(HttpStatusCode.BadRequest, "Request body was null").ToHttpResult();
+                return new ApiResponseDto(HttpStatusCode.BadRequest, ["Request body was null"]).ToHttpResult();
 
             var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames);
 
