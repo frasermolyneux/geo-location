@@ -5,9 +5,12 @@ using Microsoft.OpenApi.Models;
 
 using MX.GeoLocation.LookupWebApi;
 using MX.GeoLocation.LookupWebApi.OpenApiOperationFilters;
+using MX.GeoLocation.LookupWebApi.Configuration;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
 using Newtonsoft.Json.Converters;
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,10 +40,28 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
 });
 
+// Configure API versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    // Configure URL path versioning
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddApiExplorer(options =>
+{
+    // Format the version as "'v'major[.minor]" (e.g. v1.0)
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+// Configure Swagger
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "GeoLocation Lookup API", Version = "v1" });
+    options.OperationFilter<SwaggerDefaultValues>();
 
     options.SchemaFilter<EnumSchemaFilter>();
 
@@ -70,6 +91,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Configure Swagger options for versioning
+builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
 builder.Services.AddSingleton<ITableStorageGeoLocationRepository, TableStorageGeoLocationRepository>();
 builder.Services.AddSingleton<IMaxMindGeoLocationRepository, MaxMindGeoLocationRepository>();
 
@@ -81,7 +105,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        // Build a Swagger endpoint for each discovered API version
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+        foreach (var description in provider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                description.GroupName.ToUpperInvariant());
+        }
+    });
 }
 
 app.UseHttpsRedirection();

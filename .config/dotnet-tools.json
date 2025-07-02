@@ -7,6 +7,12 @@
       "commands": [
         "reportgenerator"
       ]
+    },
+    "swashbuckle.aspnetcore.cli": {
+      "version": "9.0.1",
+      "commands": [
+        "swagger"
+      ]
     }
   }
 }

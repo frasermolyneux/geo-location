@@ -4,6 +4,7 @@ using MaxMind.GeoIP2.Exceptions;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 using MX.GeoLocation.Abstractions.Interfaces.V1;
 using MX.GeoLocation.Abstractions.Models.V1;
@@ -17,6 +18,8 @@ using Newtonsoft.Json;
 namespace MX.GeoLocation.LookupWebApi.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}")]
     [Authorize(Roles = "LookupApiUser")]
     public class GeoLookupController : Controller, IGeoLookupApi
     {
@@ -75,11 +78,11 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.InternalServerError);
                 }
             }
-            catch (AddressNotFoundException ex)
+            catch (AddressNotFoundException)
             {
                 return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound);
             }
-            catch (GeoIP2Exception ex)
+            catch (GeoIP2Exception)
             {
                 return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.BadRequest);
             }
