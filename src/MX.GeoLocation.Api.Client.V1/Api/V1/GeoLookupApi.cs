@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using MX.GeoLocation.GeoLocationApi.Client.Extensions;
-using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
-using MX.GeoLocation.LookupApi.Abstractions.Models;
+using MX.GeoLocation.Api.Client.Extensions.V1;
+using MX.GeoLocation.Abstractions.Interfaces.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
 
 using MxIO.ApiClient;
 using MxIO.ApiClient.Abstractions;
 
 using RestSharp;
 
-namespace MX.GeoLocation.GeoLocationApi.Client.Api
+namespace MX.GeoLocation.Api.Client.V1
 {
     public class GeoLookupApi : BaseApi, IGeoLookupApi
     {

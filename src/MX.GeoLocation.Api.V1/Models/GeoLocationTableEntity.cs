@@ -3,7 +3,7 @@
 using Azure;
 using Azure.Data.Tables;
 
-using MX.GeoLocation.LookupApi.Abstractions.Models;
+using MX.GeoLocation.Abstractions.Models.V1;
 
 using Newtonsoft.Json;
 

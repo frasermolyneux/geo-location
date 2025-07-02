@@ -1,6 +1,6 @@
-﻿using MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject.PageParts;
+﻿using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
 
-namespace MX.GeoLocation.PublicWebApp.IntegrationTests
+namespace MX.GeoLocation.Web.IntegrationTests
 {
     internal interface IPage
     {

@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions
+namespace MX.GeoLocation.Web.IntegrationTests.Extensions
 {
     public static class IWebElementExtensions
     {

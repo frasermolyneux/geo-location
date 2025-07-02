@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MX.GeoLocation.LookupApi.Abstractions.Models
+namespace MX.GeoLocation.Abstractions.Models.V1
 {
     public record GeoLocationDto
     {

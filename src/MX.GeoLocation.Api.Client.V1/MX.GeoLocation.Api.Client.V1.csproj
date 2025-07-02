@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
-		<RootNamespace>MX.GeoLocation.GeoLocationApi.Client</RootNamespace>
+		<RootNamespace>MX.GeoLocation.Api.Client.V1</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Authors>Fraser Molyneux</Authors>
@@ -13,7 +13,7 @@
 		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
 		<RepositoryType>Git</RepositoryType>
-		<PackageId>MX.GeoLocation.GeoLocationApi.Client</PackageId>
+		<PackageId>MX.GeoLocation.Api.Client.V1</PackageId>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -3,13 +3,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-using MX.GeoLocation.GeoLocationApi.Client.Api;
+using MX.GeoLocation.Api.Client.V1;
 
 using MxIO.ApiClient;
 
 using RestSharp;
 
-namespace MX.GeoLocation.GeoLocationApi.Client.Tests.Api
+namespace MX.GeoLocation.Api.Client.Tests.V1
 {
     internal class GeoLookupApiTests
     {

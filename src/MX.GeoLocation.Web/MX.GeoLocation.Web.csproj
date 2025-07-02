@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 	<TargetFramework>net9.0</TargetFramework>
-	<RootNamespace>MX.GeoLocation.PublicWebApp</RootNamespace>
+	<RootNamespace>MX.GeoLocation.Web</RootNamespace>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
 	<UserSecretsId>ee0f0600-4964-4241-b623-da7ae7938f07</UserSecretsId>

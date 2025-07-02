@@ -1,7 +1,7 @@
 ﻿
 using Newtonsoft.Json;
 
-namespace MX.GeoLocation.PublicWebApp.Extensions
+namespace MX.GeoLocation.Web.Extensions
 {
     public static class SessionExtensions
     {

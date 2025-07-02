@@ -5,8 +5,8 @@ using MaxMind.GeoIP2.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
-using MX.GeoLocation.LookupApi.Abstractions.Models;
+using MX.GeoLocation.Abstractions.Interfaces.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
 using MxIO.ApiClient.Abstractions;

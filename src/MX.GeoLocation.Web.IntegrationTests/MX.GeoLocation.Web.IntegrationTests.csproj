@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>MX.GeoLocation.PublicWebApp.IntegrationTests</RootNamespace>
+    <RootNamespace>MX.GeoLocation.Web.IntegrationTests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PublishChromeDriver>True</PublishChromeDriver>

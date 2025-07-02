@@ -1,8 +1,8 @@
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 
-using MX.GeoLocation.GeoLocationApi.Client;
-using MX.GeoLocation.PublicWebApp;
+using MX.GeoLocation.Api.Client.V1;
+using MX.GeoLocation.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 

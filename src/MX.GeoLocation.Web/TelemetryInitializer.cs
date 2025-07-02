@@ -1,7 +1,7 @@
 ﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace MX.GeoLocation.PublicWebApp
+namespace MX.GeoLocation.Web
 {
     public class TelemetryInitializer : ITelemetryInitializer
     {

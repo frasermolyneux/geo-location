@@ -3,7 +3,7 @@
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
-using MX.GeoLocation.LookupApi.Abstractions.Models;
+using MX.GeoLocation.Abstractions.Models.V1;
 
 namespace MX.GeoLocation.LookupWebApi.Repositories
 {

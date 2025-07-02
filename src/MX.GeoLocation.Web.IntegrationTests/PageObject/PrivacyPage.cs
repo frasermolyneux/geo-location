@@ -1,9 +1,9 @@
-﻿using MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions;
-using MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject.PageParts;
+﻿using MX.GeoLocation.Web.IntegrationTests.Extensions;
+using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
 
 using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject
+namespace MX.GeoLocation.Web.IntegrationTests.PageObject
 {
     internal class PrivacyPage : IPage
     {

@@ -7,15 +7,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-using MX.GeoLocation.GeoLocationApi.Client;
-using MX.GeoLocation.LookupApi.Abstractions.Models;
-using MX.GeoLocation.PublicWebApp.Controllers;
+using MX.GeoLocation.Api.Client.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Web.Controllers;
 
 using MxIO.ApiClient.Abstractions;
 
 using Newtonsoft.Json;
 
-namespace MX.GeoLocation.PublicWebApp.Tests.Controllers
+namespace MX.GeoLocation.Web.Tests.Controllers
 {
     internal class HomeControllerTests
     {

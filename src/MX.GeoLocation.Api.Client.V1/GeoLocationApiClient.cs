@@ -1,6 +1,6 @@
-﻿using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
+﻿using MX.GeoLocation.Abstractions.Interfaces.V1;
 
-namespace MX.GeoLocation.GeoLocationApi.Client
+namespace MX.GeoLocation.Api.Client.V1
 {
     public class GeoLocationApiClient : IGeoLocationApiClient
     {

@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using MX.GeoLocation.GeoLocationApi.Client.Api;
-using MX.GeoLocation.LookupApi.Abstractions.Interfaces;
+using MX.GeoLocation.Api.Client.V1;
+using MX.GeoLocation.Abstractions.Interfaces.V1;
 
 using MxIO.ApiClient.Extensions;
 
-namespace MX.GeoLocation.GeoLocationApi.Client
+namespace MX.GeoLocation.Api.Client.V1
 {
     public static class ServiceCollectionExtensions
     {

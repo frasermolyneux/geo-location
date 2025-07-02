@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 using RestSharp;
 
-namespace MX.GeoLocation.GeoLocationApi.Client.Extensions
+namespace MX.GeoLocation.Api.Client.Extensions.V1
 {
     public static class RestResponseExtensions
     {

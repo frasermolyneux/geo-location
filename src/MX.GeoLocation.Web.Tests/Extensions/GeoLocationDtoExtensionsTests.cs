@@ -1,7 +1,7 @@
-﻿using MX.GeoLocation.LookupApi.Abstractions.Models;
-using MX.GeoLocation.PublicWebApp.Extensions;
+﻿using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Web.Extensions;
 
-namespace MX.GeoLocation.PublicWebApp.Tests.Extensions
+namespace MX.GeoLocation.Web.Tests.Extensions
 {
     internal class GeoLocationDtoExtensionsTests
     {

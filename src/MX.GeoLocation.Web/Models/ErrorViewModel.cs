@@ -1,4 +1,4 @@
-namespace MX.GeoLocation.PublicWebApp.Models
+namespace MX.GeoLocation.Web.Models
 {
     public class ErrorViewModel
     {

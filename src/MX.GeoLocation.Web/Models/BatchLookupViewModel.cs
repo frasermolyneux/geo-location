@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-using MX.GeoLocation.LookupApi.Abstractions.Models;
+using MX.GeoLocation.Abstractions.Models.V1;
 
-namespace MX.GeoLocation.PublicWebApp.Models
+namespace MX.GeoLocation.Web.Models
 {
     public class BatchLookupViewModel
     {

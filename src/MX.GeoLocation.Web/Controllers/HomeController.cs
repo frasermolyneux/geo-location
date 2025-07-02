@@ -3,12 +3,12 @@ using System.Net;
 
 using Microsoft.AspNetCore.Mvc;
 
-using MX.GeoLocation.GeoLocationApi.Client;
-using MX.GeoLocation.LookupApi.Abstractions.Models;
-using MX.GeoLocation.PublicWebApp.Extensions;
-using MX.GeoLocation.PublicWebApp.Models;
+using MX.GeoLocation.Api.Client.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Web.Extensions;
+using MX.GeoLocation.Web.Models;
 
-namespace MX.GeoLocation.PublicWebApp.Controllers
+namespace MX.GeoLocation.Web.Controllers
 {
     public class HomeController : Controller
     {

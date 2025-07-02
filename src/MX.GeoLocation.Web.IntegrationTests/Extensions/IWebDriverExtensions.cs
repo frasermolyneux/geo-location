@@ -3,7 +3,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace MX.GeoLocation.PublicWebApp.IntegrationTests.Extensions
+namespace MX.GeoLocation.Web.IntegrationTests.Extensions
 {
     public static class IWebDriverExtensions
     {

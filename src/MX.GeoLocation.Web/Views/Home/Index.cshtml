@@ -1,4 +1,4 @@
-﻿@using MX.GeoLocation.LookupApi.Abstractions.Models
+﻿@using MX.GeoLocation.Abstractions.Models.V1
 @model GeoLocationDto
 @{
     ViewData["Title"] = "Home Page";
@@ -98,5 +98,6 @@
         }
     </script>
 
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
 }

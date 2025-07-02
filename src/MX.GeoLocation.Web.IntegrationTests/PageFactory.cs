@@ -1,8 +1,8 @@
-﻿using MX.GeoLocation.PublicWebApp.IntegrationTests.PageObject;
+﻿using MX.GeoLocation.Web.IntegrationTests.PageObject;
 
 using OpenQA.Selenium;
 
-namespace MX.GeoLocation.PublicWebApp.IntegrationTests
+namespace MX.GeoLocation.Web.IntegrationTests
 {
     internal class PageFactory
     {

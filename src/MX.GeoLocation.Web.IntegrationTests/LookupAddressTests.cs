@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 
-namespace MX.GeoLocation.PublicWebApp.IntegrationTests
+namespace MX.GeoLocation.Web.IntegrationTests
 {
     [TestFixture("Chrome")]
     internal class LookupAddressTests : TestBase

@@ -1,8 +1,8 @@
-﻿using MX.GeoLocation.LookupApi.Abstractions.Models;
+﻿using MX.GeoLocation.Abstractions.Models.V1;
 
 using MxIO.ApiClient.Abstractions;
 
-namespace MX.GeoLocation.LookupApi.Abstractions.Interfaces
+namespace MX.GeoLocation.Abstractions.Interfaces.V1
 {
     public interface IGeoLookupApi
     {
