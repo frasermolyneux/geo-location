@@ -18,13 +18,13 @@
 
 	<ItemGroup>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>lookup-webapi</_Parameter1>
+			<_Parameter1>MX.GeoLocation.Api.V1</_Parameter1>
 		</AssemblyAttribute>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>lookup-webapi.Tests</_Parameter1>
+			<_Parameter1>MX.GeoLocation.Api.Tests.V1</_Parameter1>
 		</AssemblyAttribute>
 		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-			<_Parameter1>public-webapp.Tests</_Parameter1>
+			<_Parameter1>MX.GeoLocation.Web.Tests</_Parameter1>
 		</AssemblyAttribute>
 	</ItemGroup>
 

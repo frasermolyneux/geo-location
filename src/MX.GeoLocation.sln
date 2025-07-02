@@ -9,23 +9,23 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "abstractions", "abstractions", "{1E94FF4E-ABB4-48FE-BA72-6872D966D132}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lookup-api-abstractions", "lookup-api-abstractions\lookup-api-abstractions.csproj", "{3918D487-1711-4EE5-A7B7-3142F4A8349F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Abstractions.V1", "MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj", "{3918D487-1711-4EE5-A7B7-3142F4A8349F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lookup-api-client", "lookup-api-client\lookup-api-client.csproj", "{014C9F1C-1378-4568-BB83-3B29243572F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Api.Client.V1", "MX.GeoLocation.Api.Client.V1\MX.GeoLocation.Api.Client.V1.csproj", "{014C9F1C-1378-4568-BB83-3B29243572F9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lookup-webapi", "lookup-webapi\lookup-webapi.csproj", "{5E0C8960-40FB-42FD-A7BE-F562DBD2C9FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Api.V1", "MX.GeoLocation.Api.V1\MX.GeoLocation.Api.V1.csproj", "{5E0C8960-40FB-42FD-A7BE-F562DBD2C9FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "public-webapp", "public-webapp\public-webapp.csproj", "{7FFB3595-64C3-4FDE-A8C2-64B63810BDD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Web", "MX.GeoLocation.Web\MX.GeoLocation.Web.csproj", "{7FFB3595-64C3-4FDE-A8C2-64B63810BDD8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8C26D55E-52AD-4B45-B128-B8B2834C81C4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "public-webapp.Tests", "public-webapp.Tests\public-webapp.Tests.csproj", "{BD4B99CF-DB98-46A2-9A2B-5EE829448CEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Web.Tests", "MX.GeoLocation.Web.Tests\MX.GeoLocation.Web.Tests.csproj", "{BD4B99CF-DB98-46A2-9A2B-5EE829448CEB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lookup-webapi.Tests", "lookup-webapi.Tests\lookup-webapi.Tests.csproj", "{AFCE627B-E0FF-4B72-82CD-F4247D8BC941}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Api.Tests.V1", "MX.GeoLocation.Api.Tests.V1\MX.GeoLocation.Api.Tests.V1.csproj", "{AFCE627B-E0FF-4B72-82CD-F4247D8BC941}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "lookup-api-client.Tests", "lookup-api-client.Tests\lookup-api-client.Tests.csproj", "{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Api.Client.Tests.V1", "MX.GeoLocation.Api.Client.Tests.V1\MX.GeoLocation.Api.Client.Tests.V1.csproj", "{E1BA9F13-A38E-402C-A0C3-A8E561CF60E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "public-webapp.IntegrationTests", "public-webapp.IntegrationTests\public-webapp.IntegrationTests.csproj", "{23D56A49-A311-4C3C-8927-95268CE41A54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MX.GeoLocation.Web.IntegrationTests", "MX.GeoLocation.Web.IntegrationTests\MX.GeoLocation.Web.IntegrationTests.csproj", "{23D56A49-A311-4C3C-8927-95268CE41A54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

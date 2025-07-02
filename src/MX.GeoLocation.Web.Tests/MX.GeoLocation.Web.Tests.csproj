@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>MX.GeoLocation.GeoLocationApi.Client.Tests</RootNamespace>
+    <RootNamespace>MX.GeoLocation.PublicWebApp.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -16,7 +16,6 @@
     </PackageReference>
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="FluentAssertions" Version="8.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NUnit" Version="4.3.2" />
@@ -32,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lookup-api-client\lookup-api-client.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Web\MX.GeoLocation.Web.csproj" />
   </ItemGroup>
 
 </Project>

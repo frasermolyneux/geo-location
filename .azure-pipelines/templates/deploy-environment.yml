@@ -123,10 +123,10 @@ stages:
                       . "./scripts/GrantPrincipalAppRole.ps1" -principalId $principalId -resourceId $resourceId -appRoleId $appRoleId
 
                 - download: current
-                  artifact: lookup-webapi
+                  artifact: MX.GeoLocation.Api.V1
 
                 - download: current
-                  artifact: public-webapp
+                  artifact: MX.GeoLocation.Web
 
                 - task: AzureRmWebAppDeployment@4
                   retryCountOnTaskFailure: 3
@@ -134,7 +134,7 @@ stages:
                     azureSubscription: ${{ parameters.azureSubscription }}
                     webAppName: $(webApiName)
                     resourceGroupName: $(webAppsResourceGroupName)
-                    packageForLinux: "$(Pipeline.Workspace)/lookup-webapi/lookup-webapi.zip"
+                    packageForLinux: "$(Pipeline.Workspace)/MX.GeoLocation.Api.V1/MX.GeoLocation.Api.V1.zip"
 
                 - task: AzureRmWebAppDeployment@4
                   retryCountOnTaskFailure: 3
@@ -142,7 +142,7 @@ stages:
                     azureSubscription: ${{ parameters.azureSubscription }}
                     webAppName: $(webAppName)
                     resourceGroupName: $(webAppsResourceGroupName)
-                    packageForLinux: "$(Pipeline.Workspace)/public-webapp/public-webapp.zip"
+                    packageForLinux: "$(Pipeline.Workspace)/MX.GeoLocation.Web/MX.GeoLocation.Web.zip"
 
             postRouteTraffic:
               steps:

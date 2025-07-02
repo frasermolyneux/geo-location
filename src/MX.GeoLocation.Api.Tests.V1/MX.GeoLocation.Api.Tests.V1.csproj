@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lookup-webapi\lookup-webapi.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Api.V1\MX.GeoLocation.Api.V1.csproj" />
   </ItemGroup>
 
 </Project>

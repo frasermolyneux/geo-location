@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lookup-api-abstractions\lookup-api-abstractions.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj" />
   </ItemGroup>
 
 </Project>

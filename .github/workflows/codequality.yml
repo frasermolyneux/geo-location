@@ -46,13 +46,13 @@ jobs:
        
     - uses: frasermolyneux/actions/dotnet-web-ci@main
       with:
-        dotnet-project: "public-webapp"
+        dotnet-project: "MX.GeoLocation.Web"
         dotnet-version: 9.0.x
         src-folder: "src"
 
     - uses: frasermolyneux/actions/dotnet-web-ci@main
       with:
-        dotnet-project: "lookup-webapi"
+        dotnet-project: "MX.GeoLocation.Api.V1"
         dotnet-version: 9.0.x
         src-folder: "src"
 

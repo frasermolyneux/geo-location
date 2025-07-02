@@ -62,8 +62,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\lookup-api-abstractions\lookup-api-abstractions.csproj" />
-    <ProjectReference Include="..\lookup-api-client\lookup-api-client.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Api.Client.V1\MX.GeoLocation.Api.Client.V1.csproj" />
   </ItemGroup>
 
 </Project>

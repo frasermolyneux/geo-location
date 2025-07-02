@@ -35,40 +35,40 @@ stages:
           dotnetSdkVersion: "9.x"
           additionalBuildSteps:
             - task: DotNetCoreCLI@2
-              displayName: "Publish public-webapp project"
+              displayName: "Publish MX.GeoLocation.Web project"
               inputs:
                 command: "publish"
                 publishWebProjects: false
-                projects: "**/public-webapp.csproj"
-                arguments: "--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/public-webapp.zip"
+                projects: "**/MX.GeoLocation.Web.csproj"
+                arguments: "--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/MX.GeoLocation.Web.zip"
             - task: DotNetCoreCLI@2
-              displayName: "Publish lookup-webapi project"
+              displayName: "Publish MX.GeoLocation.Api.V1 project"
               inputs:
                 command: "publish"
                 publishWebProjects: false
-                projects: "**/lookup-webapi.csproj"
-                arguments: "--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/lookup-webapi.zip"
+                projects: "**/MX.GeoLocation.Api.V1.csproj"
+                arguments: "--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/MX.GeoLocation.Api.V1.zip"
             - task: DotNetCoreCLI@2
-              displayName: "Pack lookup-api-client project"
+              displayName: "Pack MX.GeoLocation.Api.Client.V1 project"
               inputs:
                 command: custom
                 custom: pack
                 arguments: >
-                  $(Build.SourcesDirectory)\src\lookup-api-client\lookup-api-client.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
+                  $(Build.SourcesDirectory)\src\MX.GeoLocation.Api.Client.V1\MX.GeoLocation.Api.Client.V1.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
             - task: DotNetCoreCLI@2
-              displayName: "Pack lookup-api-abstractions project"
+              displayName: "Pack MX.GeoLocation.Abstractions.V1 project"
               inputs:
                 command: custom
                 custom: pack
                 arguments: >
-                  $(Build.SourcesDirectory)\src\lookup-api-abstractions\lookup-api-abstractions.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
+                  $(Build.SourcesDirectory)\src\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj --output $(Build.ArtifactStagingDirectory)/packages /p:Configuration=$(buildConfiguration) /p:PackageVersion=$(nugetPackageVersion) --verbosity Detailed
           additionalPublishSteps:
-            - publish: "$(Build.artifactStagingDirectory)/public-webapp.zip"
-              displayName: "Publish public-webapp artifact"
-              artifact: public-webapp
-            - publish: "$(Build.artifactStagingDirectory)/lookup-webapi.zip"
-              displayName: "Publish lookup-webapi artifact"
-              artifact: lookup-webapi
+            - publish: "$(Build.artifactStagingDirectory)/MX.GeoLocation.Web.zip"
+              displayName: "Publish MX.GeoLocation.Web artifact"
+              artifact: MX.GeoLocation.Web
+            - publish: "$(Build.artifactStagingDirectory)/MX.GeoLocation.Api.V1.zip"
+              displayName: "Publish MX.GeoLocation.Api.V1 artifact"
+              artifact: MX.GeoLocation.Api.V1
             - publish: "$(Build.artifactStagingDirectory)/packages"
               displayName: "Publish NuGet Packages artifact"
               artifact: nuget-packages
