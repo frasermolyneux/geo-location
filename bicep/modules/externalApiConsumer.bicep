@@ -58,7 +58,7 @@ module apiManagementSubscription 'br:acrty7og2i6qpv3s.azurecr.io/bicep/modules/a
   params: {
     apiManagementName: apiManagement.name
     workloadName: externalApiConsumer.Workload
-    apiScope: 'geolocation-api'
+    scope: '/products/geolocation-api'
     keyVaultName: keyVault.outputs.keyVaultRef.name
     tags: tags
   }

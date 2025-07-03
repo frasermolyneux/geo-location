@@ -27,6 +27,12 @@ resource apiManagement 'Microsoft.ApiManagement/service@2021-12-01-preview' exis
   scope: resourceGroup(resourceGroupName)
 }
 
+// Reference the existing product to ensure it exists before creating consumers
+resource existingProduct 'Microsoft.ApiManagement/service/products@2021-08-01' existing = {
+  name: 'geolocation-api'
+  parent: apiManagement
+}
+
 module externalApiConsumer 'modules/externalApiConsumer.bicep' = [
   for consumer in externalApiConsumers: {
     name: '${deployment().name}-${consumer.Workload}'
@@ -42,5 +48,9 @@ module externalApiConsumer 'modules/externalApiConsumer.bicep' = [
       }
       tags: tags
     }
+
+    dependsOn: [
+      existingProduct
+    ]
   }
 ]

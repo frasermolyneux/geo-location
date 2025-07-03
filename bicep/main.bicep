@@ -116,7 +116,6 @@ module lookupWebApi 'modules/lookupWebApi.bicep' = {
       SubscriptionId: subscription().subscriptionId
     }
     appServicePlanRef: appServicePlan.outputs.outAppServicePlanRef
-    apiManagementRef: apiManagement.outputs.outApiManagementRef
     tags: tags
   }
 }
@@ -156,9 +155,59 @@ module resourceHealthAlerts 'modules/resourceHealthAlerts.bicep' = {
   }
 }
 
+module apiManagementProduct 'modules/apiManagementProduct.bicep' = {
+  name: '${deployment().name}-apiManagementProduct'
+  scope: resourceGroup(defaultResourceGroup.name)
+
+  params: {
+    environment: environment
+    instance: instance
+    apiManagementName: apiManagement.outputs.outApiManagementRef.Name
+  }
+}
+
+module apiManagementVersionedApis 'modules/apiManagementVersionedApis.bicep' = {
+  name: '${deployment().name}-apiManagementVersionedApis'
+  scope: resourceGroup(defaultResourceGroup.name)
+
+  params: {
+    apiManagementName: apiManagement.outputs.outApiManagementRef.Name
+    backendHostname: lookupWebApi.outputs.webAppDefaultHostName
+    productId: apiManagementProduct.outputs.productId
+    versionSetId: apiManagementProduct.outputs.versionSetId
+    appInsightsRef: {
+      Name: appInsights.outputs.appInsightsRef.Name
+      ResourceGroupName: defaultResourceGroup.name
+      SubscriptionId: subscription().subscriptionId
+    }
+  }
+}
+
+module apiManagementLegacyApi 'modules/apiManagementLegacyApi.bicep' = {
+  name: '${deployment().name}-apiManagementLegacyApi'
+  scope: resourceGroup(defaultResourceGroup.name)
+
+  params: {
+    apiManagementName: apiManagement.outputs.outApiManagementRef.Name
+    productId: apiManagementProduct.outputs.productId
+    versionSetId: apiManagementProduct.outputs.versionSetId
+    appInsightsRef: {
+      Name: appInsights.outputs.appInsightsRef.Name
+      ResourceGroupName: defaultResourceGroup.name
+      SubscriptionId: subscription().subscriptionId
+    }
+  }
+
+  dependsOn: [
+    apiManagementVersionedApis // Ensure backend is created first
+  ]
+}
+
 // Outputs
 output webAppIdentityPrincipalId string = publicWebApp.outputs.webAppIdentityPrincipalId
 output outResourceGroupName string = defaultResourceGroup.name
 output webAppName string = publicWebApp.outputs.webAppName
 output outWebApiName string = lookupWebApi.outputs.webAppName
 output outKeyVaultName string = keyVault.outputs.keyVaultRef.name
+output apiProductId string = apiManagementProduct.outputs.productId
+output apiVersionSetId string = apiManagementProduct.outputs.versionSetId
