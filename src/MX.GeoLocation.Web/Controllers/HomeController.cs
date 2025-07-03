@@ -161,7 +161,11 @@ namespace MX.GeoLocation.Web.Controllers
             List<string> addresses;
             try
             {
-                addresses = model.AddressData.Split(Environment.NewLine).ToList();
+                addresses = model.AddressData
+                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(address => !string.IsNullOrWhiteSpace(address))
+                    .Select(address => address.Trim())
+                    .ToList();
             }
             catch
             {
@@ -205,39 +209,37 @@ namespace MX.GeoLocation.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveData(RemoveMyDataViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            if (string.IsNullOrWhiteSpace(model.AddressData))
-            {
-                ModelState.AddModelError(nameof(model.AddressData),
-                    "You must provide an address to query against. IP or DNS is acceptable.");
+            if (!ModelState.IsValid)
                 return View(model);
-            }
 
-            if (!ValidateHostname(model.AddressData))
+            try
             {
-                ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
-                return View(model);
-            }
-
-            var deleteMetaDataResponse = await geoLocationApiClient.GeoLookup.DeleteMetadata(model.AddressData);
-
-            if (!deleteMetaDataResponse.IsSuccess)
-            {
-                deleteMetaDataResponse.Errors.ForEach(error =>
+                if (!ValidateHostname(model.AddressData))
                 {
-                    ModelState.AddModelError(nameof(model.AddressData), error);
-                });
+                    ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
+                    return View(model);
+                }
 
+                var deleteMetaDataResponse = await geoLocationApiClient.GeoLookup.DeleteMetadata(model.AddressData);
+
+                if (!deleteMetaDataResponse.IsSuccess)
+                {
+                    deleteMetaDataResponse.Errors.ForEach(error =>
+                    {
+                        ModelState.AddModelError(nameof(model.AddressData), error);
+                    });
+
+                    return View(model);
+                }
+
+                model.Removed = true;
                 return View(model);
             }
-            else
+            catch (Exception)
             {
-                model.Removed = true;
+                ModelState.AddModelError(nameof(model.AddressData), "An error occurred while trying to remove the data. Please try again.");
+                return View(model);
             }
-
-
-            return View(model);
         }
 
         private IPAddress GetUsersIpForLookup()

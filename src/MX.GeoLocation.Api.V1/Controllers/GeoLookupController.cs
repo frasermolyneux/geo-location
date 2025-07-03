@@ -179,7 +179,66 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
         Task<ApiResponseDto> IGeoLookupApi.DeleteMetadata(string hostname)
         {
-            throw new NotImplementedException();
+            return DeleteMetadataInternal(hostname);
+        }
+
+        private async Task<ApiResponseDto> DeleteMetadataInternal(string hostname)
+        {
+            try
+            {
+                if (!ValidateHostname(hostname))
+                {
+                    return new ApiResponseDto(HttpStatusCode.BadRequest, ["The address provided is invalid. IP or DNS is acceptable."]);
+                }
+
+                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                {
+                    if (localOverrides.Contains(hostname))
+                    {
+                        return new ApiResponseDto(HttpStatusCode.BadRequest, ["Cannot delete data for local addresses"]);
+                    }
+
+                    var deletedCount = 0;
+                    var messages = new List<string>();
+
+                    // Delete by resolved IP address (primary method since RowKey is TranslatedAddress)
+                    var deleted = await tableStorageGeoLocationRepository.DeleteGeoLocation(validatedAddress);
+                    if (deleted)
+                    {
+                        deletedCount++;
+                        messages.Add($"Deleted data for IP address: {validatedAddress}");
+                    }
+
+                    // If hostname is different from resolved IP, also try to delete by hostname
+                    // (in case there's legacy data stored with hostname as key)
+                    if (!string.Equals(hostname, validatedAddress, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var deletedByHostname = await tableStorageGeoLocationRepository.DeleteGeoLocation(hostname);
+                        if (deletedByHostname)
+                        {
+                            deletedCount++;
+                            messages.Add($"Deleted data for hostname: {hostname}");
+                        }
+                    }
+
+                    if (deletedCount > 0)
+                    {
+                        return new ApiResponseDto(HttpStatusCode.OK);
+                    }
+                    else
+                    {
+                        return new ApiResponseDto(HttpStatusCode.NotFound, ["No geo-location data found for the specified address"]);
+                    }
+                }
+                else
+                {
+                    return new ApiResponseDto(HttpStatusCode.BadRequest, ["Could not resolve the provided address"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ApiResponseDto(HttpStatusCode.InternalServerError, [$"An error occurred while deleting data: {ex.Message}"]);
+            }
         }
 
         private bool ValidateHostname(string address)

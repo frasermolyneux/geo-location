@@ -5,41 +5,104 @@
     ViewData["Title"] = "Remove My Data";
 }
 
-<row>
-    <h1 id="pageTitle">@ViewData["Title"]</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="h3 mb-0">
+                        <svg class="icon icon-lg me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        @ViewData["Title"]
+                    </h1>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <svg class="icon me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <strong>Important Information:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>The data we hold is transitory (not permanent)</li>
+                            <li>Data can be deleted but may be re-added if you visit the homepage or someone performs a
+                                lookup using your IP address</li>
+                            <li>This removes data from our service only, not from the upstream MaxMind service</li>
+                            <li>Anyone can submit a request to remove data</li>
+                        </ul>
+                    </div>
 
-    <p>
-        Understandably you may wish for your data to be removed from the GeoLocation service, this can be easily done.
-        <br /><br />
-        The data we hold is transitory (meaning not permanent). As such data can be deleted from the service but it will
-        be re-added if you visit the homepage of this website or
-        someone else performs a lookup using your IP Address or a domain that resolves to it. This is why anybody can
-        submit a request to remove data.
-        <br /><br />
-        Submitting the below form will remove the geo-location data associated with the address from this service. It
-        will not remove it from the downstream MaxMind service.
-    </p>
-</row>
+                    <form asp-controller="Home" asp-action="RemoveData" method="post" autocomplete="false">
+                        <div class="mb-3">
+                            <label asp-for="AddressData" class="form-label">
+                                IP Address or Domain Name
+                                <svg class="icon icon-sm ms-1" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </label>
+                            <div class="input-group">
+                                <input asp-for="AddressData" class="form-control"
+                                    placeholder="Enter IP address or domain name (e.g., 8.8.8.8 or example.com)">
+                                <button class="btn btn-danger" type="submit" id="removeDataBtn">
+                                    <svg class="icon me-2" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Remove Data
+                                </button>
+                            </div>
+                        </div>
 
-<row>
-    <form asp-controller="Home" asp-action="RemoveData" method="post" autocomplete="false">
-        <div class="input-group">
-            <input asp-for="@Model.AddressData" class="form-control">
-            <span>
-                <button class="btn" type="submit" id="search">
-                    <span class="fa fa-trash"></span>
-                </button>
-            </span>
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="validation-summary-container">
+                                <div class="alert alert-danger">
+                                    <div class="d-flex">
+                                        <svg class="icon me-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                                        </svg>
+                                        <div>
+                                            <strong>Please correct the following errors:</strong>
+                                            @Html.ValidationSummary(false, "", new { @class = "validation-list" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </form>
+
+                    @if (Model.Removed == true)
+                    {
+                        <div class="alert alert-success">
+                            <svg class="icon me-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <strong>Success!</strong> Data relating to <code>@Model.AddressData</code> has been removed from
+                            the GeoLocation database.
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-        <div>
-            <span class="text-danger">@Html.ValidationSummary(false)</span>
-        </div>
-    </form>
-</row>
-
-@if (Model.Removed == true)
-{
-    <row>
-        <p style="color: green">Data relating to @Model.AddressData has been removed from the GeoLocation database</p>
-    </row>
-}
+    </div>
+</div>
+               
+                    
+               
+                   
+                        
+                       
+                            
+                
+       

@@ -1,5 +1,4 @@
-﻿
-using Azure;
+﻿using Azure;
 using Azure.Data.Tables;
 
 using MX.GeoLocation.Abstractions.Models.V1;
@@ -36,6 +35,22 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         {
             var entity = new GeoLocationTableEntity(geoLocationDto);
             await tableClient.AddEntityAsync(entity);
+        }
+
+        public async Task<bool> DeleteGeoLocation(string address)
+        {
+            try
+            {
+                await tableClient.DeleteEntityAsync("addresses", address);
+                return true;
+            }
+            catch (RequestFailedException ex)
+            {
+                if (ex.ErrorCode == "ResourceNotFound")
+                    return false; // Entity doesn't exist, consider it already deleted
+
+                throw; // Re-throw other exceptions
+            }
         }
     }
 }

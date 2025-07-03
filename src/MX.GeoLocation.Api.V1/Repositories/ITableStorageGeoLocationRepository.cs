@@ -6,5 +6,6 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
     {
         Task<GeoLocationDto?> GetGeoLocation(string address);
         Task StoreGeoLocation(GeoLocationDto geoLocationDto);
+        Task<bool> DeleteGeoLocation(string address);
     }
 }
