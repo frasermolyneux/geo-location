@@ -10,13 +10,13 @@
 
   <ItemGroup>
 	<PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
-	<PackageReference Include="Azure.Identity" Version="1.14.0" />
+	<PackageReference Include="Azure.Identity" Version="1.14.1" />
 	<PackageReference Include="MaxMind.GeoIP2" Version="5.3.0" />
 	<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
 	<PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" Version="2.7.3" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.6" />
 	<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="9.0.6" />
-	<PackageReference Include="Microsoft.Identity.Web" Version="3.9.4" />
+	<PackageReference Include="Microsoft.Identity.Web" Version="3.10.0" />
 	<PackageReference Include="MxIO.ApiClient.Abstractions" Version="1.1.146.1" />
 	<PackageReference Include="MxIO.ApiClient.WebExtensions" Version="1.1.146.1" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -42,17 +42,13 @@
     <MakeDir Directories="$(OpenApiOutputPath)" />
     
     <!-- Restore local tools -->
-    <Exec Command="dotnet tool restore" 
-          WorkingDirectory="$(MSBuildProjectDirectory)\..\..\" />
+    <Exec Command="dotnet tool restore" WorkingDirectory="$(MSBuildProjectDirectory)\..\..\" />
     
     <!-- Generate OpenAPI files for different API versions -->
-    <Exec Command="dotnet swagger tofile --output &quot;$(OpenApiOutputPath)\openapi-v1.json&quot; &quot;$(SwaggerAssembly)&quot; v1" 
-          WorkingDirectory="$(MSBuildProjectDirectory)" 
-          ContinueOnError="true" />
+    <Exec Command="dotnet swagger tofile --output &quot;$(OpenApiOutputPath)\openapi-v1.json&quot; &quot;$(SwaggerAssembly)&quot; v1" WorkingDirectory="$(MSBuildProjectDirectory)" ContinueOnError="true" />
     
     <!-- Post-process OpenAPI files to replace /api/v1/ with / -->
-    <Exec Command="powershell -Command &quot;(Get-Content '$(OpenApiOutputPath)\openapi-v1.json').replace('/api/v1/', '/').replace('/api/v1', '/') | Set-Content '$(OpenApiOutputPath)\openapi-v1.json'&quot;" 
-          ContinueOnError="true" />
+    <Exec Command="powershell -Command &quot;(Get-Content '$(OpenApiOutputPath)\openapi-v1.json').replace('/api/v1/', '/').replace('/api/v1', '/') | Set-Content '$(OpenApiOutputPath)\openapi-v1.json'&quot;" ContinueOnError="true" />
     
     <Message Text="OpenAPI files generated and processed in $(OpenApiOutputPath)" Importance="high" />
   </Target>
