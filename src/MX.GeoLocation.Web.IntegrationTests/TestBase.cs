@@ -47,7 +47,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
 
         private async Task WarmUp()
         {
-            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://localhost:7201";
+            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://dev.geo-location.net";
             url = url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
 
             using (HttpClient client = new HttpClient() { BaseAddress = new Uri(url) })
@@ -57,7 +57,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
                     try
                     {
                         Console.WriteLine($"Performing warmup request to {url}");
-                        await client.GetAsync("/");
+                        //await client.GetAsync("/");
                     }
                     catch (Exception ex)
                     {

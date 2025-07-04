@@ -5,8 +5,9 @@
     <RootNamespace>MX.GeoLocation.Web.IntegrationTests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<PublishChromeDriver>True</PublishChromeDriver>
+    <PublishChromeDriver>True</PublishChromeDriver>
     <IsPackable>false</IsPackable>
+    <UserSecretsId>6ce3f87e-0d00-479d-ac8a-5fbc7cb2ef91</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,11 +23,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-	<PackageReference Include="Selenium.Support" Version="4.34.0" />
-	<PackageReference Include="Selenium.WebDriver" Version="4.34.0" />
-	<PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="138.0.7204.9200" />
-	<PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.36.0" />
-	<PackageReference Include="WebDriverManager" Version="2.17.5" />
+    <PackageReference Include="Selenium.Support" Version="4.34.0" />
+    <PackageReference Include="Selenium.WebDriver" Version="4.34.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="138.0.7204.9200" />
+    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.36.0" />
+    <PackageReference Include="WebDriverManager" Version="2.17.5" />
   </ItemGroup>
 
 </Project>

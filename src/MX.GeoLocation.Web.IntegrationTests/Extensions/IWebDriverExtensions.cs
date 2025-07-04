@@ -54,7 +54,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.Extensions
 
         public static void GoToPage(this IWebDriver driver, string? path = null)
         {
-            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://localhost:7201";
+            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://dev.geo-location.net";
             url = url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
 
             if (!string.IsNullOrEmpty(path))

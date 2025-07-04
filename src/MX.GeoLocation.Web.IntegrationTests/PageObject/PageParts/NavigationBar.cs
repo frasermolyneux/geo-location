@@ -25,7 +25,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts
         {
             get
             {
-                return driver.FindElementWithWait(By.Id("navbarLookupDropdown"));
+                return driver.FindElementWithWait(By.Id("navBarLookupDropdown"));
             }
         }
 
