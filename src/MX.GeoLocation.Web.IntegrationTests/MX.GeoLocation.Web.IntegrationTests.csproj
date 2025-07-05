@@ -5,17 +5,14 @@
     <RootNamespace>MX.GeoLocation.Web.IntegrationTests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PublishChromeDriver>True</PublishChromeDriver>
     <IsPackable>false</IsPackable>
     <UserSecretsId>6ce3f87e-0d00-479d-ac8a-5fbc7cb2ef91</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="8.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="NUnit" Version="4.3.2" />
-    <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.9.2">
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -23,11 +20,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Selenium.Support" Version="4.34.0" />
-    <PackageReference Include="Selenium.WebDriver" Version="4.34.0" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="138.0.7204.9200" />
-    <PackageReference Include="Selenium.WebDriver.GeckoDriver" Version="0.36.0" />
-    <PackageReference Include="WebDriverManager" Version="2.17.5" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.51.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

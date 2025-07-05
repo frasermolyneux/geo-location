@@ -1,107 +1,57 @@
-﻿using MX.GeoLocation.Web.IntegrationTests.Extensions;
-
-using OpenQA.Selenium;
+﻿using Microsoft.Playwright;
 
 namespace MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts
 {
-    internal class NavigationBar
+    public class NavigationBar
     {
-        private readonly IWebDriver driver;
+        private readonly Microsoft.Playwright.IPage page;
 
-        public NavigationBar(IWebDriver driver)
+        public NavigationBar(Microsoft.Playwright.IPage page)
         {
-            this.driver = driver;
+            this.page = page;
         }
 
-        public IWebElement NavBarHome
+        public ILocator NavBarHome => page.Locator("#navBarHome");
+        public ILocator NavBarLookupDropdown => page.Locator("#navBarLookupDropdown");
+        public ILocator NavBarLookupAddress => page.Locator("#navBarLookupAddress");
+        public ILocator NavBarLookupBatch => page.Locator("#navBarLookupBatch");
+        public ILocator NavBarPrivacyDropdown => page.Locator("#navBarPrivacyDropdown");
+        public ILocator NavBarPrivacyPolicy => page.Locator("#navBarPrivacyPolicy");
+        public ILocator NavBarPrivacyRemoveMyData => page.Locator("#navBarPrivacyRemoveMyData");
+
+        public async Task ClickNavBarHomeAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarHome"));
-            }
+            await NavBarHome.ClickAsync();
         }
 
-        public IWebElement NavBarLookupDropdown
+        public async Task ClickNavBarLookupDropdownAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarLookupDropdown"));
-            }
+            await NavBarLookupDropdown.ClickAsync();
         }
 
-        public IWebElement NavBarLookupAddress
+        public async Task ClickNavBarLookupAddressAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarLookupAddress"));
-            }
+            await NavBarLookupAddress.ClickAsync();
         }
 
-        public IWebElement NavBarLookupBatch
+        public async Task ClickNavBarLookupBatchAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarLookupBatch"));
-            }
+            await NavBarLookupBatch.ClickAsync();
         }
 
-        public IWebElement NavBarPrivacyDropdown
+        public async Task ClickNavBarPrivacyDropdownAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarPrivacyDropdown"));
-            }
+            await NavBarPrivacyDropdown.ClickAsync();
         }
 
-        public IWebElement NavBarPrivacyPolicy
+        public async Task ClickNavBarPrivacyPolicyAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarPrivacyPolicy"));
-            }
+            await NavBarPrivacyPolicy.ClickAsync();
         }
 
-        public IWebElement NavBarPrivacyRemoveMyData
+        public async Task ClickNavBarPrivacyRemoveMyDataAsync()
         {
-            get
-            {
-                return driver.FindElementWithWait(By.Id("navBarPrivacyRemoveMyData"));
-            }
-        }
-
-        public void ClickNavBarHome()
-        {
-            NavBarHome.ClickElement(driver);
-        }
-
-        public void ClickNavBarLookupDropdown()
-        {
-            NavBarLookupDropdown.ClickElement(driver);
-        }
-
-        public void ClickNavBarLookupAddress()
-        {
-            NavBarLookupAddress.ClickElement(driver);
-        }
-
-        public void ClickNavBarLookupBatch()
-        {
-            NavBarLookupBatch.ClickElement(driver);
-        }
-
-        public void ClickNavBarPrivacyDropdown()
-        {
-            NavBarPrivacyDropdown.ClickElement(driver);
-        }
-
-        public void ClickNavBarPrivacyPolicy()
-        {
-            NavBarPrivacyPolicy.ClickElement(driver);
-        }
-
-        public void ClickNavBarPrivacyRemoveMyData()
-        {
-            NavBarPrivacyRemoveMyData.ClickElement(driver);
+            await NavBarPrivacyRemoveMyData.ClickAsync();
         }
     }
 }

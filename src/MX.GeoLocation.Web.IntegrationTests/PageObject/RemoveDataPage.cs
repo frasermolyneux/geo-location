@@ -1,50 +1,54 @@
-﻿using MX.GeoLocation.Web.IntegrationTests.Extensions;
-using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
-
-using OpenQA.Selenium;
+﻿using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
+using Microsoft.Playwright;
+using Microsoft.Extensions.Configuration;
 
 namespace MX.GeoLocation.Web.IntegrationTests.PageObject
 {
-    internal class RemoveDataPage : IPage
+    public class RemoveDataPage : IPageObject
     {
-        private readonly IWebDriver driver;
+        private readonly Microsoft.Playwright.IPage page;
+        private readonly IConfiguration configuration;
 
-        public RemoveDataPage(IWebDriver driver)
+        public RemoveDataPage(Microsoft.Playwright.IPage page, IConfiguration configuration)
         {
-            this.driver = driver;
-
-            Navigation = new NavigationBar(driver);
+            this.page = page;
+            this.configuration = configuration;
+            Navigation = new NavigationBar(page);
         }
 
         public NavigationBar Navigation { get; private set; }
 
-        public bool IsOnPage
+        public async Task<bool> IsOnPageAsync()
         {
-            get
+            try
             {
-                try
-                {
-                    var pageTitle = driver.FindElementWithWait(By.Id("pageTitle"));
-                    return pageTitle.Text == "Remove My Data";
-                }
-                catch
-                {
-                    return false;
-                }
+                var title = await page.TitleAsync();
+                return title?.Contains("Remove") == true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
-        public void GoToPage(bool useNavigation = false)
+        public async Task GoToPageAsync(bool useNavigation = false)
         {
             if (useNavigation)
             {
-                Navigation.ClickNavBarPrivacyDropdown();
-                Navigation.ClickNavBarPrivacyRemoveMyData();
+                await Navigation.ClickNavBarPrivacyDropdownAsync();
+                await Navigation.ClickNavBarPrivacyRemoveMyDataAsync();
             }
             else
             {
-                driver.GoToPage("Home/RemoveData");
+                var baseUrl = GetBaseUrl();
+                await page.GotoAsync($"{baseUrl}/Home/RemoveData");
             }
+        }
+
+        private string GetBaseUrl()
+        {
+            var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
+            return url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
         }
     }
 }

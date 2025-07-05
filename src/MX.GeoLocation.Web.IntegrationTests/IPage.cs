@@ -2,11 +2,11 @@
 
 namespace MX.GeoLocation.Web.IntegrationTests
 {
-    internal interface IPage
+    public interface IPageObject
     {
         public NavigationBar Navigation { get; }
 
-        public void GoToPage(bool useNavigation = false);
-        public bool IsOnPage { get; }
+        public Task GoToPageAsync(bool useNavigation = false);
+        public Task<bool> IsOnPageAsync();
     }
 }

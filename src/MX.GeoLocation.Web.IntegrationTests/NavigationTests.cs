@@ -1,49 +1,45 @@
-using FluentAssertions;
-
 namespace MX.GeoLocation.Web.IntegrationTests
 {
-    [TestFixture("Chrome")]
-    //[TestFixture("Firefox")]
-    //[TestFixture("Edge")]
-    internal class NavigationTests : TestBase
+    public class NavigationTests : TestBase
     {
-        public NavigationTests(string browser) : base(browser)
+        [Fact]
+        public async Task CanNavigateToLookupAddressPage()
         {
+            await PageFactory!.LookupAddressPage.GoToPageAsync(true);
+            var isOnPage = await PageFactory.LookupAddressPage.IsOnPageAsync();
+            Assert.True(isOnPage);
         }
 
-        [Test]
-        public void CanNavigateToLookupAddressPage()
+        [Fact]
+        public async Task CanNavigateToBatchLookupPage()
         {
-            PageFactory.LookupAddressPage.GoToPage(true);
-            PageFactory.LookupAddressPage.IsOnPage.Should().BeTrue();
+            await PageFactory!.BatchLookupPage.GoToPageAsync(true);
+            var isOnPage = await PageFactory.BatchLookupPage.IsOnPageAsync();
+            Assert.True(isOnPage);
         }
 
-        [Test]
-        public void CanNavigateToBatchLookupPage()
+        [Fact]
+        public async Task CanNavigateToPrivacyPolicyPage()
         {
-            PageFactory.BatchLookupPage.GoToPage(true);
-            PageFactory.BatchLookupPage.IsOnPage.Should().BeTrue();
+            await PageFactory!.PrivacyPage.GoToPageAsync(true);
+            var isOnPage = await PageFactory.PrivacyPage.IsOnPageAsync();
+            Assert.True(isOnPage);
         }
 
-        [Test]
-        public void CanNavigateToPrivacyPolicyPage()
+        [Fact]
+        public async Task CanNavigateToRemoveMyDataPage()
         {
-            PageFactory.PrivacyPage.GoToPage(true);
-            PageFactory.PrivacyPage.IsOnPage.Should().BeTrue();
+            await PageFactory!.RemoveMyDataPage.GoToPageAsync(true);
+            var isOnPage = await PageFactory.RemoveMyDataPage.IsOnPageAsync();
+            Assert.True(isOnPage);
         }
 
-        [Test]
-        public void CanNavigateToRemoveMyDataPage()
+        [Fact]
+        public async Task CanNavigateToHomePage()
         {
-            PageFactory.RemoveMyDataPage.GoToPage(true);
-            PageFactory.RemoveMyDataPage.IsOnPage.Should().BeTrue();
-        }
-
-        [Test]
-        public void CanNavigateToHomePage()
-        {
-            PageFactory.HomePage.GoToPage(true);
-            PageFactory.HomePage.IsOnPage.Should().BeTrue();
+            await PageFactory!.HomePage.GoToPageAsync(true);
+            var isOnPage = await PageFactory.HomePage.IsOnPageAsync();
+            Assert.True(isOnPage);
         }
     }
 }

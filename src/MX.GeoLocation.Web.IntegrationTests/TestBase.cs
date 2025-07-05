@@ -1,84 +1,51 @@
-﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Edge;
-using OpenQA.Selenium.Firefox;
-using System.Runtime.InteropServices;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Playwright;
 
 namespace MX.GeoLocation.Web.IntegrationTests
 {
-    internal class TestBase
+    public abstract class TestBase : IAsyncLifetime
     {
-        private IWebDriver driver;
+        private IPlaywright? _playwright;
+        private IBrowser? _browser;
+        protected Microsoft.Playwright.IPage? Page { get; private set; }
+        protected PageFactory? PageFactory { get; private set; }
+        protected IConfiguration Configuration { get; private set; }
 
-        public PageFactory PageFactory { get; }
-
-        public TestBase(string browser)
+        protected TestBase()
         {
-            switch (browser)
-            {
-                case "Chrome":
-                    var options = new ChromeOptions();
-                    options.AddArgument("--headless=new");
-                    driver = new ChromeDriver(options);
-                    break;
-                case "Firefox":
-                    driver = new FirefoxDriver();
-                    break;
-                case "Edge":
-                    driver = new EdgeDriver();
-                    break;
-                default:
-                    throw new ArgumentException($"'{browser}': Unknown browser");
-            }
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false)
+                .AddEnvironmentVariables();
 
-            // Wait until the page is fully loaded on every page navigation or page reload.
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(20);
-
-            PageFactory = new PageFactory(driver);
+            Configuration = builder.Build();
         }
 
-        [SetUp]
-        public async Task Setup()
+        public async Task InitializeAsync()
         {
-            await WarmUp();
+            _playwright = await Playwright.CreateAsync();
 
-            PageFactory.HomePage.GoToPage();
+            _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+            {
+                Headless = true
+            });
+
+            Page = await _browser.NewPageAsync();
+            PageFactory = new PageFactory(Page, Configuration);
+
+            // Navigate to the home page initially
+            await PageFactory.HomePage.GoToPageAsync();
         }
 
-        private async Task WarmUp()
+        public async Task DisposeAsync()
         {
-            var url = Environment.GetEnvironmentVariable("SITE_URL") ?? "https://dev.geo-location.net";
-            url = url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
+            if (Page != null)
+                await Page.CloseAsync();
 
-            using (HttpClient client = new HttpClient() { BaseAddress = new Uri(url) })
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    try
-                    {
-                        Console.WriteLine($"Performing warmup request to {url}");
-                        //await client.GetAsync("/");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error performing warmup request");
-                        Console.WriteLine(ex);
+            if (_browser != null)
+                await _browser.CloseAsync();
 
-                        // Sleep for five seconds before trying again.
-                        Thread.Sleep(5000);
-                    }
-                }
-            }
-        }
-
-        [OneTimeTearDown]
-        public void Cleanup()
-        {
-            if (driver != null)
-            {
-                driver.Quit();
-            }
-            driver?.Dispose();
+            _playwright?.Dispose();
         }
     }
 }

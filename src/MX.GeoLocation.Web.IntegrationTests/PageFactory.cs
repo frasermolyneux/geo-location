@@ -1,12 +1,13 @@
 ﻿using MX.GeoLocation.Web.IntegrationTests.PageObject;
-
-using OpenQA.Selenium;
+using Microsoft.Playwright;
+using Microsoft.Extensions.Configuration;
 
 namespace MX.GeoLocation.Web.IntegrationTests
 {
-    internal class PageFactory
+    public class PageFactory
     {
-        private readonly IWebDriver driver;
+        private readonly Microsoft.Playwright.IPage page;
+        private readonly IConfiguration configuration;
 
         private HomePage? homePage;
         private LookupAddressPage? lookupAddressPage;
@@ -14,9 +15,10 @@ namespace MX.GeoLocation.Web.IntegrationTests
         private PrivacyPage? privacyPage;
         private RemoveDataPage? removeMyDataPage;
 
-        public PageFactory(IWebDriver driver)
+        public PageFactory(Microsoft.Playwright.IPage page, IConfiguration configuration)
         {
-            this.driver = driver;
+            this.page = page;
+            this.configuration = configuration;
         }
 
         public HomePage HomePage
@@ -24,7 +26,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
             get
             {
                 if (homePage == null)
-                    homePage = new HomePage(driver);
+                    homePage = new HomePage(page, configuration);
 
                 return homePage;
             }
@@ -35,7 +37,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
             get
             {
                 if (lookupAddressPage == null)
-                    lookupAddressPage = new LookupAddressPage(driver);
+                    lookupAddressPage = new LookupAddressPage(page, configuration);
 
                 return lookupAddressPage;
             }
@@ -46,7 +48,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
             get
             {
                 if (batchLookupPage == null)
-                    batchLookupPage = new BatchLookupPage(driver);
+                    batchLookupPage = new BatchLookupPage(page, configuration);
 
                 return batchLookupPage;
             }
@@ -57,7 +59,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
             get
             {
                 if (privacyPage == null)
-                    privacyPage = new PrivacyPage(driver);
+                    privacyPage = new PrivacyPage(page, configuration);
 
                 return privacyPage;
             }
@@ -68,7 +70,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
             get
             {
                 if (removeMyDataPage == null)
-                    removeMyDataPage = new RemoveDataPage(driver);
+                    removeMyDataPage = new RemoveDataPage(page, configuration);
 
                 return removeMyDataPage;
             }

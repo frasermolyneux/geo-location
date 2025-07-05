@@ -1,49 +1,55 @@
-﻿using MX.GeoLocation.Web.IntegrationTests.Extensions;
-using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
-
-using OpenQA.Selenium;
+﻿using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
+using Microsoft.Playwright;
+using Microsoft.Extensions.Configuration;
 
 namespace MX.GeoLocation.Web.IntegrationTests.PageObject
 {
-    internal class HomePage : IPage
+    public class HomePage : IPageObject
     {
-        private readonly IWebDriver driver;
+        private readonly Microsoft.Playwright.IPage page;
+        private readonly IConfiguration configuration;
 
-        public HomePage(IWebDriver driver)
+        public HomePage(Microsoft.Playwright.IPage page, IConfiguration configuration)
         {
-            this.driver = driver;
+            this.page = page;
+            this.configuration = configuration;
 
-            Navigation = new NavigationBar(driver);
+            Navigation = new NavigationBar(page);
         }
 
         public NavigationBar Navigation { get; private set; }
 
-        public bool IsOnPage
+        public async Task<bool> IsOnPageAsync()
         {
-            get
+            try
             {
-                try
-                {
-                    var pageTitle = driver.FindElementWithWait(By.Id("pageTitle"));
-                    return pageTitle.Text.Contains("Welcome - ");
-                }
-                catch
-                {
-                    return false;
-                }
+                // Check the page title instead of looking for a pageTitle element
+                var title = await page.TitleAsync();
+                return title?.Contains("Home Page") == true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
-        public void GoToPage(bool useNavigation = false)
+        public async Task GoToPageAsync(bool useNavigation = false)
         {
             if (useNavigation)
             {
-                Navigation.ClickNavBarHome();
+                await Navigation.ClickNavBarHomeAsync();
             }
             else
             {
-                driver.GoToPage();
+                var baseUrl = GetBaseUrl();
+                await page.GotoAsync(baseUrl);
             }
+        }
+
+        private string GetBaseUrl()
+        {
+            var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
+            return url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
         }
     }
 }

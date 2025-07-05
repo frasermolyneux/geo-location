@@ -1,49 +1,54 @@
-﻿using MX.GeoLocation.Web.IntegrationTests.Extensions;
-using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
-
-using OpenQA.Selenium;
+﻿using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
+using Microsoft.Playwright;
+using Microsoft.Extensions.Configuration;
 
 namespace MX.GeoLocation.Web.IntegrationTests.PageObject
 {
-    internal class BatchLookupPage : IPage
+    public class BatchLookupPage : IPageObject
     {
-        private readonly IWebDriver driver;
+        private readonly Microsoft.Playwright.IPage page;
+        private readonly IConfiguration configuration;
 
-        public BatchLookupPage(IWebDriver driver)
+        public BatchLookupPage(Microsoft.Playwright.IPage page, IConfiguration configuration)
         {
-            this.driver = driver;
-            Navigation = new NavigationBar(driver);
+            this.page = page;
+            this.configuration = configuration;
+            Navigation = new NavigationBar(page);
         }
 
         public NavigationBar Navigation { get; private set; }
 
-        public bool IsOnPage
+        public async Task<bool> IsOnPageAsync()
         {
-            get
+            try
             {
-                try
-                {
-                    var pageTitle = driver.FindElementWithWait(By.Id("pageTitle"));
-                    return pageTitle.Text == "Batch Lookup";
-                }
-                catch
-                {
-                    return false;
-                }
+                var title = await page.TitleAsync();
+                return title?.Contains("Batch Lookup") == true;
+            }
+            catch
+            {
+                return false;
             }
         }
 
-        public void GoToPage(bool useNavigation = false)
+        public async Task GoToPageAsync(bool useNavigation = false)
         {
             if (useNavigation)
             {
-                Navigation.ClickNavBarLookupDropdown();
-                Navigation.ClickNavBarLookupBatch();
+                await Navigation.ClickNavBarLookupDropdownAsync();
+                await Navigation.ClickNavBarLookupBatchAsync();
             }
             else
             {
-                driver.GoToPage("Home/BatchLookup");
+                var baseUrl = GetBaseUrl();
+                await page.GotoAsync($"{baseUrl}/Home/BatchLookup");
             }
+        }
+
+        private string GetBaseUrl()
+        {
+            var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
+            return url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
         }
     }
 }
