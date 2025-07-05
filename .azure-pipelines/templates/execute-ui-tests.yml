@@ -17,7 +17,36 @@ stages:
             value: "${{ parameters.siteUrl }}"
 
         steps:
-          - pwsh: Invoke-WebRequest -Uri ${{ parameters.siteUrl }} -MaximumRetryCount 10 -RetryIntervalSec 5
+          - pwsh: |
+              $maxAttempts = 30  # 5 minutes with 10 second intervals
+              $attempt = 0
+              $url = "${{ parameters.siteUrl }}"
+              
+              Write-Host "Polling $url until it returns 200 status code..."
+              
+              do {
+                  $attempt++
+                  Write-Host "Attempt $attempt of $maxAttempts..."
+                  
+                  try {
+                      $response = Invoke-WebRequest -Uri $url -Method Get -TimeoutSec 30 -UseBasicParsing
+                      if ($response.StatusCode -eq 200) {
+                          Write-Host "✅ Site is available! Status code: $($response.StatusCode)"
+                          exit 0
+                      }
+                  }
+                  catch {
+                      Write-Host "⚠️ Request failed: $($_.Exception.Message)"
+                  }
+                  
+                  if ($attempt -lt $maxAttempts) {
+                      Write-Host "Waiting 10 seconds before next attempt..."
+                      Start-Sleep -Seconds 10
+                  }
+              } while ($attempt -lt $maxAttempts)
+              
+              Write-Host "❌ Site did not become available within 5 minutes. Continuing with tests anyway..."
+            displayName: "Wait for site to be available"
 
           - task: UseDotNet@2
             displayName: "Use .NET SDK 9.x"
