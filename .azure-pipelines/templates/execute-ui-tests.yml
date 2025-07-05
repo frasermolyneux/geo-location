@@ -13,7 +13,7 @@ stages:
           clean: all
 
         variables:
-          - name: SITE_URL
+          - name: SiteUrl
             value: "${{ parameters.siteUrl }}"
 
         steps:
@@ -30,6 +30,11 @@ stages:
               command: "build"
               arguments: "--configuration Release"
               projects: "$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj"
+
+          - pwsh: |
+              # Install Playwright browsers
+              npx playwright install
+            displayName: "Install Playwright browsers"
 
           - task: DotNetCoreCLI@2
             displayName: "Run UI Tests"
