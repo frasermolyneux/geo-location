@@ -162,9 +162,14 @@ stages:
                     arguments: "--configuration Release"
                     projects: "$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj"
 
-                - pwsh: |
-                    # Install Playwright browsers
-                    npx playwright install
+                - task: DotNetCoreCLI@2
+                  displayName: "Install Playwright CLI tool"
+                  inputs:
+                    command: 'custom'
+                    custom: 'tool'
+                    arguments: 'install --global Microsoft.Playwright.CLI'
+
+                - script: playwright install
                   displayName: "Install Playwright browsers"
 
                 - task: DotNetCoreCLI@2
