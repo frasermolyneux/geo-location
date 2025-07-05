@@ -2,7 +2,7 @@ resources:
   pipelines:
     - pipeline: geo-location.ReleaseToProduction
       source: geo-location.ReleaseToProduction
-      project: Personal-Public
+      project: Molyneux.IO
       trigger: true
   repositories:
     - repository: ado-pipeline-templates
