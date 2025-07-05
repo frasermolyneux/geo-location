@@ -169,8 +169,9 @@ stages:
                     custom: 'tool'
                     arguments: 'install --global Microsoft.Playwright.CLI'
 
-                - script: playwright install
+                - script: playwright install --with-deps
                   displayName: "Install Playwright browsers"
+                  workingDirectory: "$(System.DefaultWorkingDirectory)/src/MX.GeoLocation.Web.IntegrationTests"
 
                 - task: DotNetCoreCLI@2
                   displayName: "Run UI Tests"
