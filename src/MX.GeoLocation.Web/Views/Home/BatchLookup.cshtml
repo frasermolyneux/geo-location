@@ -1,4 +1,5 @@
 ﻿@using MX.GeoLocation.Web.Models
+@using MX.GeoLocation.Abstractions.Models.V1
 @model BatchLookupViewModel
 
 @{
@@ -31,21 +32,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Entries)
+                                @if (Model.GeoLocationCollectionDto?.Items != null)
                                 {
-                                    <tr>
-                                        <td class="fw-medium">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <img src="~/images/flags/@(geoLocationDto.CountryCode?.ToLower()).png"
-                                                    alt="@geoLocationDto.CountryCode" class="result-flag" />
-                                                @geoLocationDto.TranslatedAddress
-                                            </div>
-                                        </td>
-                                        <td class="fw-medium">@geoLocationDto.AccuracyRadius</td>
-                                        <td class="fw-medium">@geoLocationDto.Latitude, @geoLocationDto.Longitude</td>
-                                        <td class="fw-medium">@(geoLocationDto.PostalCode ?? "unknown")</td>
-                                        <td class="fw-medium">@geoLocationDto.Timezone</td>
-                                    </tr>
+                                    @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Items)
+                                    {
+                                        <tr>
+                                            <td class="fw-medium">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <img src="~/images/flags/@(geoLocationDto.CountryCode?.ToLower()).png"
+                                                        alt="@geoLocationDto.CountryCode" class="result-flag" />
+                                                    @geoLocationDto.TranslatedAddress
+                                                </div>
+                                            </td>
+                                            <td class="fw-medium">@geoLocationDto.AccuracyRadius</td>
+                                            <td class="fw-medium">@geoLocationDto.Latitude, @geoLocationDto.Longitude</td>
+                                            <td class="fw-medium">@(geoLocationDto.PostalCode ?? "unknown")</td>
+                                            <td class="fw-medium">@geoLocationDto.Timezone</td>
+                                        </tr>
+                                    }
                                 }
                             </tbody>
                         </table>
@@ -121,17 +125,20 @@
                     });
 
                 var locations = [
-                                                                        @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Entries)
+                    @if (Model.GeoLocationCollectionDto?.Items != null)
                     {
-                        <text>
-                            [
-                            '@geoLocationDto.Address',
-                                                                                                                @geoLocationDto.Latitude,
-                            @geoLocationDto.Longitude
-                            ],
-                        </text>
-                                                                        }
-                                                                    ];
+                                    @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Items)
+                        {
+                            <text>
+                                [
+                                '@geoLocationDto.Address',
+                                                                                                                                @geoLocationDto.Latitude,
+                                @geoLocationDto.Longitude
+                                ],
+                            </text>
+                                    }
+                    }
+                                                                            ];
 
                 for (count = 0; count < locations.length; count++) {
                     new google.maps.Marker({

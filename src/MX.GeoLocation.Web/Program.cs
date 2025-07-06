@@ -26,12 +26,21 @@ builder.Services.AddServiceProfiler();
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddGeoLocationApiClient(options =>
+builder.Services.AddGeoLocationApiClient();
+
+builder.Services.Configure<GeoLocationApiClientOptions>(options =>
 {
-    options.BaseUrl = builder.Configuration["geolocation_base_url"] ?? builder.Configuration["apim_base_url"] ?? throw new ArgumentNullException("apim_base_url");
-    options.PrimaryApiKey = builder.Configuration["apim_subscription_key"] ?? throw new ArgumentNullException("apim_subscription_key");
-    options.ApiAudience = builder.Configuration["geolocation_api_application_audience"] ?? throw new ArgumentNullException("geolocation_api_application_audience");
-    options.ApiPathPrefix = builder.Configuration["apim_geolocation_path_prefix"] ?? "geolocation";
+    var baseUrl = builder.Configuration["geolocation_base_url"] ?? builder.Configuration["apim_base_url"] ?? throw new ArgumentNullException("apim_base_url");
+    var pathPrefix = builder.Configuration["apim_geolocation_path_prefix"] ?? "geolocation";
+
+    // Combine base URL with path prefix since ApiPathPrefix is removed
+    options.BaseUrl = $"{baseUrl.TrimEnd('/')}/{pathPrefix.TrimStart('/')}";
+
+    var subscriptionKey = builder.Configuration["apim_subscription_key"] ?? throw new ArgumentNullException("apim_subscription_key");
+    var apiAudience = builder.Configuration["geolocation_api_application_audience"] ?? throw new ArgumentNullException("geolocation_api_application_audience");
+
+    options.WithSubscriptionKey(subscriptionKey)
+           .WithEntraIdAuthentication(apiAudience);
 });
 
 builder.Services.AddHttpContextAccessor();

@@ -11,7 +11,7 @@ using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Web.Controllers;
 
-using MxIO.ApiClient.Abstractions;
+using MX.Api.Abstractions;
 
 using Newtonsoft.Json;
 
@@ -66,7 +66,7 @@ namespace MX.GeoLocation.Web.Tests.Controllers
         public async Task IndexShouldRedirectToLookupAddressWhenGetGeoLocationFails(HttpStatusCode httpStatusCode)
         {
             // Arrange
-            A.CallTo(() => fakeGeoLocationClient.GeoLookup.GetGeoLocation(A<string>.Ignored)).Returns(Task.FromResult(new ApiResponseDto<GeoLocationDto>(httpStatusCode)));
+            A.CallTo(() => fakeGeoLocationClient.GeoLookup.V1.GetGeoLocation(A<string>.Ignored)).Returns(Task.FromResult(new ApiResult<GeoLocationDto>(httpStatusCode)));
 
             // Act
             var result = await homeController.Index();
@@ -113,7 +113,7 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             byte[]? nullSessionData = null;
             byte[]? wellFormedSessionData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(wellFormedGeoLocationDto));
             A.CallTo(() => fakeHttpContextAccessor.HttpContext.Session.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
-            A.CallTo(() => fakeGeoLocationClient.GeoLookup.GetGeoLocation(A<string>.Ignored)).Returns(Task.FromResult(new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, wellFormedGeoLocationDto)));
+            A.CallTo(() => fakeGeoLocationClient.GeoLookup.V1.GetGeoLocation(A<string>.Ignored)).Returns(Task.FromResult(new ApiResult<GeoLocationDto>(HttpStatusCode.OK, new ApiResponse<GeoLocationDto>(wellFormedGeoLocationDto))));
 
             // Act
             var result = await homeController.Index();

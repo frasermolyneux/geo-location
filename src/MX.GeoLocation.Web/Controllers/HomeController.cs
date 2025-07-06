@@ -38,17 +38,17 @@ namespace MX.GeoLocation.Web.Controllers
 
             var address = GetUsersIpForLookup();
 
-            var lookupAddressResponse = await geoLocationApiClient.GeoLookup.GetGeoLocation(address.ToString());
+            var lookupAddressResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocation(address.ToString());
 
-            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result == null)
+            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result?.Data == null)
             {
                 return RedirectToAction("LookupAddress");
             }
             else
             {
-                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupAddressResponse.Result);
+                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupAddressResponse.Result.Data);
 
-                return View(lookupAddressResponse.Result);
+                return View(lookupAddressResponse.Result.Data);
             }
         }
 
@@ -105,14 +105,17 @@ namespace MX.GeoLocation.Web.Controllers
                 return View(model);
             }
 
-            var lookupAddressResponse = await geoLocationApiClient.GeoLookup.GetGeoLocation(model.AddressData);
+            var lookupAddressResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocation(model.AddressData);
 
             if (!lookupAddressResponse.IsSuccess)
             {
-                lookupAddressResponse.Errors.ForEach(error =>
+                if (lookupAddressResponse.Result?.Errors != null)
                 {
-                    ModelState.AddModelError(nameof(model.AddressData), error);
-                });
+                    foreach (var error in lookupAddressResponse.Result.Errors)
+                    {
+                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                    }
+                }
 
                 return View(model);
             }
@@ -122,7 +125,7 @@ namespace MX.GeoLocation.Web.Controllers
             }
             else
             {
-                model.GeoLocationDto = lookupAddressResponse.Result;
+                model.GeoLocationDto = lookupAddressResponse.Result?.Data;
             }
 
             return View(model);
@@ -181,19 +184,22 @@ namespace MX.GeoLocation.Web.Controllers
                 return View(model);
             }
 
-            var lookupAddressesResponse = await geoLocationApiClient.GeoLookup.GetGeoLocations(addresses);
+            var lookupAddressesResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocations(addresses);
 
-            if (!lookupAddressesResponse.IsSuccess || lookupAddressesResponse.Errors.Any())
+            if (!lookupAddressesResponse.IsSuccess || (lookupAddressesResponse.Result?.Errors?.Any() == true))
             {
-                lookupAddressesResponse.Errors.ForEach(error =>
+                if (lookupAddressesResponse.Result?.Errors != null)
                 {
-                    ModelState.AddModelError(nameof(model.AddressData), error);
-                });
+                    foreach (var error in lookupAddressesResponse.Result.Errors)
+                    {
+                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                    }
+                }
             }
 
             if (lookupAddressesResponse.IsSuccess)
             {
-                model.GeoLocationCollectionDto = lookupAddressesResponse.Result;
+                model.GeoLocationCollectionDto = lookupAddressesResponse.Result?.Data;
             }
 
             return View(model);
@@ -220,14 +226,17 @@ namespace MX.GeoLocation.Web.Controllers
                     return View(model);
                 }
 
-                var deleteMetaDataResponse = await geoLocationApiClient.GeoLookup.DeleteMetadata(model.AddressData);
+                var deleteMetaDataResponse = await geoLocationApiClient.GeoLookup.V1.DeleteMetadata(model.AddressData);
 
                 if (!deleteMetaDataResponse.IsSuccess)
                 {
-                    deleteMetaDataResponse.Errors.ForEach(error =>
+                    if (deleteMetaDataResponse.Result?.Errors != null)
                     {
-                        ModelState.AddModelError(nameof(model.AddressData), error);
-                    });
+                        foreach (var error in deleteMetaDataResponse.Result.Errors)
+                        {
+                            ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                        }
+                    }
 
                     return View(model);
                 }

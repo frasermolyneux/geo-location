@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 
+using MX.Api.Abstractions;
+using MX.Api.Web.Extensions;
 using MX.GeoLocation.Abstractions.Interfaces.V1;
 using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.LookupWebApi.Constants;
 using MX.GeoLocation.LookupWebApi.Repositories;
-
-using MxIO.ApiClient.Abstractions;
-using MxIO.ApiClient.WebExtensions;
 
 using Newtonsoft.Json;
 
@@ -42,7 +42,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         {
             if (!ValidateHostname(hostname))
             {
-                return new ApiResponseDto(HttpStatusCode.BadRequest, ["The address provided is invalid. IP or DNS is acceptable."]).ToHttpResult();
+                return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToBadRequestResult().ToHttpResult();
             }
 
             var response = await ((IGeoLookupApi)this).GetGeoLocation(hostname);
@@ -50,7 +50,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             return response.ToHttpResult();
         }
 
-        async Task<ApiResponseDto<GeoLocationDto>> IGeoLookupApi.GetGeoLocation(string hostname)
+        async Task<ApiResult<GeoLocationDto>> IGeoLookupApi.GetGeoLocation(string hostname)
         {
             try
             {
@@ -58,33 +58,33 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                 {
                     if (localOverrides.Contains(hostname))
                     {
-                        return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound);
+                        return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS)).ToNotFoundResult();
                     }
 
                     var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
 
                     if (geoLocationDto != null)
-                        return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, geoLocationDto);
+                        return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
 
                     geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
                     geoLocationDto.Address = hostname; // Set the address to be the original hostname query
 
                     await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
 
-                    return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.OK, geoLocationDto);
+                    return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
                 }
                 else
                 {
-                    return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.InternalServerError);
+                    return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.HOSTNAME_RESOLUTION_FAILED, ErrorMessages.HOSTNAME_RESOLUTION_FAILED)).ToApiResult(HttpStatusCode.InternalServerError);
                 }
             }
             catch (AddressNotFoundException)
             {
-                return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.NotFound);
+                return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND)).ToNotFoundResult();
             }
-            catch (GeoIP2Exception)
+            catch (GeoIP2Exception ex)
             {
-                return new ApiResponseDto<GeoLocationDto>(HttpStatusCode.BadRequest);
+                return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message)).ToBadRequestResult();
             }
         }
 
@@ -101,21 +101,21 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             }
             catch
             {
-                return new ApiResponseDto(HttpStatusCode.BadRequest, ["Could not deserialize request body"]).ToHttpResult();
+                return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.INVALID_JSON, ErrorMessages.INVALID_JSON)).ToBadRequestResult().ToHttpResult();
             }
 
             if (hostnames == null)
-                return new ApiResponseDto(HttpStatusCode.BadRequest, ["Request body was null"]).ToHttpResult();
+                return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.NULL_REQUEST, ErrorMessages.NULL_REQUEST)).ToBadRequestResult().ToHttpResult();
 
             var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames);
 
             return response.ToHttpResult();
         }
 
-        async Task<ApiResponseDto<GeoLocationCollectionDto>> IGeoLookupApi.GetGeoLocations(List<string> hostnames)
+        async Task<ApiResult<CollectionModel<GeoLocationDto>>> IGeoLookupApi.GetGeoLocations(List<string> hostnames)
         {
             var entries = new List<GeoLocationDto>();
-            var errors = new List<string>();
+            var errors = new List<ApiError>();
 
             foreach (var hostname in hostnames)
             {
@@ -125,7 +125,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     {
                         if (localOverrides.Contains(hostname))
                         {
-                            errors.Add("Hostname is a loopback or local address, geo location data is unavailable");
+                            errors.Add(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS_BATCH));
                             continue;
                         }
 
@@ -145,27 +145,28 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     }
                     else
                     {
-                        errors.Add($"The hostname provided '{hostname} is invalid'");
+                        errors.Add(new ApiError(ErrorCodes.INVALID_HOSTNAME, $"The hostname provided '{hostname}' is invalid"));
                     }
                 }
                 catch (AddressNotFoundException ex)
                 {
-                    errors.Add(ex.Message);
+                    errors.Add(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ex.Message));
                 }
                 catch (GeoIP2Exception ex)
                 {
-                    errors.Add(ex.Message);
+                    errors.Add(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message));
                 }
             }
 
-            var result = new GeoLocationCollectionDto
+            var result = new CollectionModel<GeoLocationDto>
             {
-                Entries = entries,
-                TotalRecords = entries.Count,
-                FilteredRecords = entries.Count
+                Items = entries,
+                TotalCount = entries.Count,
+                FilteredCount = entries.Count
             };
 
-            return new ApiResponseDto<GeoLocationCollectionDto>(HttpStatusCode.OK, result, errors);
+            var response = new ApiResponse<CollectionModel<GeoLocationDto>>(result) { Errors = errors.ToArray() };
+            return response.ToApiResult();
         }
 
         [HttpDelete]
@@ -177,25 +178,25 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             return response.ToHttpResult();
         }
 
-        Task<ApiResponseDto> IGeoLookupApi.DeleteMetadata(string hostname)
+        Task<ApiResult> IGeoLookupApi.DeleteMetadata(string hostname)
         {
             return DeleteMetadataInternal(hostname);
         }
 
-        private async Task<ApiResponseDto> DeleteMetadataInternal(string hostname)
+        private async Task<ApiResult> DeleteMetadataInternal(string hostname)
         {
             try
             {
                 if (!ValidateHostname(hostname))
                 {
-                    return new ApiResponseDto(HttpStatusCode.BadRequest, ["The address provided is invalid. IP or DNS is acceptable."]);
+                    return new ApiResponse(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToBadRequestResult();
                 }
 
                 if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
-                        return new ApiResponseDto(HttpStatusCode.BadRequest, ["Cannot delete data for local addresses"]);
+                        return new ApiResponse(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS_DELETE)).ToBadRequestResult();
                     }
 
                     var deletedCount = 0;
@@ -223,21 +224,21 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
                     if (deletedCount > 0)
                     {
-                        return new ApiResponseDto(HttpStatusCode.OK);
+                        return new ApiResponse().ToApiResult();
                     }
                     else
                     {
-                        return new ApiResponseDto(HttpStatusCode.NotFound, ["No geo-location data found for the specified address"]);
+                        return new ApiResponse(new ApiError(ErrorCodes.NOT_FOUND, ErrorMessages.NOT_FOUND)).ToNotFoundResult();
                     }
                 }
                 else
                 {
-                    return new ApiResponseDto(HttpStatusCode.BadRequest, ["Could not resolve the provided address"]);
+                    return new ApiResponse(new ApiError(ErrorCodes.HOSTNAME_RESOLUTION_FAILED, ErrorMessages.HOSTNAME_RESOLUTION_FAILED_DELETE)).ToBadRequestResult();
                 }
             }
             catch (Exception ex)
             {
-                return new ApiResponseDto(HttpStatusCode.InternalServerError, [$"An error occurred while deleting data: {ex.Message}"]);
+                return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, $"An error occurred while deleting data: {ex.Message}")).ToApiResult(HttpStatusCode.InternalServerError);
             }
         }
 
