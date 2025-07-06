@@ -1,10 +1,17 @@
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 
+using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add user secrets in development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 builder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 builder.Services.AddLogging();
@@ -26,22 +33,10 @@ builder.Services.AddServiceProfiler();
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddGeoLocationApiClient();
-
-builder.Services.Configure<GeoLocationApiClientOptions>(options =>
-{
-    var baseUrl = builder.Configuration["geolocation_base_url"] ?? builder.Configuration["apim_base_url"] ?? throw new ArgumentNullException("apim_base_url");
-    var pathPrefix = builder.Configuration["apim_geolocation_path_prefix"] ?? "geolocation";
-
-    // Combine base URL with path prefix since ApiPathPrefix is removed
-    options.BaseUrl = $"{baseUrl.TrimEnd('/')}/{pathPrefix.TrimStart('/')}";
-
-    var subscriptionKey = builder.Configuration["apim_subscription_key"] ?? throw new ArgumentNullException("apim_subscription_key");
-    var apiAudience = builder.Configuration["geolocation_api_application_audience"] ?? throw new ArgumentNullException("geolocation_api_application_audience");
-
-    options.WithSubscriptionKey(subscriptionKey)
-           .WithEntraIdAuthentication(apiAudience);
-});
+builder.Services.AddGeoLocationApiClient()
+    .WithBaseUrl(builder.Configuration["GeoLocationApi:BaseUrl"] ?? throw new ArgumentNullException("GeoLocationApi:BaseUrl"))
+    .WithApiKeyAuthentication(builder.Configuration["GeoLocationApi:ApiKey"] ?? throw new ArgumentNullException("GeoLocationApi:ApiKey"))
+    .WithAzureCredentials(builder.Configuration["GeoLocationApi:ApplicationAudience"] ?? throw new ArgumentNullException("GeoLocationApi:ApplicationAudience"));
 
 builder.Services.AddHttpContextAccessor();
 

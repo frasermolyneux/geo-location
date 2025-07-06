@@ -114,15 +114,15 @@ resource webApp 'Microsoft.Web/sites@2023-01-01' = {
           value: '1'
         }
         {
-          name: 'apim_base_url'
-          value: apiManagement.properties.gatewayUrl
+          name: 'GeoLocationApi__BaseUrl'
+          value: '${apiManagement.properties.gatewayUrl}/geolocation'
         }
         {
-          name: 'apim_subscription_key'
+          name: 'GeoLocationApi__ApiKey'
           value: '@Microsoft.KeyVault(SecretUri=${apiManagementSubscription.outputs.primaryKeySecretRef.secretUri})'
         }
         {
-          name: 'geolocation_api_application_audience'
+          name: 'GeoLocationApi__ApplicationAudience'
           value: 'api://geolocation-api-${environment}-${instance}'
         }
         {
