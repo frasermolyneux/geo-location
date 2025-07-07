@@ -11,7 +11,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
     internal class BaseApiTests
     {
         private ILogger<GeoLookupApi> fakeLogger;
-        private IOptions<GeoLocationApiClientOptions> fakeOptions;
+        private IOptionsSnapshot<ApiClientOptions> fakeOptionsSnapshot;
         private IApiTokenProvider fakeApiTokenProvider;
         private IRestClientService fakeRestClientService;
 
@@ -24,18 +24,18 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
         public void SetUp()
         {
             fakeLogger = A.Fake<ILogger<GeoLookupApi>>();
-            fakeOptions = A.Fake<IOptions<GeoLocationApiClientOptions>>();
+            fakeOptionsSnapshot = A.Fake<IOptionsSnapshot<ApiClientOptions>>();
             fakeApiTokenProvider = A.Fake<IApiTokenProvider>();
             fakeRestClientService = A.Fake<IRestClientService>();
 
-            A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
+            A.CallTo(() => fakeOptionsSnapshot.Get(nameof(GeoLocationApiClientOptions))).Returns(validGeoLocationApiClientOptions);
         }
 
         [Test]
         public void GeoLookupApiShouldBeCreatedSuccessfully()
         {
             // Act
-            var geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientService, fakeOptions);
+            var geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientService, fakeOptionsSnapshot);
 
             // Assert
             geoLookupApi.Should().NotBeNull();

@@ -15,7 +15,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
     internal class GeoLookupApiTests
     {
         private ILogger<GeoLookupApi> fakeLogger;
-        private IOptions<GeoLocationApiClientOptions> fakeOptions;
+        private IOptionsSnapshot<ApiClientOptions> fakeOptionsSnapshot;
         private IApiTokenProvider fakeApiTokenProvider;
         private IRestClientService fakeRestClientService;
 
@@ -30,13 +30,13 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
         public void SetUp()
         {
             fakeLogger = A.Fake<ILogger<GeoLookupApi>>();
-            fakeOptions = A.Fake<IOptions<GeoLocationApiClientOptions>>();
+            fakeOptionsSnapshot = A.Fake<IOptionsSnapshot<ApiClientOptions>>();
             fakeApiTokenProvider = A.Fake<IApiTokenProvider>();
             fakeRestClientService = A.Fake<IRestClientService>();
 
-            A.CallTo(() => fakeOptions.Value).Returns(validGeoLocationApiClientOptions);
+            A.CallTo(() => fakeOptionsSnapshot.Get(nameof(GeoLocationApiClientOptions))).Returns(validGeoLocationApiClientOptions);
 
-            geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientService, fakeOptions);
+            geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientService, fakeOptionsSnapshot);
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
                 Content = jsonPayload
             };
 
-            A.CallTo(() => fakeRestClientService.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientService.ExecuteAsync(A<string>.Ignored, A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             // Act
@@ -77,7 +77,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
                 Content = jsonPayload
             };
 
-            A.CallTo(() => fakeRestClientService.ExecuteAsync("https://google.co.uk", A<RestRequest>.Ignored, default(CancellationToken)))
+            A.CallTo(() => fakeRestClientService.ExecuteAsync(A<string>.Ignored, A<RestRequest>.Ignored, default(CancellationToken)))
                 .Returns(Task.FromResult(restResponse));
 
             // Act
