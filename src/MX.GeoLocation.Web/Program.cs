@@ -34,9 +34,9 @@ builder.Services.AddServiceProfiler();
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddGeoLocationApiClient()
-    .WithBaseUrl(builder.Configuration["GeoLocationApi:BaseUrl"] ?? throw new ArgumentNullException("GeoLocationApi:BaseUrl"))
-    .WithApiKeyAuthentication(builder.Configuration["GeoLocationApi:ApiKey"] ?? throw new ArgumentNullException("GeoLocationApi:ApiKey"))
-    .WithAzureCredentials(builder.Configuration["GeoLocationApi:ApplicationAudience"] ?? throw new ArgumentNullException("GeoLocationApi:ApplicationAudience"));
+    .WithBaseUrl(nameof(GeoLocationApiClientOptions), builder.Configuration["GeoLocationApi:BaseUrl"] ?? throw new ArgumentNullException("GeoLocationApi:BaseUrl"))
+    .WithApiKeyAuthentication(nameof(GeoLocationApiClientOptions), builder.Configuration["GeoLocationApi:ApiKey"] ?? throw new ArgumentNullException("GeoLocationApi:ApiKey"))
+    .WithAzureCredentials(nameof(GeoLocationApiClientOptions), builder.Configuration["GeoLocationApi:ApplicationAudience"] ?? throw new ArgumentNullException("GeoLocationApi:ApplicationAudience"));
 
 builder.Services.AddHttpContextAccessor();
 
