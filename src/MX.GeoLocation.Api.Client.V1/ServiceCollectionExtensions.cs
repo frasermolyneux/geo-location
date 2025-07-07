@@ -29,14 +29,14 @@ namespace MX.GeoLocation.Api.Client.V1
                 serviceCollection.Configure(configure);
             }
 
-            // Register the V1 API implementation
-            serviceCollection.AddSingleton<IGeoLookupApi, GeoLookupApi>();
+            // Register the V1 API implementation as scoped to match IRestClientService lifetime
+            serviceCollection.AddScoped<IGeoLookupApi, GeoLookupApi>();
 
-            // Register the versioned API selector
-            serviceCollection.AddSingleton<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
+            // Register the versioned API selector as scoped to match V1 API lifetime
+            serviceCollection.AddScoped<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
 
-            // Register the main API client
-            serviceCollection.AddSingleton<IGeoLocationApiClient, GeoLocationApiClient>();
+            // Register the main API client as scoped to match versioned API lifetime
+            serviceCollection.AddScoped<IGeoLocationApiClient, GeoLocationApiClient>();
 
             return serviceCollection;
         }
