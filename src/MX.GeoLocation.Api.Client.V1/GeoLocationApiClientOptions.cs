@@ -2,8 +2,18 @@
 
 namespace MX.GeoLocation.Api.Client.V1
 {
-    public class GeoLocationApiClientOptions : ApiClientOptions
+    /// <summary>
+    /// Custom options for the GeoLocation API client
+    /// </summary>
+    public class GeoLocationApiClientOptions : ApiClientOptionsBase
     {
-        // Empty constructor to avoid https://rules.sonarsource.com/csharp/RSPEC-2094
+
+        /// <summary>
+        /// Validates the options
+        /// </summary>
+        public override void Validate()
+        {
+            base.Validate();
+        }
     }
 }

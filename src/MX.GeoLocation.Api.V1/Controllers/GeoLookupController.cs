@@ -23,15 +23,18 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
     [Authorize(Roles = "LookupApiUser")]
     public class GeoLookupController : Controller, IGeoLookupApi
     {
+        private readonly ILogger<GeoLookupController> _logger;
         private readonly ITableStorageGeoLocationRepository tableStorageGeoLocationRepository;
         private readonly IMaxMindGeoLocationRepository maxMindGeoLocationRepository;
 
         private readonly string[] localOverrides = { "localhost", "127.0.0.1" };
 
         public GeoLookupController(
+            ILogger<GeoLookupController> logger,
             ITableStorageGeoLocationRepository tableStorageGeoLocationRepository,
             IMaxMindGeoLocationRepository maxMindGeoLocationRepository)
         {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.tableStorageGeoLocationRepository = tableStorageGeoLocationRepository;
             this.maxMindGeoLocationRepository = maxMindGeoLocationRepository ?? throw new ArgumentNullException(nameof(maxMindGeoLocationRepository));
         }
@@ -40,51 +43,89 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         [Route("lookup/{hostname}")]
         public async Task<IActionResult> GetGeoLocation(string hostname)
         {
+            using var scope = _logger.BeginScope(new Dictionary<string, object>
+            {
+                ["Hostname"] = hostname,
+                ["Operation"] = "GetGeoLocation"
+            });
+
+            _logger.LogInformation("Getting geolocation for hostname {Hostname}", hostname);
+
             if (!ValidateHostname(hostname))
             {
-                return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToBadRequestResult().ToHttpResult();
+                _logger.LogWarning("Invalid hostname provided: {Hostname}", hostname);
+                var errorResponse = new ApiResponse<GeoLocationDto>(
+                    new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME));
+                return errorResponse.ToApiResult(HttpStatusCode.BadRequest).ToHttpResult();
             }
 
-            var response = await ((IGeoLookupApi)this).GetGeoLocation(hostname);
-
+            var response = await ((IGeoLookupApi)this).GetGeoLocation(hostname, default);
             return response.ToHttpResult();
         }
 
-        async Task<ApiResult<GeoLocationDto>> IGeoLookupApi.GetGeoLocation(string hostname)
+        async Task<ApiResult<GeoLocationDto>> IGeoLookupApi.GetGeoLocation(string hostname, CancellationToken cancellationToken)
         {
             try
             {
+                _logger.LogInformation("Processing geolocation lookup for {Hostname}", hostname);
+
                 if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
-                        return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS)).ToNotFoundResult();
+                        _logger.LogWarning("Local address lookup attempted: {Hostname}", hostname);
+                        return new ApiResponse<GeoLocationDto>(
+                            new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS))
+                            .ToApiResult(HttpStatusCode.BadRequest);
                     }
 
+                    // Try cache first
                     var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
 
                     if (geoLocationDto != null)
+                    {
+                        _logger.LogInformation("Found cached geolocation data for {ValidatedAddress}", validatedAddress);
                         return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
+                    }
 
+                    // Fallback to MaxMind
+                    _logger.LogInformation("No cached data found, querying MaxMind for {ValidatedAddress}", validatedAddress);
                     geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
                     geoLocationDto.Address = hostname; // Set the address to be the original hostname query
 
                     await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
+                    _logger.LogInformation("Successfully stored geolocation data for {ValidatedAddress}", validatedAddress);
 
                     return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
                 }
                 else
                 {
-                    return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.HOSTNAME_RESOLUTION_FAILED, ErrorMessages.HOSTNAME_RESOLUTION_FAILED)).ToApiResult(HttpStatusCode.InternalServerError);
+                    _logger.LogError("Hostname resolution failed for {Hostname}", hostname);
+                    return new ApiResponse<GeoLocationDto>(
+                        new ApiError(ErrorCodes.HOSTNAME_RESOLUTION_FAILED, ErrorMessages.HOSTNAME_RESOLUTION_FAILED))
+                        .ToApiResult(HttpStatusCode.BadRequest);
                 }
             }
-            catch (AddressNotFoundException)
+            catch (AddressNotFoundException ex)
             {
-                return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND)).ToNotFoundResult();
+                _logger.LogWarning(ex, "Address not found for {Hostname}", hostname);
+                return new ApiResponse<GeoLocationDto>(
+                    new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND))
+                    .ToApiResult(HttpStatusCode.NotFound);
             }
             catch (GeoIP2Exception ex)
             {
-                return new ApiResponse<GeoLocationDto>(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message)).ToBadRequestResult();
+                _logger.LogError(ex, "GeoIP2 error for {Hostname}", hostname);
+                return new ApiResponse<GeoLocationDto>(
+                    new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message))
+                    .ToApiResult(HttpStatusCode.BadRequest);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error during geolocation lookup for {Hostname}", hostname);
+                return new ApiResponse<GeoLocationDto>(
+                    new ApiError(ErrorCodes.INTERNAL_ERROR, "An unexpected error occurred"))
+                    .ToApiResult(HttpStatusCode.InternalServerError);
             }
         }
 
@@ -107,12 +148,12 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             if (hostnames == null)
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.NULL_REQUEST, ErrorMessages.NULL_REQUEST)).ToBadRequestResult().ToHttpResult();
 
-            var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames);
+            var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames, default);
 
             return response.ToHttpResult();
         }
 
-        async Task<ApiResult<CollectionModel<GeoLocationDto>>> IGeoLookupApi.GetGeoLocations(List<string> hostnames)
+        async Task<ApiResult<CollectionModel<GeoLocationDto>>> IGeoLookupApi.GetGeoLocations(List<string> hostnames, CancellationToken cancellationToken)
         {
             var entries = new List<GeoLocationDto>();
             var errors = new List<ApiError>();
@@ -173,12 +214,12 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
         [Route("lookup/{hostname}")]
         public async Task<IActionResult> DeleteMetadata(string hostname)
         {
-            var response = await ((IGeoLookupApi)this).DeleteMetadata(hostname);
+            var response = await ((IGeoLookupApi)this).DeleteMetadata(hostname, default);
 
             return response.ToHttpResult();
         }
 
-        Task<ApiResult> IGeoLookupApi.DeleteMetadata(string hostname)
+        Task<ApiResult> IGeoLookupApi.DeleteMetadata(string hostname, CancellationToken cancellationToken)
         {
             return DeleteMetadataInternal(hostname);
         }

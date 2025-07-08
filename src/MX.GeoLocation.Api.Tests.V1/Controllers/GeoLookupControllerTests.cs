@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1;
@@ -15,7 +16,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
         [SetUp]
         public void Setup()
         {
-            geoLookupController = new GeoLookupController(A.Fake<ITableStorageGeoLocationRepository>(), A.Fake<IMaxMindGeoLocationRepository>());
+            geoLookupController = new GeoLookupController(A.Fake<ILogger<GeoLookupController>>(), A.Fake<ITableStorageGeoLocationRepository>(), A.Fake<IMaxMindGeoLocationRepository>());
         }
 
         [TestCase("abcdefg")]
@@ -42,8 +43,8 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             var apiResponseDto = objectResult?.Value as ApiResponse<GeoLocationDto>;
             apiResponseDto.Should().NotBeNull();
 
-            apiResponseDto?.Errors.Should().NotBeNullOrEmpty();
-            apiResponseDto?.Errors.First().Message.Should().Be("The address provided is invalid. IP or DNS is acceptable.");
+            apiResponseDto!.Errors.Should().NotBeNullOrEmpty();
+            apiResponseDto.Errors!.First().Message.Should().Be("The address provided is invalid. IP or DNS is acceptable.");
         }
 
         [TestCase("localhost")]

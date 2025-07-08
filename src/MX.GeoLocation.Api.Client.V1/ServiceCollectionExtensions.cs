@@ -14,28 +14,22 @@ namespace MX.GeoLocation.Api.Client.V1
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Adds the GeoLocation API client services to the service collection
+        /// Adds the GeoLocation API client services with custom configuration
         /// </summary>
         /// <param name="serviceCollection">The service collection</param>
-        /// <param name="configure">Optional configuration action</param>
+        /// <param name="configureOptions">Action to configure the GeoLocation API options</param>
         /// <returns>The service collection for chaining</returns>
-        public static IServiceCollection AddGeoLocationApiClient(this IServiceCollection serviceCollection,
-            Action<GeoLocationApiClientOptions>? configure = null)
+        public static IServiceCollection AddGeoLocationApiClient(
+            this IServiceCollection serviceCollection,
+            Action<GeoLocationApiOptionsBuilder> configureOptions)
         {
-            serviceCollection.AddApiClient();
+            // Register V1 API using the new typed API client pattern
+            serviceCollection.AddTypedApiClient<IGeoLookupApi, GeoLookupApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
-            if (configure != null)
-            {
-                serviceCollection.Configure(configure);
-            }
-
-            // Register the V1 API implementation as scoped to match IRestClientService lifetime
-            serviceCollection.AddScoped<IGeoLookupApi, GeoLookupApi>();
-
-            // Register the versioned API selector as scoped to match V1 API lifetime
+            // Register versioned API wrapper
             serviceCollection.AddScoped<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
 
-            // Register the main API client as scoped to match versioned API lifetime
+            // Register main client
             serviceCollection.AddScoped<IGeoLocationApiClient, GeoLocationApiClient>();
 
             return serviceCollection;

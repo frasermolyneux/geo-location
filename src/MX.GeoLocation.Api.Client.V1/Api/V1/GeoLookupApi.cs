@@ -14,38 +14,74 @@ using RestSharp;
 
 namespace MX.GeoLocation.Api.Client.V1
 {
-    public class GeoLookupApi : BaseApi, IGeoLookupApi
+    public class GeoLookupApi : BaseApi<GeoLocationApiClientOptions>, IGeoLookupApi
     {
-        public GeoLookupApi(ILogger<GeoLookupApi> logger, IApiTokenProvider? apiTokenProvider, IRestClientService restClientService, IOptionsSnapshot<ApiClientOptions> optionsSnapshot) 
-            : base(logger, apiTokenProvider, restClientService, optionsSnapshot, nameof(GeoLocationApiClientOptions))
+        public GeoLookupApi(
+            ILogger<BaseApi<GeoLocationApiClientOptions>> logger,
+            IApiTokenProvider? apiTokenProvider,
+            IRestClientService restClientService,
+            GeoLocationApiClientOptions options)
+            : base(logger, apiTokenProvider, restClientService, options)
         {
-
         }
 
-        public async Task<ApiResult<GeoLocationDto>> GetGeoLocation(string hostname)
+        public async Task<ApiResult<GeoLocationDto>> GetGeoLocation(string hostname, CancellationToken cancellationToken = default)
         {
-            var request = await CreateRequestAsync($"v1/lookup/{hostname}", Method.Get);
-            var response = await ExecuteAsync(request);
+            try
+            {
+                var request = await CreateRequestAsync($"v1/lookup/{hostname}", Method.Get, cancellationToken);
+                var response = await ExecuteAsync(request, cancellationToken);
 
-            return response.ToApiResult<GeoLocationDto>();
+                var result = response.ToApiResult<GeoLocationDto>();
+                return result;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse<GeoLocationDto>(
+                    new ApiError("CLIENT_ERROR", "Failed to retrieve geolocation"));
+                return new ApiResult<GeoLocationDto>(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
         }
 
-        public async Task<ApiResult<CollectionModel<GeoLocationDto>>> GetGeoLocations(List<string> hostnames)
+        public async Task<ApiResult<CollectionModel<GeoLocationDto>>> GetGeoLocations(List<string> hostnames, CancellationToken cancellationToken = default)
         {
-            var request = await CreateRequestAsync($"v1/lookup", Method.Post);
-            request.AddJsonBody(hostnames);
+            try
+            {
+                var request = await CreateRequestAsync($"v1/lookup", Method.Post, cancellationToken);
+                if (hostnames != null)
+                {
+                    request.AddJsonBody(hostnames);
+                }
 
-            var response = await ExecuteAsync(request);
+                var response = await ExecuteAsync(request, cancellationToken);
+                var result = response.ToApiResult<CollectionModel<GeoLocationDto>>();
 
-            return response.ToApiResult<CollectionModel<GeoLocationDto>>();
+                return result;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse<CollectionModel<GeoLocationDto>>(
+                    new ApiError("CLIENT_ERROR", "Failed to retrieve geolocations"));
+                return new ApiResult<CollectionModel<GeoLocationDto>>(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
         }
 
-        public async Task<ApiResult> DeleteMetadata(string hostname)
+        public async Task<ApiResult> DeleteMetadata(string hostname, CancellationToken cancellationToken = default)
         {
-            var request = await CreateRequestAsync($"v1/lookup/{hostname}", Method.Delete);
-            var response = await ExecuteAsync(request);
+            try
+            {
+                var request = await CreateRequestAsync($"v1/lookup/{hostname}", Method.Delete, cancellationToken);
+                var response = await ExecuteAsync(request, cancellationToken);
 
-            return response.ToApiResult();
+                var result = response.ToApiResult();
+                return result;
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse(
+                    new ApiError("CLIENT_ERROR", "Failed to delete metadata"));
+                return new ApiResult(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
         }
     }
 }
