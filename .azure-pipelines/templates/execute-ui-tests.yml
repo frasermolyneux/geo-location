@@ -18,6 +18,8 @@ stages:
 
         steps:
           - pwsh: |
+              Start-Sleep -Seconds 60
+
               $maxAttempts = 30  # 5 minutes with 10 second intervals
               $attempt = 0
               $url = "${{ parameters.siteUrl }}"
