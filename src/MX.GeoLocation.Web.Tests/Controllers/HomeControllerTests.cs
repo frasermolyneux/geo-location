@@ -72,13 +72,13 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             var result = await homeController.Index();
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType<RedirectToActionResult>();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
 
             var redirectToActionResult = result as RedirectToActionResult;
 
-            redirectToActionResult.Should().NotBeNull();
-            redirectToActionResult?.ActionName.Should().Be("LookupAddress");
+            Assert.That(redirectToActionResult, Is.Not.Null);
+            Assert.That(redirectToActionResult!.ActionName, Is.EqualTo("LookupAddress"));
         }
 
         [Test]
@@ -86,24 +86,42 @@ namespace MX.GeoLocation.Web.Tests.Controllers
         {
             // Arrange
             byte[]? sessionData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(wellFormedGeoLocationDto));
-            A.CallTo(() => fakeHttpContextAccessor.HttpContext.Session.TryGetValue("UserGeoLocationDto", out sessionData)).Returns(true);
+            A.CallTo(() => fakeHttpContextAccessor.HttpContext!.Session.TryGetValue("UserGeoLocationDto", out sessionData)).Returns(true);
 
             // Act
             var result = await homeController.Index();
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType<ViewResult>();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ViewResult>());
 
             var viewResult = result as ViewResult;
 
-            viewResult.Should().NotBeNull();
-            viewResult?.Model.Should().NotBeNull();
-            viewResult?.Model.Should().BeOfType<GeoLocationDto>();
+            Assert.That(viewResult, Is.Not.Null);
+            Assert.That(viewResult!.Model, Is.Not.Null);
+            Assert.That(viewResult.Model, Is.InstanceOf<GeoLocationDto>());
 
-            var viewResultGeoLocationDto = viewResult?.Model as GeoLocationDto;
+            var viewResultGeoLocationDto = viewResult.Model as GeoLocationDto;
 
-            viewResultGeoLocationDto.Should().BeEquivalentTo(wellFormedGeoLocationDto);
+            Assert.That(viewResultGeoLocationDto, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewResultGeoLocationDto!.AccuracyRadius, Is.EqualTo(wellFormedGeoLocationDto.AccuracyRadius));
+                Assert.That(viewResultGeoLocationDto.Address, Is.EqualTo(wellFormedGeoLocationDto.Address));
+                Assert.That(viewResultGeoLocationDto.CityName, Is.EqualTo(wellFormedGeoLocationDto.CityName));
+                Assert.That(viewResultGeoLocationDto.ContinentCode, Is.EqualTo(wellFormedGeoLocationDto.ContinentCode));
+                Assert.That(viewResultGeoLocationDto.ContinentName, Is.EqualTo(wellFormedGeoLocationDto.ContinentName));
+                Assert.That(viewResultGeoLocationDto.CountryCode, Is.EqualTo(wellFormedGeoLocationDto.CountryCode));
+                Assert.That(viewResultGeoLocationDto.CountryName, Is.EqualTo(wellFormedGeoLocationDto.CountryName));
+                Assert.That(viewResultGeoLocationDto.IsEuropeanUnion, Is.EqualTo(wellFormedGeoLocationDto.IsEuropeanUnion));
+                Assert.That(viewResultGeoLocationDto.Latitude, Is.EqualTo(wellFormedGeoLocationDto.Latitude));
+                Assert.That(viewResultGeoLocationDto.Longitude, Is.EqualTo(wellFormedGeoLocationDto.Longitude));
+                Assert.That(viewResultGeoLocationDto.PostalCode, Is.EqualTo(wellFormedGeoLocationDto.PostalCode));
+                Assert.That(viewResultGeoLocationDto.RegisteredCountry, Is.EqualTo(wellFormedGeoLocationDto.RegisteredCountry));
+                Assert.That(viewResultGeoLocationDto.RepresentedCountry, Is.EqualTo(wellFormedGeoLocationDto.RepresentedCountry));
+                Assert.That(viewResultGeoLocationDto.Timezone, Is.EqualTo(wellFormedGeoLocationDto.Timezone));
+                Assert.That(viewResultGeoLocationDto.Traits, Is.EquivalentTo(wellFormedGeoLocationDto.Traits));
+            });
         }
 
         [Test]
@@ -112,27 +130,45 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             // Arrange
             byte[]? nullSessionData = null;
             byte[]? wellFormedSessionData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(wellFormedGeoLocationDto));
-            A.CallTo(() => fakeHttpContextAccessor.HttpContext.Session.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
+            A.CallTo(() => fakeHttpContextAccessor.HttpContext!.Session.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
             A.CallTo(() => fakeGeoLocationClient.GeoLookup.V1.GetGeoLocation(A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(Task.FromResult(new ApiResult<GeoLocationDto>(HttpStatusCode.OK, new ApiResponse<GeoLocationDto>(wellFormedGeoLocationDto))));
 
             // Act
             var result = await homeController.Index();
 
             // Assert
-            A.CallTo(() => fakeHttpContextAccessor.HttpContext.Session.Set("UserGeoLocationDto", A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeHttpContextAccessor.HttpContext!.Session.Set("UserGeoLocationDto", A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
 
-            result.Should().NotBeNull();
-            result.Should().BeOfType<ViewResult>();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ViewResult>());
 
             var viewResult = result as ViewResult;
 
-            viewResult.Should().NotBeNull();
-            viewResult?.Model.Should().NotBeNull();
-            viewResult?.Model.Should().BeOfType<GeoLocationDto>();
+            Assert.That(viewResult, Is.Not.Null);
+            Assert.That(viewResult!.Model, Is.Not.Null);
+            Assert.That(viewResult.Model, Is.InstanceOf<GeoLocationDto>());
 
-            var viewResultGeoLocationDto = viewResult?.Model as GeoLocationDto;
+            var viewResultGeoLocationDto = viewResult.Model as GeoLocationDto;
 
-            viewResultGeoLocationDto.Should().BeEquivalentTo(wellFormedGeoLocationDto);
+            Assert.That(viewResultGeoLocationDto, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(viewResultGeoLocationDto!.AccuracyRadius, Is.EqualTo(wellFormedGeoLocationDto.AccuracyRadius));
+                Assert.That(viewResultGeoLocationDto.Address, Is.EqualTo(wellFormedGeoLocationDto.Address));
+                Assert.That(viewResultGeoLocationDto.CityName, Is.EqualTo(wellFormedGeoLocationDto.CityName));
+                Assert.That(viewResultGeoLocationDto.ContinentCode, Is.EqualTo(wellFormedGeoLocationDto.ContinentCode));
+                Assert.That(viewResultGeoLocationDto.ContinentName, Is.EqualTo(wellFormedGeoLocationDto.ContinentName));
+                Assert.That(viewResultGeoLocationDto.CountryCode, Is.EqualTo(wellFormedGeoLocationDto.CountryCode));
+                Assert.That(viewResultGeoLocationDto.CountryName, Is.EqualTo(wellFormedGeoLocationDto.CountryName));
+                Assert.That(viewResultGeoLocationDto.IsEuropeanUnion, Is.EqualTo(wellFormedGeoLocationDto.IsEuropeanUnion));
+                Assert.That(viewResultGeoLocationDto.Latitude, Is.EqualTo(wellFormedGeoLocationDto.Latitude));
+                Assert.That(viewResultGeoLocationDto.Longitude, Is.EqualTo(wellFormedGeoLocationDto.Longitude));
+                Assert.That(viewResultGeoLocationDto.PostalCode, Is.EqualTo(wellFormedGeoLocationDto.PostalCode));
+                Assert.That(viewResultGeoLocationDto.RegisteredCountry, Is.EqualTo(wellFormedGeoLocationDto.RegisteredCountry));
+                Assert.That(viewResultGeoLocationDto.RepresentedCountry, Is.EqualTo(wellFormedGeoLocationDto.RepresentedCountry));
+                Assert.That(viewResultGeoLocationDto.Timezone, Is.EqualTo(wellFormedGeoLocationDto.Timezone));
+                Assert.That(viewResultGeoLocationDto.Traits, Is.EquivalentTo(wellFormedGeoLocationDto.Traits));
+            });
         }
 
         [TearDown]

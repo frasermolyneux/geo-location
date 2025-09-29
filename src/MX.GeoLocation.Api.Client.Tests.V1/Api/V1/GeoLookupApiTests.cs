@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Linq;
 
 using Microsoft.Extensions.Logging;
 
@@ -52,10 +53,9 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
             var result = await geoLookupApi.GetGeoLocation("google.co.uk");
 
             // Assert
-            result.Should().NotBeNull();
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Result?.Data?.Address.Should().Be("google.co.uk");
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(result.Result?.Data?.Address, Is.EqualTo("google.co.uk"));
         }
 
 
@@ -78,10 +78,10 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
             var result = await geoLookupApi.GetGeoLocations(new List<string> { "13.64.69.151", "2603:1040:1302::580", "google.co.uk" });
 
             // Assert
-            result.Should().NotBeNull();
-
-            result.StatusCode.Should().Be(HttpStatusCode.OK);
-            result.Result?.Data?.Items.Should().HaveCount(3);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+            Assert.That(result.Result?.Data?.Items, Is.Not.Null);
+            Assert.That(result.Result!.Data!.Items!.Count(), Is.EqualTo(3));
         }
 
         [TearDown]

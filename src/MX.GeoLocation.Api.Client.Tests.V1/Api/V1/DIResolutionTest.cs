@@ -4,7 +4,6 @@ using MX.GeoLocation.Api.Client.V1;
 using MX.Api.Client;
 using MX.Api.Client.Auth;
 using NUnit.Framework;
-using FluentAssertions;
 
 namespace MX.GeoLocation.Api.Client.Tests.V1.Api.V1;
 
@@ -41,6 +40,6 @@ internal class DIResolutionTest
         // Act & Assert
         var geoLookupApi = serviceProvider.GetService<GeoLookupApi>();
 
-        geoLookupApi.Should().NotBeNull();
+        Assert.That(geoLookupApi, Is.Not.Null);
     }
 }

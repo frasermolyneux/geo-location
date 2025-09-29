@@ -21,7 +21,7 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            result.ToString().Should().Be("London, United Kingdom");
+            Assert.That(result.ToString(), Is.EqualTo("London, United Kingdom"));
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            result.ToString().Should().Be("London, United Kingdom");
+            Assert.That(result.ToString(), Is.EqualTo("London, United Kingdom"));
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            result.ToString().Should().Be("GB");
+            Assert.That(result.ToString(), Is.EqualTo("GB"));
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            result.ToString().Should().Be("UK");
+            Assert.That(result.ToString(), Is.EqualTo("UK"));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            result.ToString().Should().Be("Unknown");
+            Assert.That(result.ToString(), Is.EqualTo("Unknown"));
         }
     }
 }
