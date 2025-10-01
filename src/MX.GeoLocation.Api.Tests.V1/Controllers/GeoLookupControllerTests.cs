@@ -1,4 +1,5 @@
-﻿
+﻿using System.Net;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -30,21 +31,21 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             var result = await geoLookupController.GetGeoLocation(invalidHostname);
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType<ObjectResult>();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
 
             var objectResult = result as ObjectResult;
 
-            objectResult.Should().NotBeNull();
-            objectResult?.StatusCode.Should().Be(400);
+            Assert.That(objectResult, Is.Not.Null);
+            Assert.That(objectResult!.StatusCode, Is.EqualTo(400));
 
-            objectResult?.Value.Should().BeOfType<ApiResponse<GeoLocationDto>>();
+            Assert.That(objectResult.Value, Is.InstanceOf<ApiResponse<GeoLocationDto>>());
 
-            var apiResponseDto = objectResult?.Value as ApiResponse<GeoLocationDto>;
-            apiResponseDto.Should().NotBeNull();
+            var apiResponseDto = objectResult.Value as ApiResponse<GeoLocationDto>;
+            Assert.That(apiResponseDto, Is.Not.Null);
 
-            apiResponseDto!.Errors.Should().NotBeNullOrEmpty();
-            apiResponseDto.Errors!.First().Message.Should().Be("The address provided is invalid. IP or DNS is acceptable.");
+            Assert.That(apiResponseDto!.Errors, Is.Not.Null.And.Not.Empty);
+            Assert.That(apiResponseDto.Errors!.First().Message, Is.EqualTo("The address provided is invalid. IP or DNS is acceptable."));
         }
 
         [TestCase("localhost")]
@@ -58,18 +59,18 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             var result = await geoLookupController.GetGeoLocation(localhost);
 
             // Assert
-            result.Should().NotBeNull();
-            result.Should().BeOfType<ObjectResult>();
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<ObjectResult>());
 
             var objectResult = result as ObjectResult;
 
-            objectResult.Should().NotBeNull();
-            objectResult?.StatusCode.Should().Be(404);
+            Assert.That(objectResult, Is.Not.Null);
+            Assert.That(objectResult!.StatusCode, Is.EqualTo((int)HttpStatusCode.BadRequest));
 
-            objectResult?.Value.Should().BeOfType<ApiResponse<GeoLocationDto>>();
+            Assert.That(objectResult.Value, Is.InstanceOf<ApiResponse<GeoLocationDto>>());
 
-            var apiResponseDto = objectResult?.Value as ApiResponse<GeoLocationDto>;
-            apiResponseDto.Should().NotBeNull();
+            var apiResponseDto = objectResult.Value as ApiResponse<GeoLocationDto>;
+            Assert.That(apiResponseDto, Is.Not.Null);
 
             //apiResponseDto?.Errors.Should().NotBeNullOrEmpty();
             //apiResponseDto?.Errors.First().Message.Should().Be("Hostname is a loopback or local address, geo location data is unavailable");

@@ -199,15 +199,16 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                 }
             }
 
-            var result = new CollectionModel<GeoLocationDto>
+            var data = new CollectionModel<GeoLocationDto>
             {
-                Items = entries,
-                TotalCount = entries.Count,
-                FilteredCount = entries.Count
+                Items = entries
             };
 
-            var response = new ApiResponse<CollectionModel<GeoLocationDto>>(result) { Errors = errors.ToArray() };
-            return response.ToApiResult();
+            return new ApiResponse<CollectionModel<GeoLocationDto>>(data)
+            {
+                Errors = errors.ToArray(),
+                Pagination = new ApiPagination(entries.Count, entries.Count, 0, 0)
+            }.ToApiResult();
         }
 
         [HttpDelete]

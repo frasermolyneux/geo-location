@@ -1,11 +1,15 @@
 trigger: none
 pr: none
 
+# Added valid scheduled cleanup (weekly Saturday 04:30 UTC) to consistently clean dev resources.
+# Assumption: Automated cleanup desired; adjust cron or remove block if manual-only is preferred.
 schedules:
-  displayName: Destroy Development
-  branches:
-    include:
-      - main
+  - cron: "30 4 * * 6"
+    displayName: "Weekly Destroy Development (Sat 04:30 UTC)"
+    branches:
+      include:
+        - main
+    always: true
 
 pool:
   vmImage: ubuntu-latest

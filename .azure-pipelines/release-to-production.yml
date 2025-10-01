@@ -4,11 +4,11 @@ trigger:
       - "main"
 
 schedules:
-  - cron: "0 3 * * 3"
-    displayName: "Weekly Wednesday 3am UTC"
+  - cron: "0 3 * * 4"
+    displayName: "Weekly Release (Thu 03:00 UTC)"
     branches:
       include:
-        - "main"
+        - main
     always: true
 
 pr: none

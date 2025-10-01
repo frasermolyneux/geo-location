@@ -32,7 +32,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
             var geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientService, validGeoLocationApiClientOptions);
 
             // Assert
-            geoLookupApi.Should().NotBeNull();
+            Assert.That(geoLookupApi, Is.Not.Null);
         }
 
         [TearDown]
