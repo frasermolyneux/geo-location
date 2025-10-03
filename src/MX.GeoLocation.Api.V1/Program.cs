@@ -11,6 +11,7 @@ using MX.GeoLocation.LookupWebApi.Repositories;
 using Newtonsoft.Json.Converters;
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +23,15 @@ builder.Services.AddMemoryCache();
 builder.Services.Configure<TelemetryConfiguration>(telemetryConfiguration =>
 {
     var telemetryProcessorChainBuilder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
-    telemetryProcessorChainBuilder.UseAdaptiveSampling(excludedTypes: "Exception");
+    telemetryProcessorChainBuilder.UseAdaptiveSampling(
+        settings: new SamplingPercentageEstimatorSettings
+        {
+            InitialSamplingPercentage = 5,
+            MinSamplingPercentage = 5,
+            MaxSamplingPercentage = 60
+        },
+        callback: null,
+        excludedTypes: "Exception");
     telemetryProcessorChainBuilder.Build();
 });
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions

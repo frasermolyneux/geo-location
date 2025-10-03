@@ -1,6 +1,6 @@
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
-
+using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
 using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
@@ -21,7 +21,15 @@ builder.Services.AddMemoryCache();
 builder.Services.Configure<TelemetryConfiguration>(telemetryConfiguration =>
 {
     var telemetryProcessorChainBuilder = telemetryConfiguration.DefaultTelemetrySink.TelemetryProcessorChainBuilder;
-    telemetryProcessorChainBuilder.UseAdaptiveSampling(excludedTypes: "Exception");
+    telemetryProcessorChainBuilder.UseAdaptiveSampling(
+        settings: new SamplingPercentageEstimatorSettings
+        {
+            InitialSamplingPercentage = 5,
+            MinSamplingPercentage = 5,
+            MaxSamplingPercentage = 60
+        },
+        callback: null,
+        excludedTypes: "Exception");
     telemetryProcessorChainBuilder.Build();
 });
 builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceOptions
