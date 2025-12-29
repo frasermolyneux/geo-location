@@ -1,7 +1,7 @@
 resources:
   pipelines:
-    - pipeline: geo-location.ReleaseToProduction
-      source: geo-location.ReleaseToProduction
+    - pipeline: geo-location.release-to-production
+      source: geo-location.release-to-production
       project: Molyneux.IO
       trigger: true
   repositories:
