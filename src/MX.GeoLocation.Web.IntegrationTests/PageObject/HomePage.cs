@@ -42,7 +42,11 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             else
             {
                 var baseUrl = GetBaseUrl();
-                await page.GotoAsync(baseUrl);
+                await page.GotoAsync(baseUrl, new PageGotoOptions
+                {
+                    Timeout = 60000,
+                    WaitUntil = WaitUntilState.NetworkIdle
+                });
             }
         }
 

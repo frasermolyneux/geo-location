@@ -67,7 +67,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             catch
             {
                 // If "Located in" doesn't appear, check for error messages
-                await page.WaitForSelectorAsync(".validation-summary-errors", new PageWaitForSelectorOptions { Timeout = 10000 });
+                await page.WaitForSelectorAsync(".validation-summary-errors", new PageWaitForSelectorOptions { Timeout = 30000 });
             }
         }
 

@@ -31,6 +31,9 @@ namespace MX.GeoLocation.Web.IntegrationTests
             });
 
             Page = await _browser.NewPageAsync();
+            // Slow CI environments can take longer to navigate/render.
+            Page.SetDefaultTimeout(60000);
+            Page.SetDefaultNavigationTimeout(60000);
             PageFactory = new PageFactory(Page, Configuration);
 
             // Navigate to the home page initially

@@ -18,7 +18,8 @@ stages:
 
         steps:
           - pwsh: |
-              Start-Sleep -Seconds 60
+              Invoke-WebRequest -Uri $url -Method Get -TimeoutSec 30 -UseBasicParsing -ErrorAction SilentlyContinue
+              Start-Sleep -Seconds 90
 
               $maxAttempts = 30  # 5 minutes with 10 second intervals
               $attempt = 0
