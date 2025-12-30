@@ -53,20 +53,21 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
         public async Task ExecuteLookupAddressFlowAsync(string address)
         {
             await AddressDataField.FillAsync(address);
-            await SearchButton.ClickAsync();
+            // The lookup posts results without a navigation; avoid waiting on a non-existent nav and allow extra time for the API call.
+            await SearchButton.ClickAsync(new LocatorClickOptions { NoWaitAfter = true });
 
-            // Wait for the page to load and the results to appear
-            await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            // Give the API response and UI render more headroom in CI.
+            await page.WaitForLoadStateAsync(LoadState.NetworkIdle, new PageWaitForLoadStateOptions { Timeout = 60000 });
 
             // Wait for either success result or error result - using proper selectors
             try
             {
-                await page.WaitForSelectorAsync("text=Located in", new PageWaitForSelectorOptions { Timeout = 10000 });
+                await page.WaitForSelectorAsync("text=Located in", new PageWaitForSelectorOptions { Timeout = 30000 });
             }
             catch
             {
                 // If "Located in" doesn't appear, check for error messages
-                await page.WaitForSelectorAsync(".validation-summary-errors", new PageWaitForSelectorOptions { Timeout = 5000 });
+                await page.WaitForSelectorAsync(".validation-summary-errors", new PageWaitForSelectorOptions { Timeout = 10000 });
             }
         }
 
