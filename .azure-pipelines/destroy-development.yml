@@ -1,11 +1,10 @@
 trigger: none
 pr: none
 
-# Added valid scheduled cleanup (weekly Saturday 04:30 UTC) to consistently clean dev resources.
-# Assumption: Automated cleanup desired; adjust cron or remove block if manual-only is preferred.
+# Nightly cleanup at 01:20 UTC to keep dev spend low.
 schedules:
-  - cron: "30 4 * * 6"
-    displayName: "Weekly Destroy Development (Sat 04:30 UTC)"
+  - cron: "20 1 * * *"
+    displayName: "Nightly Destroy Development (01:20 UTC)"
     branches:
       include:
         - main
@@ -34,10 +33,18 @@ stages:
             deploy:
               steps:
                 - task: AzureCLI@2
-                  displayName: DestroyDevResources
+                  displayName: DestroyDevResourceGroup
                   inputs:
                     azureSubscription: "spn-geo-location-development"
                     scriptType: "pscore"
                     scriptLocation: "inlineScript"
                     inlineScript: |
-                      Write-Host "TODO"
+                      $params = Get-Content "$(System.DefaultWorkingDirectory)/params/dev.json" | ConvertFrom-Json
+                      $envName = $params.parameters.environment.value
+                      $location = $params.parameters.location.value
+                      $instance = $params.parameters.instance.value
+
+                      $resourceGroupName = "rg-geolocation-$envName-$location-$instance"
+
+                      Write-Host "Deleting resource group $resourceGroupName"
+                      az group delete --name $resourceGroupName --yes --no-wait
