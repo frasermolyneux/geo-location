@@ -194,7 +194,7 @@ stages:
             inputs:
               command: "build"
               arguments: "--configuration Release"
-              projects: "$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj"
+              projects: "$(System.DefaultWorkingDirectory)/src/MX.GeoLocation.Web.IntegrationTests/MX.GeoLocation.Web.IntegrationTests.csproj"
 
           - task: DotNetCoreCLI@2
             displayName: "Install Playwright CLI tool"
@@ -211,22 +211,21 @@ stages:
               $maxAttempts = 2
               $attempt = 0
               $exitCode = 1
-              $projects = Get-ChildItem -Path "$(System.DefaultWorkingDirectory)" -Recurse -Filter '*.IntegrationTests.csproj' | Select-Object -ExpandProperty FullName
+              $project = Join-Path $env:SYSTEM_DEFAULTWORKINGDIRECTORY "src/MX.GeoLocation.Web.IntegrationTests/MX.GeoLocation.Web.IntegrationTests.csproj"
 
-              if (-not $projects) {
-                Write-Error "No integration test projects found under $(System.DefaultWorkingDirectory)."
-                exit 1
+              if (-not (Test-Path $project)) {
+                  Write-Error "Integration test project not found at expected path: $project"
+                  exit 1
               }
 
-              $project = $projects[0]
               Write-Host "Using integration test project: $project"
 
               do {
                   $attempt++
                   Write-Host "Running UI tests (attempt $attempt of $maxAttempts)..."
 
-                dotnet test "$project" --no-build --configuration Release
-                $exitCode = $LASTEXITCODE
+                  dotnet test "$project" --no-build --configuration Release
+                  $exitCode = $LASTEXITCODE
 
                   if ($exitCode -eq 0) {
                       Write-Host "UI tests succeeded."
