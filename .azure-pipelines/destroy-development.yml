@@ -32,6 +32,9 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                  displayName: Checkout repository
+
                 - task: AzureCLI@2
                   displayName: DestroyDevResourceGroup
                   inputs:
