@@ -211,13 +211,22 @@ stages:
               $maxAttempts = 2
               $attempt = 0
               $exitCode = 1
+              $projects = Get-ChildItem -Path "$(System.DefaultWorkingDirectory)" -Recurse -Filter '*.IntegrationTests.csproj' | Select-Object -ExpandProperty FullName
+
+              if (-not $projects) {
+                Write-Error "No integration test projects found under $(System.DefaultWorkingDirectory)."
+                exit 1
+              }
+
+              $project = $projects[0]
+              Write-Host "Using integration test project: $project"
 
               do {
                   $attempt++
                   Write-Host "Running UI tests (attempt $attempt of $maxAttempts)..."
 
-                  dotnet test "$(System.DefaultWorkingDirectory)/**/*.IntegrationTests.csproj" --no-build --configuration Release
-                  $exitCode = $LASTEXITCODE
+                dotnet test "$project" --no-build --configuration Release
+                $exitCode = $LASTEXITCODE
 
                   if ($exitCode -eq 0) {
                       Write-Host "UI tests succeeded."
