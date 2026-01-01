@@ -30,6 +30,38 @@ stages:
                 - checkout: self
 
                 - task: AzureCLI@2
+                  displayName: Purge soft-deleted APIM (dev only)
+                  condition: eq('${{ parameters.environmentName }}', 'dev')
+                  inputs:
+                    azureSubscription: ${{ parameters.azureSubscription }}
+                    scriptType: "pscore"
+                    scriptLocation: "inlineScript"
+                    inlineScript: |
+                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
+
+                      $location = $config.parameters.location.value
+                      $environment = $config.parameters.environment.value
+
+                      $prefix = "apim-geolocation-$environment-$location-"
+                      Write-Host "Checking for soft-deleted APIM instances with prefix '$prefix' in $location..."
+
+                      $deletedServices = az apim deletedservice list --location $location | ConvertFrom-Json
+
+                      $deletedNames = $deletedServices `
+                        | Where-Object { $_.name -like "$prefix*" } `
+                        | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
+
+                      if (-not $deletedNames) {
+                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix'."
+                        return
+                      }
+
+                      foreach ($name in @($deletedNames)) {
+                        Write-Host "Purging soft-deleted APIM '$name' in $location..."
+                        az apim deletedservice purge --name $name --location $location
+                      }
+
+                - task: AzureCLI@2
                   displayName: deploy_${{ parameters.environmentName }}_bicep
                   inputs:
                     azureSubscription: ${{ parameters.azureSubscription }}
