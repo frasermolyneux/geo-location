@@ -45,16 +45,26 @@ stages:
 
                       Write-Host "Looking for soft-deleted APIM instances in $location with prefix '$prefix'..."
 
-                      $deleted = az apim deletedservice list --location $location --query "[?starts_with(name, '$prefix')]" -o json | ConvertFrom-Json
+                      $subscriptionId = az account show --query id -o tsv
+                      $apiVersion = "2021-08-01"
 
-                      if (-not $deleted) {
+                      $deletedResponse = az rest -m GET `
+                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/deletedservices?api-version=$apiVersion" `
+                        --only-show-errors -o json
+
+                      $deleted = $deletedResponse | ConvertFrom-Json
+                      $matches = $deleted.value | Where-Object { $_.properties.location -eq $location -and $_.name -like "$prefix*" }
+
+                      if (-not $matches) {
                         Write-Host "No soft-deleted APIM instances found for prefix '$prefix' in $location."
                         return
                       }
 
-                      foreach ($item in @($deleted)) {
+                      foreach ($item in @($matches)) {
                         Write-Host "Purging soft-deleted APIM '$($item.name)' in $location..."
-                        az apim deletedservice purge --name $item.name --location $location
+                        az rest -m POST `
+                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices/$($item.name)/purge?api-version=$apiVersion" `
+                          --only-show-errors -o none
 
                         if ($LASTEXITCODE -ne 0) {
                           Write-Warning "Purge call for '$($item.name)' failed with exit code $LASTEXITCODE; continuing so deployment can proceed."
