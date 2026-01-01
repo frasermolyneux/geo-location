@@ -48,14 +48,20 @@ stages:
                       $subscriptionId = az account show --query id -o tsv
                       $apiVersion = "2021-08-01"
 
-                      $deletedServices = az rest `
-                        -m GET `
-                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices?api-version=$apiVersion" `
-                        | ConvertFrom-Json
+                      try {
+                        $deletedServices = az rest `
+                          -m GET `
+                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices?api-version=$apiVersion" `
+                          | ConvertFrom-Json
 
-                      $deletedNames = $deletedServices.value `
-                        | Where-Object { $_.name -like "$prefix*" } `
-                        | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
+                        $deletedNames = $deletedServices.value `
+                          | Where-Object { $_.name -like "$prefix*" } `
+                          | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
+                      }
+                      catch {
+                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix'. (lookup returned 404)"
+                        return
+                      }
 
                       if (-not $deletedNames) {
                         Write-Host "No soft-deleted APIM instances found for prefix '$prefix'."
