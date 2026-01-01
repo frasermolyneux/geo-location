@@ -48,9 +48,10 @@ stages:
                       $subscriptionId = az account show --query id -o tsv
                       $apiVersion = "2021-08-01"
 
+                      # Some CLI versions return 404 when scoping the list by location; use the provider-level list and filter in PowerShell.
                       $deletedResponse = az rest `
                         -m GET `
-                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices?api-version=$apiVersion" `
+                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/deletedservices?api-version=$apiVersion" `
                         --only-show-errors `
                         -o json
 
@@ -62,8 +63,10 @@ stages:
 
                       $deletedServices = $deletedResponse | ConvertFrom-Json
 
-                      $deletedNames = $deletedServices.value `
-                        | Where-Object { $_.name -like "$prefix*" } `
+                      $deletedItems = $deletedServices.value `
+                        | Where-Object { $_.name -like "$prefix*" -and $_.properties.location -eq $location }
+
+                      $deletedNames = $deletedItems `
                         | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
 
                       if (-not $deletedNames) {
@@ -71,11 +74,14 @@ stages:
                         return
                       }
 
-                      foreach ($name in @($deletedNames)) {
-                        Write-Host "Purging soft-deleted APIM '$name' in $location..."
+                      foreach ($item in @($deletedItems)) {
+                        $name = $item.name
+                        $itemLocation = $item.properties.location
+
+                        Write-Host "Purging soft-deleted APIM '$name' in $itemLocation..."
                         az rest `
                           -m POST `
-                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices/$name/purge?api-version=$apiVersion" `
+                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$itemLocation/deletedservices/$name/purge?api-version=$apiVersion" `
                           --only-show-errors `
                           -o json
 
