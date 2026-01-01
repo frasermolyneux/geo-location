@@ -48,20 +48,23 @@ stages:
                       $subscriptionId = az account show --query id -o tsv
                       $apiVersion = "2021-08-01"
 
-                      try {
-                        $deletedServices = az rest `
-                          -m GET `
-                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices?api-version=$apiVersion" `
-                          | ConvertFrom-Json
+                      $deletedResponse = az rest `
+                        -m GET `
+                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices?api-version=$apiVersion" `
+                        --only-show-errors `
+                        -o json
 
-                        $deletedNames = $deletedServices.value `
-                          | Where-Object { $_.name -like "$prefix*" } `
-                          | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
-                      }
-                      catch {
-                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix'. (lookup returned 404)"
+                      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($deletedResponse)) {
+                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix'. (lookup returned HTTP $LASTEXITCODE)"
+                        $global:LASTEXITCODE = 0
                         return
                       }
+
+                      $deletedServices = $deletedResponse | ConvertFrom-Json
+
+                      $deletedNames = $deletedServices.value `
+                        | Where-Object { $_.name -like "$prefix*" } `
+                        | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
 
                       if (-not $deletedNames) {
                         Write-Host "No soft-deleted APIM instances found for prefix '$prefix'."
@@ -72,7 +75,14 @@ stages:
                         Write-Host "Purging soft-deleted APIM '$name' in $location..."
                         az rest `
                           -m POST `
-                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices/$name/purge?api-version=$apiVersion"
+                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices/$name/purge?api-version=$apiVersion" `
+                          --only-show-errors `
+                          -o json
+
+                        if ($LASTEXITCODE -ne 0) {
+                          Write-Warning "Purge call for '$name' returned HTTP $LASTEXITCODE; continuing without failing pipeline."
+                          $global:LASTEXITCODE = 0
+                        }
                       }
 
                 - task: AzureCLI@2
