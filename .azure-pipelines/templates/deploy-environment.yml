@@ -37,61 +37,27 @@ stages:
                     scriptType: "pscore"
                     scriptLocation: "inlineScript"
                     inlineScript: |
-                      $config = (Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json)
+                      $config = Get-Content params/${{ parameters.environmentName }}.json | ConvertFrom-Json
 
                       $location = $config.parameters.location.value
                       $environment = $config.parameters.environment.value
-
                       $prefix = "apim-geolocation-$environment-$location-"
-                      Write-Host "Checking for soft-deleted APIM instances with prefix '$prefix' in $location..."
 
-                      $subscriptionId = az account show --query id -o tsv
-                      $apiVersion = "2021-08-01"
+                      Write-Host "Looking for soft-deleted APIM instances in $location with prefix '$prefix'..."
 
-                      # Some CLI versions return 404 when scoping the list by location; use the provider-level list and filter in PowerShell.
-                      $deletedResponse = az rest `
-                        -m GET `
-                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/deletedservices?api-version=$apiVersion" `
-                        --only-show-errors `
-                        -o json
+                      $deleted = az apim deletedservice list --location $location --query "[?starts_with(name, '$prefix')]" -o json | ConvertFrom-Json
 
-                      if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($deletedResponse)) {
-                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix'. (lookup returned HTTP $LASTEXITCODE)"
-                        $global:LASTEXITCODE = 0
+                      if (-not $deleted) {
+                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix' in $location."
                         return
                       }
 
-                      $deletedServices = $deletedResponse | ConvertFrom-Json
-
-                      # Emit everything we see for debugging
-                      Write-Host "Soft-deleted APIM candidates (all locations):"
-                      $deletedServices.value | ForEach-Object { Write-Host "- $($_.name) @ $($_.properties.location)" }
-
-                      # Prefer matching prefix, but fall back to any in the same location so we don't miss the blocking instance.
-                      $deletedItems = $deletedServices.value `
-                        | Where-Object { $_.properties.location -eq $location -and ($_.name -like "$prefix*" -or $true) }
-
-                      $deletedNames = $deletedItems `
-                        | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
-
-                      if (-not $deletedNames) {
-                        Write-Host "No soft-deleted APIM instances found for prefix '$prefix'."
-                        return
-                      }
-
-                      foreach ($item in @($deletedItems)) {
-                        $name = $item.name
-                        $itemLocation = $item.properties.location
-
-                        Write-Host "Purging soft-deleted APIM '$name' in $itemLocation..."
-                        az rest `
-                          -m POST `
-                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$itemLocation/deletedservices/$name/purge?api-version=$apiVersion" `
-                          --only-show-errors `
-                          -o json
+                      foreach ($item in @($deleted)) {
+                        Write-Host "Purging soft-deleted APIM '$($item.name)' in $location..."
+                        az apim deletedservice purge --name $item.name --location $location
 
                         if ($LASTEXITCODE -ne 0) {
-                          Write-Warning "Purge call for '$name' returned HTTP $LASTEXITCODE; continuing without failing pipeline."
+                          Write-Warning "Purge call for '$($item.name)' failed with exit code $LASTEXITCODE; continuing so deployment can proceed."
                           $global:LASTEXITCODE = 0
                         }
                       }
