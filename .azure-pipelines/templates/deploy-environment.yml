@@ -45,9 +45,15 @@ stages:
                       $prefix = "apim-geolocation-$environment-$location-"
                       Write-Host "Checking for soft-deleted APIM instances with prefix '$prefix' in $location..."
 
-                      $deletedServices = az apim deletedservice list --location $location | ConvertFrom-Json
+                      $subscriptionId = az account show --query id -o tsv
+                      $apiVersion = "2021-08-01"
 
-                      $deletedNames = $deletedServices `
+                      $deletedServices = az rest `
+                        -m GET `
+                        -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices?api-version=$apiVersion" `
+                        | ConvertFrom-Json
+
+                      $deletedNames = $deletedServices.value `
                         | Where-Object { $_.name -like "$prefix*" } `
                         | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
 
@@ -58,7 +64,9 @@ stages:
 
                       foreach ($name in @($deletedNames)) {
                         Write-Host "Purging soft-deleted APIM '$name' in $location..."
-                        az apim deletedservice purge --name $name --location $location
+                        az rest `
+                          -m POST `
+                          -u "https://management.azure.com/subscriptions/$subscriptionId/providers/Microsoft.ApiManagement/locations/$location/deletedservices/$name/purge?api-version=$apiVersion"
                       }
 
                 - task: AzureCLI@2
