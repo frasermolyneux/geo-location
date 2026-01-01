@@ -63,8 +63,13 @@ stages:
 
                       $deletedServices = $deletedResponse | ConvertFrom-Json
 
+                      # Emit everything we see for debugging
+                      Write-Host "Soft-deleted APIM candidates (all locations):"
+                      $deletedServices.value | ForEach-Object { Write-Host "- $($_.name) @ $($_.properties.location)" }
+
+                      # Prefer matching prefix, but fall back to any in the same location so we don't miss the blocking instance.
                       $deletedItems = $deletedServices.value `
-                        | Where-Object { $_.name -like "$prefix*" -and $_.properties.location -eq $location }
+                        | Where-Object { $_.properties.location -eq $location -and ($_.name -like "$prefix*" -or $true) }
 
                       $deletedNames = $deletedItems `
                         | Select-Object -ExpandProperty name -ErrorAction SilentlyContinue
