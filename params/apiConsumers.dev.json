@@ -22,8 +22,12 @@
         "externalApiConsumers": {
             "value": [
                 {
-                    "Workload": "portal-repo-func-dev",
-                    "PrincipalId": "67b5ab3c-057d-4771-a750-6ddd723c053f"
+                    "Workload": "portal-repository-func-dev",
+                    "PrincipalId": "bec26e1f-d66c-4234-aa3a-ca96ae0f61de"
+                },
+                {
+                    "Workload": "portal-web-dev",
+                    "PrincipalId": "640262c1-e930-4ec1-8ffc-d47caa32ead7"
                 }
             ]
         }
