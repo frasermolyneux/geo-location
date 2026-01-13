@@ -22,11 +22,11 @@
         "externalApiConsumers": {
             "value": [
                 {
-                    "Workload": "portal-repository-func-prd",
+                    "Workload": "portal2-repository-func-prd",
                     "PrincipalId": "737442a4-9953-45fb-8fdb-425b63c7963d"
                 },
                 {
-                    "Workload": "portal-web-prd",
+                    "Workload": "portal2-web-prd",
                     "PrincipalId": "37bbe97d-def7-4cdd-9ea4-31bce4f23d5f"
                 }
             ]
