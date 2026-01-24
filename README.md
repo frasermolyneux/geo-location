@@ -2,6 +2,7 @@
 
 | Stage | Status |
 | --- | --- |
+| Build and Test | [![Build and Test](https://github.com/frasermolyneux/geo-location/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/build-and-test.yml) |
 | Code Quality | [![Code Quality](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml) |
 | Build | [![Build Status](https://dev.azure.com/frasermolyneux/Personal-Public/_apis/build/status%2Fgeo-location.ReleaseToProduction?repoName=frasermolyneux%2Fgeo-location&branchName=main&stageName=build)](https://dev.azure.com/frasermolyneux/Personal-Public/_build/latest?definitionId=184&repoName=frasermolyneux%2Fgeo-location&branchName=main) |
 | Development | [![Build Status](https://dev.azure.com/frasermolyneux/Personal-Public/_apis/build/status%2Fgeo-location.ReleaseToProduction?repoName=frasermolyneux%2Fgeo-location&branchName=main&stageName=deploy_dev)](https://dev.azure.com/frasermolyneux/Personal-Public/_build/latest?definitionId=184&repoName=frasermolyneux%2Fgeo-location&branchName=main) |
@@ -31,11 +32,19 @@ The primary use-case for integration with the [xtremeidiots-portal](https://gith
 ![architecture](./docs/images/architecture.png)
 
 * This workload is deployed to the shared Molyneux.IO platform; as such services such as `Azure Front Door`, `API Management`, `App Service Plans` and `Log Analytics Workspace` are already deployed. This workload will either extend them or integrate with them.
-* The `Web App` is a public-facing ASP .NET 7 website that allows geo location lookups.
+* The `Web App` is a public-facing ASP .NET 9 website that allows geo location lookups.
   * No authentication is required for the application
-* The `API App` is a .NET 7 Web Api that performs the geo location lookups using the MaxMind service.
+* The `API App` is a .NET 9 Web Api that performs the geo location lookups using the MaxMind service.
   * AAD authentication is required for the application.
 * The GeoLocation API is published to API Management and will require AAD Authentication and Subscription Keys.
+
+### NuGet Packages
+
+The repository publishes NuGet packages that multi-target both .NET 9 and .NET 10:
+* `MX.GeoLocation.LookupApi.Abstractions` - Core abstractions and models
+* `MX.GeoLocation.Api.Client.V1` - API client library
+
+See [docs/dotnet-multi-targeting.md](docs/dotnet-multi-targeting.md) for details on the multi-targeting strategy.
 
 ---
 
