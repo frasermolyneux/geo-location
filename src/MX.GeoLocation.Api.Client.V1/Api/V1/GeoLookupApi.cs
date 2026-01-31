@@ -48,7 +48,7 @@ namespace MX.GeoLocation.Api.Client.V1
             try
             {
                 var request = await CreateRequestAsync($"v1/lookup", Method.Post, cancellationToken);
-                if (hostnames != null)
+                if (hostnames is not null)
                 {
                     request.AddJsonBody(hostnames);
                 }

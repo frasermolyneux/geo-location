@@ -145,7 +145,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.INVALID_JSON, ErrorMessages.INVALID_JSON)).ToBadRequestResult().ToHttpResult();
             }
 
-            if (hostnames == null)
+            if (hostnames is null)
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.NULL_REQUEST, ErrorMessages.NULL_REQUEST)).ToBadRequestResult().ToHttpResult();
 
             var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames, default);

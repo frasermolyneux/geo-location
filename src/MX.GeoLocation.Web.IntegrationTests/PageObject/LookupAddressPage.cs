@@ -109,7 +109,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
                     // Extract location from "Located in Geneva, Switzerland" format
                     if (text.StartsWith("Located in "))
                     {
-                        return text.Substring("Located in ".Length).Trim();
+                        return text["Located in ".Length..].Trim();
                     }
                 }
 
