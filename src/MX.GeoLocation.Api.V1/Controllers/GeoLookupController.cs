@@ -206,7 +206,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
             return new ApiResponse<CollectionModel<GeoLocationDto>>(data)
             {
-                Errors = errors.ToArray(),
+                Errors = [..errors],
                 Pagination = new ApiPagination(entries.Count, entries.Count, 0, 0)
             }.ToApiResult();
         }
