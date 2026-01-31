@@ -155,8 +155,8 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
         async Task<ApiResult<CollectionModel<GeoLocationDto>>> IGeoLookupApi.GetGeoLocations(List<string> hostnames, CancellationToken cancellationToken)
         {
-            var entries = new List<GeoLocationDto>();
-            var errors = new List<ApiError>();
+            List<GeoLocationDto> entries = [];
+            List<ApiError> errors = [];
 
             foreach (var hostname in hostnames)
             {
@@ -242,7 +242,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     }
 
                     var deletedCount = 0;
-                    var messages = new List<string>();
+                    List<string> messages = [];
 
                     // Delete by resolved IP address (primary method since RowKey is TranslatedAddress)
                     var deleted = await tableStorageGeoLocationRepository.DeleteGeoLocation(validatedAddress);

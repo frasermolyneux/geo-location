@@ -165,7 +165,7 @@ namespace MX.GeoLocation.Web.Controllers
             try
             {
                 addresses = model.AddressData
-                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
                     .Where(address => !string.IsNullOrWhiteSpace(address))
                     .Select(address => address.Trim())
                     .ToList();
