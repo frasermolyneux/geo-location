@@ -75,9 +75,9 @@ namespace MX.GeoLocation.LookupWebApi.Models
         {
             get
             {
-                if (TraitsSerialised != null)
-                    return JsonConvert.DeserializeObject<Dictionary<string, string?>>(TraitsSerialised) ?? new Dictionary<string, string?>();
-                return new Dictionary<string, string?>();
+                if (TraitsSerialised is not null)
+                    return JsonConvert.DeserializeObject<Dictionary<string, string?>>(TraitsSerialised) ?? new();
+                return new();
             }
             private set { }
         }

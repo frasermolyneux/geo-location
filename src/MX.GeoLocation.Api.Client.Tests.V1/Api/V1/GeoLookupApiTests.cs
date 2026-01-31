@@ -75,7 +75,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
                 .Returns(Task.FromResult(restResponse));
 
             // Act
-            var result = await geoLookupApi.GetGeoLocations(new List<string> { "13.64.69.151", "2603:1040:1302::580", "google.co.uk" });
+            var result = await geoLookupApi.GetGeoLocations(["13.64.69.151", "2603:1040:1302::580", "google.co.uk"]);
 
             // Assert
             Assert.That(result, Is.Not.Null);

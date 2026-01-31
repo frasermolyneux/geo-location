@@ -14,9 +14,10 @@ namespace MX.GeoLocation.LookupWebApi.OpenApiOperationFilters
                 model.Type = "string";
                 model.Enum.Clear();
 
-                Enum.GetNames(context.Type)
-                    .ToList()
-                    .ForEach(n => model.Enum.Add(new OpenApiString(n)));
+                foreach (var name in Enum.GetNames(context.Type))
+                {
+                    model.Enum.Add(new OpenApiString(name));
+                }
             }
         }
     }

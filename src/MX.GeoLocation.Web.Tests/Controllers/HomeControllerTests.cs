@@ -52,7 +52,7 @@ namespace MX.GeoLocation.Web.Tests.Controllers
                 RegisteredCountry = "GB",
                 RepresentedCountry = null,
                 Timezone = "Europe/London",
-                Traits = new Dictionary<string, string?>()
+                Traits = new()
                 {
                     { "AutonomousSystemNumber", "6871" },
                     { "ConnectionType", null },
