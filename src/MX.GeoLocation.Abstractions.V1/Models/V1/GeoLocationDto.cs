@@ -50,6 +50,6 @@ namespace MX.GeoLocation.Abstractions.Models.V1
         public string? Timezone { get; internal set; }
 
         [JsonProperty]
-        public Dictionary<string, string?> Traits { get; internal set; } = new Dictionary<string, string?>();
+        public Dictionary<string, string?> Traits { get; internal set; } = new();
     }
 }

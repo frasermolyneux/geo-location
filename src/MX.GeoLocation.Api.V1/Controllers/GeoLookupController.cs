@@ -69,7 +69,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 _logger.LogInformation("Processing geolocation lookup for {Hostname}", hostname);
 
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -82,7 +82,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     // Try cache first
                     var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
 
-                    if (geoLocationDto != null)
+                    if (geoLocationDto is not null)
                     {
                         _logger.LogInformation("Found cached geolocation data for {ValidatedAddress}", validatedAddress);
                         return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
@@ -162,7 +162,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 try
                 {
-                    if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                    if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
                     {
                         if (localOverrides.Contains(hostname))
                         {
@@ -172,7 +172,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
                         var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
 
-                        if (geoLocationDto != null)
+                        if (geoLocationDto is not null)
                             entries.Add(geoLocationDto);
                         else
                         {
@@ -234,7 +234,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     return new ApiResponse(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToBadRequestResult();
                 }
 
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -295,7 +295,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 var hostEntry = Dns.GetHostEntry(address);
 
-                if (hostEntry.AddressList.FirstOrDefault() != null)
+                if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     return true;
                 }
@@ -320,7 +320,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 var hostEntry = Dns.GetHostEntry(address);
 
-                if (hostEntry.AddressList.FirstOrDefault() != null)
+                if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     validatedAddress = hostEntry.AddressList.First().ToString();
                     return true;

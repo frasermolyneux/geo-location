@@ -290,7 +290,7 @@ namespace MX.GeoLocation.Web.Controllers
             {
                 var hostEntry = Dns.GetHostEntry(address);
 
-                if (hostEntry.AddressList.FirstOrDefault() != null)
+                if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     return true;
                 }
