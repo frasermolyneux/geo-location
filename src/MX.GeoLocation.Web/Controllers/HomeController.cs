@@ -186,7 +186,7 @@ namespace MX.GeoLocation.Web.Controllers
 
             var lookupAddressesResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocations(addresses);
 
-            if (!lookupAddressesResponse.IsSuccess || (lookupAddressesResponse.Result?.Errors?.Any() == true))
+            if (!lookupAddressesResponse.IsSuccess || (lookupAddressesResponse.Result?.Errors?.Any() ?? false))
             {
                 if (lookupAddressesResponse.Result?.Errors is not null)
                 {
