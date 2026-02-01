@@ -23,7 +23,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             try
             {
                 var title = await page.TitleAsync();
-                return title?.Contains("Remove") == true;
+                return title?.Contains("Remove") ?? false;
             }
             catch
             {

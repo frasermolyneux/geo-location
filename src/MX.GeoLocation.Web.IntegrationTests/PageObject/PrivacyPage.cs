@@ -23,7 +23,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             try
             {
                 var title = await page.TitleAsync();
-                return title?.Contains("Privacy") == true;
+                return title?.Contains("Privacy") ?? false;
             }
             catch
             {

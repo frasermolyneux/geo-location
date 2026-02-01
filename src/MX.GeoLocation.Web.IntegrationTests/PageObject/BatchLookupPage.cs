@@ -23,7 +23,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             try
             {
                 var title = await page.TitleAsync();
-                return title?.Contains("Batch Lookup") == true;
+                return title?.Contains("Batch Lookup") ?? false;
             }
             catch
             {

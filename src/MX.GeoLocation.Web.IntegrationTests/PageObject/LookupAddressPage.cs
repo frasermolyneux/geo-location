@@ -24,7 +24,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             {
                 // Check if we're on the lookup address page using title or page content
                 var title = await page.TitleAsync();
-                return title?.Contains("Lookup Address") == true;
+                return title?.Contains("Lookup Address") ?? false;
             }
             catch
             {
