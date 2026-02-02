@@ -40,7 +40,7 @@ namespace MX.GeoLocation.Web.Controllers
 
             var lookupAddressResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocation(address.ToString());
 
-            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result?.Data == null)
+            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result?.Data is null)
             {
                 return RedirectToAction("LookupAddress");
             }
