@@ -261,12 +261,12 @@ namespace MX.GeoLocation.Web.Controllers
 
             IPAddress? address = null;
 
-            if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) == true)
+            if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) ?? false)
             {
                 IPAddress.TryParse(cfConnectingIp, out address);
             }
 
-            if (address is null && httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(xForwardedForHeaderKey, out var forwardedAddress) == true)
+            if (address is null && (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(xForwardedForHeaderKey, out var forwardedAddress) ?? false))
             {
                 IPAddress.TryParse(forwardedAddress, out address);
             }
