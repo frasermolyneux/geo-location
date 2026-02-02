@@ -33,14 +33,14 @@ namespace MX.GeoLocation.Web.Controllers
         {
             var sessionGeoLocationDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<GeoLocationDto>(UserLocationSessionKey);
 
-            if (sessionGeoLocationDto != null)
+            if (sessionGeoLocationDto is not null)
                 return View(sessionGeoLocationDto);
 
             var address = GetUsersIpForLookup();
 
             var lookupAddressResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocation(address.ToString());
 
-            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result?.Data == null)
+            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result?.Data is null)
             {
                 return RedirectToAction("LookupAddress");
             }
@@ -109,7 +109,7 @@ namespace MX.GeoLocation.Web.Controllers
 
             if (!lookupAddressResponse.IsSuccess)
             {
-                if (lookupAddressResponse.Result?.Errors != null)
+                if (lookupAddressResponse.Result?.Errors is not null)
                 {
                     foreach (var error in lookupAddressResponse.Result.Errors)
                     {
@@ -149,7 +149,7 @@ namespace MX.GeoLocation.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> BatchLookup(BatchLookupViewModel model)
         {
-            if (model.AddressData != null)
+            if (model.AddressData is not null)
                 httpContextAccessor.HttpContext?.Session.SetString(BatchLookupSessionKey, model.AddressData);
 
             if (!ModelState.IsValid) return View(model);
@@ -165,7 +165,7 @@ namespace MX.GeoLocation.Web.Controllers
             try
             {
                 addresses = model.AddressData
-                    .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
                     .Where(address => !string.IsNullOrWhiteSpace(address))
                     .Select(address => address.Trim())
                     .ToList();
@@ -186,9 +186,9 @@ namespace MX.GeoLocation.Web.Controllers
 
             var lookupAddressesResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocations(addresses);
 
-            if (!lookupAddressesResponse.IsSuccess || (lookupAddressesResponse.Result?.Errors?.Any() == true))
+            if (!lookupAddressesResponse.IsSuccess || (lookupAddressesResponse.Result?.Errors?.Any() ?? false))
             {
-                if (lookupAddressesResponse.Result?.Errors != null)
+                if (lookupAddressesResponse.Result?.Errors is not null)
                 {
                     foreach (var error in lookupAddressesResponse.Result.Errors)
                     {
@@ -230,7 +230,7 @@ namespace MX.GeoLocation.Web.Controllers
 
                 if (!deleteMetaDataResponse.IsSuccess)
                 {
-                    if (deleteMetaDataResponse.Result?.Errors != null)
+                    if (deleteMetaDataResponse.Result?.Errors is not null)
                     {
                         foreach (var error in deleteMetaDataResponse.Result.Errors)
                         {
@@ -261,19 +261,17 @@ namespace MX.GeoLocation.Web.Controllers
 
             IPAddress? address = null;
 
-            if (httpContextAccessor.HttpContext?.Request.Headers.ContainsKey(cfConnectingIpKey) == true)
+            if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) ?? false)
             {
-                var cfConnectingIp = httpContextAccessor.HttpContext.Request.Headers[cfConnectingIpKey];
                 IPAddress.TryParse(cfConnectingIp, out address);
             }
 
-            if (address == null && httpContextAccessor.HttpContext?.Request.Headers.ContainsKey(xForwardedForHeaderKey) == true)
+            if (address is null && (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(xForwardedForHeaderKey, out var forwardedAddress) ?? false))
             {
-                var forwardedAddress = httpContextAccessor.HttpContext.Request.Headers[xForwardedForHeaderKey];
                 IPAddress.TryParse(forwardedAddress, out address);
             }
 
-            if (address == null)
+            if (address is null)
                 address = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
 
             return address ?? IPAddress.Parse("8.8.8.8");
@@ -290,7 +288,7 @@ namespace MX.GeoLocation.Web.Controllers
             {
                 var hostEntry = Dns.GetHostEntry(address);
 
-                if (hostEntry.AddressList.FirstOrDefault() != null)
+                if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     return true;
                 }

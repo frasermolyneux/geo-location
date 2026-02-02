@@ -24,7 +24,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             {
                 // Check if we're on the lookup address page using title or page content
                 var title = await page.TitleAsync();
-                return title?.Contains("Lookup Address") == true;
+                return title?.Contains("Lookup Address") ?? false;
             }
             catch
             {
@@ -109,7 +109,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
                     // Extract location from "Located in Geneva, Switzerland" format
                     if (text.StartsWith("Located in "))
                     {
-                        return text.Substring("Located in ".Length).Trim();
+                        return text["Located in ".Length..].Trim();
                     }
                 }
 
@@ -131,7 +131,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
         private string GetBaseUrl()
         {
             var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
-            return url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
+            return url.EndsWith("/") ? url[..^1] : url;
         }
     }
 }

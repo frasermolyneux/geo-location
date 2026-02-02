@@ -69,7 +69,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 _logger.LogInformation("Processing geolocation lookup for {Hostname}", hostname);
 
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -82,7 +82,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     // Try cache first
                     var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
 
-                    if (geoLocationDto != null)
+                    if (geoLocationDto is not null)
                     {
                         _logger.LogInformation("Found cached geolocation data for {ValidatedAddress}", validatedAddress);
                         return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
@@ -145,7 +145,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.INVALID_JSON, ErrorMessages.INVALID_JSON)).ToBadRequestResult().ToHttpResult();
             }
 
-            if (hostnames == null)
+            if (hostnames is null)
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.NULL_REQUEST, ErrorMessages.NULL_REQUEST)).ToBadRequestResult().ToHttpResult();
 
             var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames, default);
@@ -155,14 +155,14 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
         async Task<ApiResult<CollectionModel<GeoLocationDto>>> IGeoLookupApi.GetGeoLocations(List<string> hostnames, CancellationToken cancellationToken)
         {
-            var entries = new List<GeoLocationDto>();
-            var errors = new List<ApiError>();
+            List<GeoLocationDto> entries = [];
+            List<ApiError> errors = [];
 
             foreach (var hostname in hostnames)
             {
                 try
                 {
-                    if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                    if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
                     {
                         if (localOverrides.Contains(hostname))
                         {
@@ -172,7 +172,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
                         var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
 
-                        if (geoLocationDto != null)
+                        if (geoLocationDto is not null)
                             entries.Add(geoLocationDto);
                         else
                         {
@@ -206,7 +206,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 
             return new ApiResponse<CollectionModel<GeoLocationDto>>(data)
             {
-                Errors = errors.ToArray(),
+                Errors = [..errors],
                 Pagination = new ApiPagination(entries.Count, entries.Count, 0, 0)
             }.ToApiResult();
         }
@@ -234,7 +234,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     return new ApiResponse(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToBadRequestResult();
                 }
 
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress != null)
+                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -242,7 +242,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     }
 
                     var deletedCount = 0;
-                    var messages = new List<string>();
+                    List<string> messages = [];
 
                     // Delete by resolved IP address (primary method since RowKey is TranslatedAddress)
                     var deleted = await tableStorageGeoLocationRepository.DeleteGeoLocation(validatedAddress);
@@ -295,7 +295,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 var hostEntry = Dns.GetHostEntry(address);
 
-                if (hostEntry.AddressList.FirstOrDefault() != null)
+                if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     return true;
                 }
@@ -320,7 +320,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             {
                 var hostEntry = Dns.GetHostEntry(address);
 
-                if (hostEntry.AddressList.FirstOrDefault() != null)
+                if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     validatedAddress = hostEntry.AddressList.First().ToString();
                     return true;

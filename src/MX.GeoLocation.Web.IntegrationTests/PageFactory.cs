@@ -25,9 +25,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
         {
             get
             {
-                if (homePage == null)
-                    homePage = new HomePage(page, configuration);
-
+                homePage ??= new HomePage(page, configuration);
                 return homePage;
             }
         }
@@ -36,9 +34,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
         {
             get
             {
-                if (lookupAddressPage == null)
-                    lookupAddressPage = new LookupAddressPage(page, configuration);
-
+                lookupAddressPage ??= new LookupAddressPage(page, configuration);
                 return lookupAddressPage;
             }
         }
@@ -47,9 +43,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
         {
             get
             {
-                if (batchLookupPage == null)
-                    batchLookupPage = new BatchLookupPage(page, configuration);
-
+                batchLookupPage ??= new BatchLookupPage(page, configuration);
                 return batchLookupPage;
             }
         }
@@ -58,9 +52,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
         {
             get
             {
-                if (privacyPage == null)
-                    privacyPage = new PrivacyPage(page, configuration);
-
+                privacyPage ??= new PrivacyPage(page, configuration);
                 return privacyPage;
             }
         }
@@ -69,9 +61,7 @@ namespace MX.GeoLocation.Web.IntegrationTests
         {
             get
             {
-                if (removeMyDataPage == null)
-                    removeMyDataPage = new RemoveDataPage(page, configuration);
-
+                removeMyDataPage ??= new RemoveDataPage(page, configuration);
                 return removeMyDataPage;
             }
         }

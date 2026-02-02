@@ -42,10 +42,10 @@ namespace MX.GeoLocation.Web.IntegrationTests
 
         public async Task DisposeAsync()
         {
-            if (Page != null)
+            if (Page is not null)
                 await Page.CloseAsync();
 
-            if (_browser != null)
+            if (_browser is not null)
                 await _browser.CloseAsync();
 
             _playwright?.Dispose();

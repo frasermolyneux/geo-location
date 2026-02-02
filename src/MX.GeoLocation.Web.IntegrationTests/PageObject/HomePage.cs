@@ -25,7 +25,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
             {
                 // Check the page title instead of looking for a pageTitle element
                 var title = await page.TitleAsync();
-                return title?.Contains("Home Page") == true;
+                return title?.Contains("Home Page") ?? false;
             }
             catch
             {
@@ -53,7 +53,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
         private string GetBaseUrl()
         {
             var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
-            return url.EndsWith("/") ? url.Substring(0, url.Length - 1) : url;
+            return url.EndsWith("/") ? url[..^1] : url;
         }
     }
 }
