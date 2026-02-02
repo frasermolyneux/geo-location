@@ -261,15 +261,13 @@ namespace MX.GeoLocation.Web.Controllers
 
             IPAddress? address = null;
 
-            if (httpContextAccessor.HttpContext?.Request.Headers.ContainsKey(cfConnectingIpKey) ?? false)
+            if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) == true)
             {
-                var cfConnectingIp = httpContextAccessor.HttpContext.Request.Headers[cfConnectingIpKey];
                 IPAddress.TryParse(cfConnectingIp, out address);
             }
 
-            if (address is null && (httpContextAccessor.HttpContext?.Request.Headers.ContainsKey(xForwardedForHeaderKey) ?? false))
+            if (address is null && httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(xForwardedForHeaderKey, out var forwardedAddress) == true)
             {
-                var forwardedAddress = httpContextAccessor.HttpContext.Request.Headers[xForwardedForHeaderKey];
                 IPAddress.TryParse(forwardedAddress, out address);
             }
 
