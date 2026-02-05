@@ -3,12 +3,12 @@ name: Dependency Review
 on:
   pull_request:
 
-permissions:
-  contents: read # This is required for actions/checkout
-  pull-requests: write # required by review action to post summary
 
 jobs:
   dependency-review:
+    permissions:
+      contents: read
+      pull-requests: read
     runs-on: ubuntu-latest
 
     steps:
