@@ -1,0 +1,31 @@
+name: Destroy Development
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+permissions: {}
+
+jobs:
+  terraform-destroy-dev:
+    permissions:
+      contents: read
+      id-token: write
+    environment: Development
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.repository }}-dev
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: frasermolyneux/actions/terraform-destroy@main
+      with:
+        terraform-folder: "terraform"
+        terraform-var-file: "tfvars/dev.tfvars"
+        terraform-backend-file: "backends/dev.backend.hcl"
+        AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+        AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+        AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}

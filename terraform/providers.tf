@@ -1,0 +1,43 @@
+terraform {
+  required_version = ">= 1.14.3"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.59.0"
+    }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 2.50.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.11.1"
+    }
+  }
+
+  backend "azurerm" {}
+}
+
+provider "azurerm" {
+  subscription_id = var.subscription_id
+
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
+
+  storage_use_azuread = true
+}
+
+provider "azurerm" {
+  alias           = "dns"
+  subscription_id = var.dns.subscription_id
+
+  features {}
+
+  storage_use_azuread = true
+}
+
+provider "azuread" {}
