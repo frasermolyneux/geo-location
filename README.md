@@ -1,9 +1,11 @@
 # GeoLocation Service
 
+[![Build and Test](https://github.com/frasermolyneux/geo-location/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/build-and-test.yml)
 [![Code Quality](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml)
 [![Copilot Setup Steps](https://github.com/frasermolyneux/geo-location/actions/workflows/copilot-setup-steps.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/copilot-setup-steps.yml)
 [![Dependabot Automerge](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml)
 [![Dependency Review](https://github.com/frasermolyneux/geo-location/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/dependency-review.yml)
+[![PR Verify](https://github.com/frasermolyneux/geo-location/actions/workflows/pr-verify.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/pr-verify.yml)
 
 ## Documentation
 
