@@ -23,6 +23,17 @@ locals {
   entra_api_identifier_uri   = format("api://%s/%s", data.azuread_client_config.current.tenant_id, local.entra_api_app_display_name)
   entra_web_app_display_name = "geolocation-web-${var.environment}"
 
+  # API app role ID for LookupApiUser
+  lookup_api_user_role_id = "b4b62713-44f8-4871-8c10-2c85369b776d"
+
+  public_hostname = "${var.dns.web_subdomain}.${var.dns.domain}"
+
+  api_management_name = "apim-${var.workload}-${var.environment}-${var.location}-${random_id.environment_id.hex}"
+
+  entra_api_app_display_name = "geolocation-api-${var.environment}"
+  entra_api_identifier_uri   = format("api://%s/%s", data.azuread_client_config.current.tenant_id, local.entra_api_app_display_name)
+  entra_web_app_display_name = "geolocation-web-${var.environment}"
+
   entra_web_redirect_uris = distinct([
     "https://${local.public_hostname}/signin-oidc",
     "https://${local.web_app_name}.azurewebsites.net/signin-oidc",

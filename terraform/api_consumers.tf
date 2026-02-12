@@ -64,7 +64,7 @@ resource "azurerm_key_vault_secret" "consumer_apim_key" {
 resource "azuread_app_role_assignment" "consumer_to_api" {
   for_each = { for c in var.api_consumers : c.workload => c }
 
-  app_role_id         = "b4b62713-44f8-4871-8c10-2c85369b776d" # LookupApiUser role
+  app_role_id         = local.lookup_api_user_role_id
   principal_object_id = each.value.principal_id
   resource_object_id  = azuread_service_principal.api.object_id
 }
