@@ -27,11 +27,19 @@ dns = {
 
 api_consumers = [
   {
-    workload     = "portal2-repository-func-prd"
+    workload     = "portal-repository-func-dev"
+    principal_id = "bec26e1f-d66c-4234-aa3a-ca96ae0f61de"
+  },
+  {
+    workload     = "portal-repository-func-prd"
     principal_id = "737442a4-9953-45fb-8fdb-425b63c7963d"
   },
   {
-    workload     = "portal2-web-prd"
+    workload     = "portal-web-dev"
+    principal_id = "640262c1-e930-4ec1-8ffc-d47caa32ead7"
+  },
+  {
+    workload     = "portal-web-prd"
     principal_id = "37bbe97d-def7-4cdd-9ea4-31bce4f23d5f"
   }
 ]

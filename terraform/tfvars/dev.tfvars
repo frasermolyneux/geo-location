@@ -25,16 +25,7 @@ dns = {
   web_subdomain       = "dev"
 }
 
-api_consumers = [
-  {
-    workload     = "portal2-repository-func-dev"
-    principal_id = "bec26e1f-d66c-4234-aa3a-ca96ae0f61de"
-  },
-  {
-    workload     = "portal2-web-dev"
-    principal_id = "640262c1-e930-4ec1-8ffc-d47caa32ead7"
-  }
-]
+api_consumers = []
 
 tags = {
   Environment = "dev"
