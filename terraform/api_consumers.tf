@@ -8,10 +8,19 @@ resource "azurerm_api_management_subscription" "consumers" {
   state               = "active"
 }
 
+resource "random_id" "consumer" {
+  for_each    = { for c in var.api_consumers : c.workload => c }
+  byte_length = 6
+
+  keepers = {
+    workload = each.value.workload
+  }
+}
+
 resource "azurerm_key_vault" "consumer" {
   for_each = { for c in var.api_consumers : c.workload => c }
 
-  name                = "kv-${substr(md5(each.value.workload), 0, 12)}-${data.azurerm_resource_group.rg.location}"
+  name                = "kv-${random_id.consumer[each.key].hex}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   tenant_id           = data.azuread_client_config.current.tenant_id
