@@ -46,12 +46,16 @@ resource "azurerm_key_vault_secret" "api_client_id" {
   name         = "geolocation-api-${var.environment}-clientid"
   value        = azuread_application.api.client_id
   key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "api_client_secret" {
   name         = "geolocation-api-${var.environment}-clientsecret"
   value        = azuread_application_password.api.value
   key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
 }
 
 # Web App Registration

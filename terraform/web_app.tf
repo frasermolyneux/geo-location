@@ -48,6 +48,8 @@ resource "azurerm_key_vault_secret" "web_apim_subscription_key" {
   name         = "${local.web_app_name}-apim-subscription-key"
   value        = azurerm_api_management_subscription.web.primary_key
   key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
 }
 
 resource "azurerm_app_service_custom_hostname_binding" "web" {

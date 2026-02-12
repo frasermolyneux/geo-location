@@ -42,10 +42,20 @@ resource "azurerm_role_assignment" "consumer_kv_secrets_user" {
   principal_id         = each.value.principal_id
 }
 
+resource "azurerm_role_assignment" "consumer_kv_deploy_secrets_officer" {
+  for_each = { for c in var.api_consumers : c.workload => c }
+
+  scope                = azurerm_key_vault.consumer[each.key].id
+  role_definition_name = "Key Vault Secrets Officer"
+  principal_id         = data.azuread_client_config.current.object_id
+}
+
 resource "azurerm_key_vault_secret" "consumer_apim_key" {
   for_each = { for c in var.api_consumers : c.workload => c }
 
   name         = "${each.value.workload}-apim-subscription-key"
   value        = azurerm_api_management_subscription.consumers[each.key].primary_key
   key_vault_id = azurerm_key_vault.consumer[each.key].id
+
+  depends_on = [azurerm_role_assignment.consumer_kv_deploy_secrets_officer]
 }

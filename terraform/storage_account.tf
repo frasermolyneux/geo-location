@@ -18,4 +18,6 @@ resource "azurerm_key_vault_secret" "storage_connection_string" {
   name         = "${azurerm_storage_account.data.name}-connectionstring"
   value        = azurerm_storage_account.data.primary_connection_string
   key_vault_id = azurerm_key_vault.kv.id
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
 }
