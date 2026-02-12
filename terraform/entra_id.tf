@@ -103,3 +103,10 @@ resource "azuread_application_password" "web" {
     rotation = time_rotating.thirty_days.id
   }
 }
+
+# App role assignments for Web App managed identity to access API
+resource "azuread_app_role_assignment" "web_to_api" {
+  app_role_id         = "b4b62713-44f8-4871-8c10-2c85369b776d" # LookupApiUser role
+  principal_object_id = azurerm_linux_web_app.web.identity[0].principal_id
+  resource_object_id  = azuread_service_principal.api.object_id
+}

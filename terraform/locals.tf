@@ -2,12 +2,15 @@ locals {
   resource_group_name               = "rg-${var.workload}-${var.environment}-${var.location}"
   platform_hosting_app_service_plan = data.terraform_remote_state.platform_hosting.outputs.app_service_plans["default"]
 
+  # Location abbreviations for resource names with strict length limits
+  location_short = substr(var.location, 0, 3)
+
   app_insights_name = "ai-${var.workload}-${var.environment}-${var.location}"
 
   api_app_name = "app-${var.workload}-api-${var.environment}-${var.location}-${random_id.environment_id.hex}"
   web_app_name = "app-${var.workload}-web-${var.environment}-${var.location}-${random_id.environment_id.hex}"
 
-  key_vault_name = "kv-${random_id.environment_id.hex}"
+  key_vault_name = "kv-${random_id.environment_id.hex}-${local.location_short}"
 
   storage_account_prefix = "sageoloc"
   storage_account_name   = lower("${local.storage_account_prefix}${var.environment}${random_id.storage.hex}")
