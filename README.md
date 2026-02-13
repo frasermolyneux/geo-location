@@ -4,12 +4,15 @@
 [![Code Quality](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml)
 [![Copilot Setup Steps](https://github.com/frasermolyneux/geo-location/actions/workflows/copilot-setup-steps.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/copilot-setup-steps.yml)
 [![Dependabot Automerge](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml)
-[![Dependency Review](https://github.com/frasermolyneux/geo-location/actions/workflows/dependency-review.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/dependency-review.yml)
+[![Deploy Dev](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-dev.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-dev.yml)
+[![Deploy Prd](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-prd.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-prd.yml)
+[![Destroy Development](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-development.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-development.yml)
+[![Destroy Environment](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-environment.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-environment.yml)
 [![PR Verify](https://github.com/frasermolyneux/geo-location/actions/workflows/pr-verify.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/pr-verify.yml)
 
 ## Documentation
 
-* [Manual Steps](/docs/manual-steps.md) - Key Vault entries for MaxMind credentials.
+* [Manual Steps](docs/manual-steps.md)
 
 ## Overview
 

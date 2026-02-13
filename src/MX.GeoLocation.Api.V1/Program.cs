@@ -108,9 +108,9 @@ builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 builder.Services.AddSingleton<TableServiceClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
-    var tableEndpoint = configuration["Storage__TableEndpoint"];
+    var tableEndpoint = configuration["Storage:TableEndpoint"];
     if (string.IsNullOrWhiteSpace(tableEndpoint))
-        throw new InvalidOperationException("Storage__TableEndpoint is not configured.");
+        throw new InvalidOperationException("Storage:TableEndpoint is not configured.");
     return new TableServiceClient(new Uri(tableEndpoint), new DefaultAzureCredential());
 });
 
