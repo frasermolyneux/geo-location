@@ -50,7 +50,8 @@
     <Exec Command="dotnet swagger tofile --output &quot;$(OpenApiOutputPath)\openapi-v1.json&quot; &quot;$(SwaggerAssembly)&quot; v1" WorkingDirectory="$(MSBuildProjectDirectory)" ContinueOnError="true" />
     
     <!-- Post-process OpenAPI files to replace /api/v1/ with / -->
-    <Exec Command="powershell -Command &quot;(Get-Content '$(OpenApiOutputPath)\openapi-v1.json').replace('/api/v1/', '/').replace('/api/v1', '/') | Set-Content '$(OpenApiOutputPath)\openapi-v1.json'&quot;" ContinueOnError="true" />
+    <Exec Condition="'$(OS)' == 'Windows_NT'" Command="powershell -Command &quot;(Get-Content '$(OpenApiOutputPath)\openapi-v1.json').replace('/api/v1/', '/').replace('/api/v1', '/') | Set-Content '$(OpenApiOutputPath)\openapi-v1.json'&quot;" ContinueOnError="true" />
+    <Exec Condition="'$(OS)' != 'Windows_NT'" Command="sed -i 's|/api/v1/|/|g; s|/api/v1|/|g' '$(OpenApiOutputPath)/openapi-v1.json'" ContinueOnError="true" />
     
     <Message Text="OpenAPI files generated and processed in $(OpenApiOutputPath)" Importance="high" />
   </Target>

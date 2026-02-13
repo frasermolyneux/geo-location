@@ -23,6 +23,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         public async Task<GeoLocationDto> GetGeoLocation(string address)
         {
             var userId = Convert.ToInt32(configuration["maxmind_userid"]);
+            var apiKey = configuration["maxmind_apikey"] ?? throw new InvalidOperationException("maxmind_apikey configuration is required");
 
             var operation = telemetryClient.StartOperation<DependencyTelemetry>("MaxMindQuery");
             operation.Telemetry.Type = $"HTTP";
@@ -30,7 +31,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
             try
             {
-                using (var reader = new WebServiceClient(userId, configuration["maxmind_apikey"]))
+                using (var reader = new WebServiceClient(userId, apiKey))
                 {
                     var lookupResult = await reader.CityAsync(address);
 

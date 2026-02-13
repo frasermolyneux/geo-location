@@ -54,7 +54,7 @@ namespace MX.GeoLocation.Web.IntegrationTests.PageObject
         {
             await AddressDataField.FillAsync(address);
             // The lookup posts results without a navigation; avoid waiting on a non-existent nav and allow extra time for the API call.
-            await SearchButton.ClickAsync(new LocatorClickOptions { NoWaitAfter = true });
+            await SearchButton.ClickAsync();
 
             // Give the API response and UI render more headroom in CI.
             await page.WaitForLoadStateAsync(LoadState.NetworkIdle, new PageWaitForLoadStateOptions { Timeout = 60000 });
