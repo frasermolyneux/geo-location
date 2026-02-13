@@ -24,4 +24,5 @@
 - `MX.GeoLocation.Web/Program.cs` wires the API client and sessions; `HomeController.cs` drives lookup, batch lookup, and data removal flows.
 
 ## Infrastructure
-- Bicep templates and parameter files live under `bicep/` and `params/`; generated OpenAPI artifacts land in `openapi/`.
+- Terraform under `terraform/` builds App Services (API + Web on shared platform-hosting plan), API Management (Consumption), Key Vault, Storage, DNS, Entra ID apps, and Application Insights (per-environment tfvars/backends). GitHub Actions workflows cover build/test, codequality, PR verify, deploy-dev/prd, destroy-development/environment, dependabot-automerge, and copilot-setup-steps.
+- Generated OpenAPI artifacts land in `openapi/`.
