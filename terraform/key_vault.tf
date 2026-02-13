@@ -27,3 +27,27 @@ resource "azurerm_role_assignment" "web_kv_secrets_user" {
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_linux_web_app.web.identity[0].principal_id
 }
+
+resource "azurerm_key_vault_secret" "maxmind_apikey" {
+  name         = "maxmind-apikey"
+  value        = "placeholder"
+  key_vault_id = azurerm_key_vault.kv.id
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
+}
+
+resource "azurerm_key_vault_secret" "maxmind_userid" {
+  name         = "maxmind-userid"
+  value        = "placeholder"
+  key_vault_id = azurerm_key_vault.kv.id
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
+}
