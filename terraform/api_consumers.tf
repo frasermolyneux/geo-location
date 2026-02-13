@@ -60,6 +60,16 @@ resource "azurerm_key_vault_secret" "consumer_apim_key" {
   depends_on = [azurerm_role_assignment.consumer_kv_deploy_secrets_officer]
 }
 
+resource "azurerm_key_vault_secret" "consumer_apim_key_secondary" {
+  for_each = { for c in var.api_consumers : c.workload => c }
+
+  name         = "${each.value.workload}-apim-subscription-key-secondary"
+  value        = azurerm_api_management_subscription.consumers[each.key].secondary_key
+  key_vault_id = azurerm_key_vault.consumer[each.key].id
+
+  depends_on = [azurerm_role_assignment.consumer_kv_deploy_secrets_officer]
+}
+
 # App role assignments for API consumers to access API
 resource "azuread_app_role_assignment" "consumer_to_api" {
   for_each = { for c in var.api_consumers : c.workload => c }
