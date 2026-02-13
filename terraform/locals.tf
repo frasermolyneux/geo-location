@@ -1,6 +1,7 @@
 locals {
   resource_group_name               = "rg-${var.workload}-${var.environment}-${var.location}"
   platform_hosting_app_service_plan = data.terraform_remote_state.platform_hosting.outputs.app_service_plans["default"]
+  platform_monitoring_workspace_id  = data.terraform_remote_state.platform_monitoring.outputs.log_analytics.id
 
   # Location abbreviations for resource names with strict length limits
   location_short = substr(var.location, 0, 3)
