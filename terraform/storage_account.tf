@@ -14,10 +14,8 @@ resource "azurerm_storage_table" "geolocations" {
   storage_account_name = azurerm_storage_account.data.name
 }
 
-resource "azurerm_key_vault_secret" "storage_connection_string" {
-  name         = "${azurerm_storage_account.data.name}-connectionstring"
-  value        = azurerm_storage_account.data.primary_connection_string
-  key_vault_id = azurerm_key_vault.kv.id
-
-  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
+resource "azurerm_role_assignment" "api_table_data_contributor" {
+  scope                = azurerm_storage_account.data.id
+  role_definition_name = "Storage Table Data Contributor"
+  principal_id         = azurerm_linux_web_app.api.identity[0].principal_id
 }

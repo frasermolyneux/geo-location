@@ -37,7 +37,7 @@ resource "azurerm_linux_web_app" "api" {
     "AzureAd__Audience"                          = local.entra_api_identifier_uri
     "maxmind_apikey"                             = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.kv.name};SecretName=maxmind-apikey)"
     "maxmind_userid"                             = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.kv.name};SecretName=maxmind-userid)"
-    "appdata_storage_connectionstring"           = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.kv.name};SecretName=${azurerm_storage_account.data.name}-connectionstring)"
+    "Storage__TableEndpoint"                     = azurerm_storage_account.data.primary_table_endpoint
     "APPINSIGHTS_PROFILERFEATURE_VERSION"        = "1.0.0"
     "DiagnosticServices_EXTENSION_VERSION"       = "~3"
   }

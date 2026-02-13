@@ -1,3 +1,5 @@
+using Azure.Identity;
+using Azure.Data.Tables;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Identity.Web;
@@ -102,6 +104,15 @@ builder.Services.AddSwaggerGen(options =>
 
 // Configure Swagger options for versioning
 builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
+
+builder.Services.AddSingleton<TableServiceClient>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var tableEndpoint = configuration["Storage__TableEndpoint"];
+    if (string.IsNullOrWhiteSpace(tableEndpoint))
+        throw new InvalidOperationException("Storage__TableEndpoint is not configured.");
+    return new TableServiceClient(new Uri(tableEndpoint), new DefaultAzureCredential());
+});
 
 builder.Services.AddSingleton<ITableStorageGeoLocationRepository, TableStorageGeoLocationRepository>();
 builder.Services.AddSingleton<IMaxMindGeoLocationRepository, MaxMindGeoLocationRepository>();

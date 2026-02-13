@@ -10,9 +10,9 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
     {
         private readonly TableClient tableClient;
 
-        public TableStorageGeoLocationRepository(IConfiguration configuration)
+        public TableStorageGeoLocationRepository(TableServiceClient tableServiceClient)
         {
-            tableClient = new TableClient(configuration["appdata_storage_connectionstring"], "geolocations");
+            tableClient = tableServiceClient.GetTableClient("geolocations");
         }
 
         public async Task<GeoLocationDto?> GetGeoLocation(string address)
