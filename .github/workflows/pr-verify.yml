@@ -16,6 +16,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
@@ -105,6 +106,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
     if: github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-dev')
     environment: Development
     needs: [build-and-test, terraform-plan-and-apply-dev]
@@ -125,6 +127,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+      pull-requests: write
     if: github.event.pull_request.draft == false && github.event.pull_request.user.login != 'dependabot[bot]' && contains(github.event.pull_request.labels.*.name, 'deploy-dev')
     environment: Development
     needs: [build-and-test, terraform-plan-and-apply-dev, app-service-deploy-api-dev]
