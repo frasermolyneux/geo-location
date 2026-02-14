@@ -32,7 +32,8 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
             try
             {
-                using (var reader = new WebServiceClient(userId, configuration["maxmind_apikey"]))
+                var licenseKey = configuration["maxmind_apikey"] ?? throw new InvalidOperationException("The 'maxmind_apikey' configuration value is not set.");
+                using (var reader = new WebServiceClient(userId, licenseKey))
                 {
                     var lookupResult = await reader.CityAsync(address);
 

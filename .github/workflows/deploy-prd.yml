@@ -25,14 +25,12 @@ jobs:
           dotnet-project: "MX.GeoLocation.Api.V1"
           dotnet-version: 9.0.x
           src-folder: "src"
-          artifact-name: "MX.GeoLocation.Api.V1"
 
       - uses: frasermolyneux/actions/dotnet-web-ci@main
         with:
           dotnet-project: "MX.GeoLocation.Web"
           dotnet-version: 9.0.x
           src-folder: "src"
-          artifact-name: "MX.GeoLocation.Web"
           skip-nuget-artifact-upload: "true"
 
   terraform-plan-and-apply-dev:
