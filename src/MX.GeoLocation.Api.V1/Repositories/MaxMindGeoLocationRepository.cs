@@ -22,7 +22,9 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
         public async Task<GeoLocationDto> GetGeoLocation(string address)
         {
-            var userId = Convert.ToInt32(configuration["maxmind_userid"]);
+            var userIdString = configuration["maxmind_userid"];
+            if (!int.TryParse(userIdString, out var userId))
+                throw new InvalidOperationException($"The 'maxmind_userid' configuration value '{userIdString}' is not a valid integer.");
 
             var operation = telemetryClient.StartOperation<DependencyTelemetry>("MaxMindQuery");
             operation.Telemetry.Type = $"HTTP";
