@@ -29,6 +29,9 @@ provider "azurerm" {
     key_vault {
       purge_soft_delete_on_destroy = false
     }
+    api_management {
+      purge_soft_delete_on_destroy = false
+    }
   }
 
   storage_use_azuread = true
