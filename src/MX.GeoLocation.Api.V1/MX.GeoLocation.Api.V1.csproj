@@ -26,33 +26,11 @@
 	<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
 	<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
 	<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.10" />
-	<PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+	<PackageReference Include="Scalar.AspNetCore" Version="2.0.36" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj" />
   </ItemGroup>
-
-  <!-- Post-build target to generate OpenAPI files -->
-  <Target Name="GenerateOpenApiFiles" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-    <PropertyGroup>
-      <OpenApiOutputPath>$(MSBuildProjectDirectory)\..\..\openapi</OpenApiOutputPath>
-      <SwaggerAssembly>$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll</SwaggerAssembly>
-    </PropertyGroup>
-    
-    <!-- Ensure output directory exists -->
-    <MakeDir Directories="$(OpenApiOutputPath)" />
-    
-    <!-- Restore local tools -->
-    <Exec Command="dotnet tool restore" WorkingDirectory="$(MSBuildProjectDirectory)\..\..\" />
-    
-    <!-- Generate OpenAPI files for different API versions -->
-    <Exec Command="dotnet swagger tofile --output &quot;$(OpenApiOutputPath)\openapi-v1.json&quot; &quot;$(SwaggerAssembly)&quot; v1" WorkingDirectory="$(MSBuildProjectDirectory)" ContinueOnError="true" />
-    
-    <!-- Post-process OpenAPI files to replace /api/v1/ with / -->
-    <Exec Command="powershell -Command &quot;(Get-Content '$(OpenApiOutputPath)\openapi-v1.json').replace('/api/v1/', '/').replace('/api/v1', '/') | Set-Content '$(OpenApiOutputPath)\openapi-v1.json'&quot;" ContinueOnError="true" />
-    
-    <Message Text="OpenAPI files generated and processed in $(OpenApiOutputPath)" Importance="high" />
-  </Target>
 
 </Project>

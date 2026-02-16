@@ -19,7 +19,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}")]
+    [Route("v{version:apiVersion}")]
     [Authorize(Roles = "LookupApiUser")]
     public class GeoLookupController : Controller, IGeoLookupApi
     {

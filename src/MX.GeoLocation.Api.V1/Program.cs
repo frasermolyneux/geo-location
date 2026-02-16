@@ -3,17 +3,15 @@ using Azure.Data.Tables;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Identity.Web;
-using Microsoft.OpenApi.Models;
 
 using MX.GeoLocation.LookupWebApi;
-using MX.GeoLocation.LookupWebApi.OpenApiOperationFilters;
-using MX.GeoLocation.LookupWebApi.Configuration;
+using MX.GeoLocation.LookupWebApi.OpenApi;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
 using Newtonsoft.Json.Converters;
 using Asp.Versioning;
-using Asp.Versioning.ApiExplorer;
 using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,43 +65,12 @@ builder.Services.AddApiVersioning(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-// Configure Swagger
-builder.Services.AddEndpointsApiExplorer();
-
-builder.Services.AddSwaggerGen(options =>
+// Configure OpenAPI
+builder.Services.AddOpenApi("v1", options =>
 {
-    options.OperationFilter<SwaggerDefaultValues>();
-
-    options.SchemaFilter<EnumSchemaFilter>();
-
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "",
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            []
-        }
-    });
+    options.AddDocumentTransformer<StripVersionPrefixTransformer>();
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
 });
-
-// Configure Swagger options for versioning
-builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
 builder.Services.AddSingleton<TableServiceClient>(sp =>
 {
@@ -122,21 +89,8 @@ builder.Services.AddHealthChecks();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        // Build a Swagger endpoint for each discovered API version
-        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-        foreach (var description in provider.ApiVersionDescriptions)
-        {
-            options.SwaggerEndpoint(
-                $"/swagger/{description.GroupName}/swagger.json",
-                description.GroupName.ToUpperInvariant());
-        }
-    });
-}
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 app.UseHttpsRedirection();
 
@@ -144,6 +98,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHealthChecks("/api/health").AllowAnonymous();
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();
