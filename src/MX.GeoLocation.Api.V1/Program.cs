@@ -68,7 +68,6 @@ builder.Services.AddApiVersioning(options =>
 // Configure OpenAPI
 builder.Services.AddOpenApi("v1", options =>
 {
-    options.AddDocumentTransformer<StripVersionPrefixTransformer>();
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
 });
 
