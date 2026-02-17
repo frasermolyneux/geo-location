@@ -31,7 +31,7 @@ output "api_management_resource_group_name" {
 }
 
 output "api_version_set_id" {
-  value = azurerm_api_management_api_version_set.api_version_set.id
+  value = azurerm_api_management_api_version_set.api_version_set.name
 }
 
 output "api_management_product_id" {
