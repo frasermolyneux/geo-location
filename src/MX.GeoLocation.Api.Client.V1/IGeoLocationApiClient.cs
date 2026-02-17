@@ -11,5 +11,10 @@ namespace MX.GeoLocation.Api.Client.V1
         /// Gets the versioned GeoLookup API
         /// </summary>
         IVersionedGeoLookupApi GeoLookup { get; }
+
+        /// <summary>
+        /// Gets the API info endpoint
+        /// </summary>
+        IApiInfoApi ApiInfo { get; }
     }
 }

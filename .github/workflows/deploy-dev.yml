@@ -136,7 +136,7 @@ jobs:
         shell: bash
         run: |
           EXPECTED_VERSION="${{ needs.build-and-test.outputs.build_version }}"
-          INFO_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/api/info"
+          INFO_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
           echo "Waiting for $INFO_URL to report version '$EXPECTED_VERSION'..."
           for i in $(seq 1 30); do
             RESPONSE=$(curl -s "$INFO_URL" || true)
@@ -145,7 +145,7 @@ jobs:
               echo "API is running expected version '$EXPECTED_VERSION' (attempt $i)"
               exit 0
             fi
-            echo "Attempt $i: got version '$CURRENT_VERSION' - waiting 10s...""
+            echo "Attempt $i: got version '$CURRENT_VERSION' - waiting 10s..."
             sleep 10
           done
           echo "API did not report expected version '$EXPECTED_VERSION' in time (last seen: '$CURRENT_VERSION')"

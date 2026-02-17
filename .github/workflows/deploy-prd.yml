@@ -144,7 +144,7 @@ jobs:
         shell: bash
         run: |
           EXPECTED_VERSION="${{ needs.build-and-test.outputs.build_version }}"
-          INFO_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/api/info"
+          INFO_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
           echo "Waiting for $INFO_URL to report version '$EXPECTED_VERSION'..."
           for i in $(seq 1 30); do
             RESPONSE=$(curl -s "$INFO_URL" || true)
@@ -318,7 +318,7 @@ jobs:
         shell: bash
         run: |
           EXPECTED_VERSION="${{ needs.build-and-test.outputs.build_version }}"
-          INFO_URL="https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/api/info"
+          INFO_URL="https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
           echo "Waiting for $INFO_URL to report version '$EXPECTED_VERSION'..."
           for i in $(seq 1 30); do
             RESPONSE=$(curl -s "$INFO_URL" || true)

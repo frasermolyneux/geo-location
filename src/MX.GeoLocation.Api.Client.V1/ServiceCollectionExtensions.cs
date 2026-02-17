@@ -29,6 +29,9 @@ namespace MX.GeoLocation.Api.Client.V1
             // Register V1.1 API
             serviceCollection.AddTypedApiClient<Abstractions.Interfaces.V1_1.IGeoLookupApi, GeoLookupApiV1_1, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
+            // Register API info endpoint
+            serviceCollection.AddTypedApiClient<IApiInfoApi, ApiInfoApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
+
             // Register versioned API wrapper
             serviceCollection.AddScoped<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
 

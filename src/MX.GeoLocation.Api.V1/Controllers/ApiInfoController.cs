@@ -2,15 +2,17 @@ using System.Reflection;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MX.GeoLocation.Abstractions.Models;
 
-namespace MX.GeoLocation.LookupWebApi.Controllers;
+namespace MX.GeoLocation.LookupWebApi.Controllers.V1;
 
 [ApiController]
 [AllowAnonymous]
-[ApiVersionNeutral]
+[ApiVersion("1.0")]
+[Route("v{version:apiVersion}/info")]
 public class ApiInfoController : ControllerBase
 {
-    [HttpGet("/api/info")]
+    [HttpGet]
     public IActionResult GetInfo()
     {
         var assembly = Assembly.GetExecutingAssembly();
@@ -19,14 +21,11 @@ public class ApiInfoController : ControllerBase
             .InformationalVersion ?? "unknown";
         var assemblyVersion = assembly.GetName().Version?.ToString() ?? "unknown";
 
-        // Strip SemVer2 build metadata (+commit hash) for clean version comparison
-        var buildVersion = informationalVersion.Split('+')[0];
-
-        return Ok(new
+        return Ok(new ApiInfoDto
         {
-            version = informationalVersion,
-            buildVersion,
-            assemblyVersion
+            Version = informationalVersion,
+            BuildVersion = informationalVersion.Split('+')[0],
+            AssemblyVersion = assemblyVersion
         });
     }
 }
