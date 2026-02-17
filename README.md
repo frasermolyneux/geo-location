@@ -17,7 +17,12 @@
 
 ## Overview
 
-GeoLocation is a .NET 9 workload that fronts MaxMind lookups with an Entra-protected API and caches results in Azure Table Storage to reduce latency and cost. The API exposes versioned endpoints for single or batch hostname/IP lookups plus metadata deletion, enforcing the `LookupApiUser` role. An MVC web front end calls the API using API-key and Entra authentication, handles Cloudflare/X-Forwarded-For headers, and stores the user’s last lookup in session. The API serves its OpenAPI spec at runtime at `/openapi/v1.json`, and infrastructure is managed by Terraform under `terraform/`.
+GeoLocation is a .NET 9 workload that fronts MaxMind lookups with an Entra-protected API and caches results in Azure Table Storage to reduce latency and cost. The API exposes two versioned endpoint groups:
+
+- **v1.0**: Single/batch hostname/IP lookup, metadata deletion, and API info — cached permanently in the `geolocations` table
+- **v1.1**: City and Insights lookups with typed DTOs and MaxMind Anonymizer support — cached in the `geolocationsv11` table (city: permanent, insights: configurable TTL)
+
+Both versions enforce the `LookupApiUser` Entra role. An MVC web front end calls the API using API-key and Entra authentication, handles Cloudflare/X-Forwarded-For headers, and stores the user’s last lookup in session. The API serves its OpenAPI specs at runtime at `/openapi/v1.0.json` and `/openapi/v1.1.json`, and infrastructure is managed by Terraform under `terraform/`. Build versioning uses Nerdbank.GitVersioning.
 
 ## Contributing
 
