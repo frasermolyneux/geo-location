@@ -54,7 +54,6 @@ jobs:
           echo "web_app_name=$(terraform output -raw web_app_name)" >> $GITHUB_OUTPUT
           echo "api_management_name=$(terraform output -raw api_management_name)" >> $GITHUB_OUTPUT
           echo "api_management_resource_group_name=$(terraform output -raw api_management_resource_group_name)" >> $GITHUB_OUTPUT
-          echo "api_version_set_id=$(terraform output -raw api_version_set_id)" >> $GITHUB_OUTPUT
           echo "api_management_product_id=$(terraform output -raw api_management_product_id)" >> $GITHUB_OUTPUT
         env:
           ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
@@ -70,7 +69,6 @@ jobs:
       web_app_name: ${{ steps.terraform-output.outputs.web_app_name }}
       api_management_name: ${{ steps.terraform-output.outputs.api_management_name }}
       api_management_resource_group_name: ${{ steps.terraform-output.outputs.api_management_resource_group_name }}
-      api_version_set_id: ${{ steps.terraform-output.outputs.api_version_set_id }}
       api_management_product_id: ${{ steps.terraform-output.outputs.api_management_product_id }}
 
   app-service-deploy-api-dev:
@@ -157,8 +155,6 @@ jobs:
             --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
-            --api-version v1 \
-            --api-version-set-id "${{ needs.terraform-plan-and-apply-dev.outputs.api_version_set_id }}" \
             --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net" \
             --subscription-required true
 
