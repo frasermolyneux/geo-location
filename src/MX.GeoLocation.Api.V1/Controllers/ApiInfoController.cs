@@ -19,9 +19,13 @@ public class ApiInfoController : ControllerBase
             .InformationalVersion ?? "unknown";
         var assemblyVersion = assembly.GetName().Version?.ToString() ?? "unknown";
 
+        // Strip SemVer2 build metadata (+commit hash) for clean version comparison
+        var buildVersion = informationalVersion.Split('+')[0];
+
         return Ok(new
         {
             version = informationalVersion,
+            buildVersion,
             assemblyVersion
         });
     }

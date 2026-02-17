@@ -35,7 +35,7 @@ jobs:
           skip-nuget-artifact-upload: "true"
 
     outputs:
-      build_version: ${{ steps.api-ci.outputs.semver }}
+      build_version: ${{ steps.api-ci.outputs.build_version }}
 
   terraform-plan-and-apply-dev:
     permissions:
@@ -148,7 +148,7 @@ jobs:
           echo "Waiting for $INFO_URL to report version '$EXPECTED_VERSION'..."
           for i in $(seq 1 30); do
             RESPONSE=$(curl -s "$INFO_URL" || true)
-            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.version // empty' 2>/dev/null || true)
+            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.buildVersion // empty' 2>/dev/null || true)
             if [ "$CURRENT_VERSION" = "$EXPECTED_VERSION" ]; then
               echo "API is running expected version '$EXPECTED_VERSION' (attempt $i)"
               exit 0
@@ -322,7 +322,7 @@ jobs:
           echo "Waiting for $INFO_URL to report version '$EXPECTED_VERSION'..."
           for i in $(seq 1 30); do
             RESPONSE=$(curl -s "$INFO_URL" || true)
-            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.version // empty' 2>/dev/null || true)
+            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.buildVersion // empty' 2>/dev/null || true)
             if [ "$CURRENT_VERSION" = "$EXPECTED_VERSION" ]; then
               echo "API is running expected version '$EXPECTED_VERSION' (attempt $i)"
               exit 0
