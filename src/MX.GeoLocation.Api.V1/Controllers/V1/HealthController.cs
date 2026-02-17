@@ -29,7 +29,13 @@ public class HealthController : ControllerBase
 
         return StatusCode(statusCode, new
         {
-            status = result.Status.ToString()
+            status = result.Status.ToString(),
+            checks = result.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description
+            })
         });
     }
 }

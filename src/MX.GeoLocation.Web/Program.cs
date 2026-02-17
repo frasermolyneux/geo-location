@@ -4,6 +4,7 @@ using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
 using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
+using MX.GeoLocation.Web.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,7 +51,10 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSession();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddCheck<GeoLocationApiHealthCheck>(
+        name: "geolocation-api",
+        tags: ["dependency"]);
 
 var app = builder.Build();
 

@@ -8,6 +8,7 @@ using MX.GeoLocation.LookupWebApi;
 using MX.GeoLocation.LookupWebApi.OpenApi;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
+using MX.GeoLocation.LookupWebApi.HealthChecks;
 using Newtonsoft.Json.Converters;
 using Asp.Versioning;
 using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
@@ -90,7 +91,13 @@ builder.Services.AddSingleton<TableServiceClient>(sp =>
 builder.Services.AddSingleton<ITableStorageGeoLocationRepository, TableStorageGeoLocationRepository>();
 builder.Services.AddSingleton<IMaxMindGeoLocationRepository, MaxMindGeoLocationRepository>();
 
-builder.Services.AddHealthChecks();
+builder.Services.AddHealthChecks()
+    .AddAzureTable(
+        name: "azure-table-storage",
+        tags: ["dependency"])
+    .AddCheck<MaxMindConfigurationHealthCheck>(
+        name: "maxmind-configuration",
+        tags: ["dependency"]);
 
 var app = builder.Build();
 
