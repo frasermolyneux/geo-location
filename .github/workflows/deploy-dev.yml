@@ -12,7 +12,8 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-web-ci@main
+      - id: api-ci
+        uses: frasermolyneux/actions/dotnet-web-ci@main
         with:
           dotnet-project: "MX.GeoLocation.Api.V1"
           dotnet-version: 9.0.x
@@ -24,6 +25,9 @@ jobs:
           dotnet-version: 9.0.x
           src-folder: "src"
           skip-nuget-artifact-upload: "true"
+
+    outputs:
+      build_version: ${{ steps.api-ci.outputs.build_version }}
 
   terraform-plan-and-apply-dev:
     permissions:
@@ -116,7 +120,7 @@ jobs:
       contents: read
       id-token: write
     environment: Development
-    needs: [terraform-plan-and-apply-dev, app-service-deploy-api-dev]
+    needs: [build-and-test, terraform-plan-and-apply-dev, app-service-deploy-api-dev]
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-dev
@@ -128,21 +132,23 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Wait for API to be ready
+      - name: Wait for API version ${{ needs.build-and-test.outputs.build_version }}
         shell: bash
         run: |
-          APP_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/health"
-          echo "Waiting for $APP_URL to respond..."
+          EXPECTED_VERSION="${{ needs.build-and-test.outputs.build_version }}"
+          INFO_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/api/info"
+          echo "Waiting for $INFO_URL to report version '$EXPECTED_VERSION'..."
           for i in $(seq 1 30); do
-            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" || true)
-            if [ "$STATUS" = "200" ]; then
-              echo "API is ready (attempt $i)"
+            RESPONSE=$(curl -s "$INFO_URL" || true)
+            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.version // empty' 2>/dev/null || true)
+            if [ "$CURRENT_VERSION" = "$EXPECTED_VERSION" ]; then
+              echo "API is running expected version '$EXPECTED_VERSION' (attempt $i)"
               exit 0
             fi
-            echo "Attempt $i: HTTP $STATUS - waiting 10s..."
+            echo "Attempt $i: got version '$CURRENT_VERSION' - waiting 10s..."
             sleep 10
           done
-          echo "API did not become ready in time"
+          echo "API did not report expected version '$EXPECTED_VERSION' in time (last seen: '$CURRENT_VERSION')"
           exit 1
 
       - name: Import OpenAPI v1 spec into APIM
