@@ -35,7 +35,7 @@ jobs:
           skip-nuget-artifact-upload: "true"
 
     outputs:
-      build_version: ${{ steps.api-ci.outputs.build_version }}
+      build_version: ${{ steps.api-ci.outputs.semver }}
 
   terraform-plan-and-apply-dev:
     permissions:
@@ -163,7 +163,7 @@ jobs:
         shell: bash
         run: |
           az apim api import \
-            --resource-group "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_resource_group_name }}" \
+            --resource-group "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_resource_group_name }}"\
             --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}" \
             --api-id geolocation-api-v1 \
             --display-name "GeoLocation Lookup API" \

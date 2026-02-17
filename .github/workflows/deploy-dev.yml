@@ -27,7 +27,7 @@ jobs:
           skip-nuget-artifact-upload: "true"
 
     outputs:
-      build_version: ${{ steps.api-ci.outputs.build_version }}
+      build_version: ${{ steps.api-ci.outputs.semver }}
 
   terraform-plan-and-apply-dev:
     permissions:
@@ -145,7 +145,7 @@ jobs:
               echo "API is running expected version '$EXPECTED_VERSION' (attempt $i)"
               exit 0
             fi
-            echo "Attempt $i: got version '$CURRENT_VERSION' - waiting 10s..."
+            echo "Attempt $i: got version '$CURRENT_VERSION' - waiting 10s...""
             sleep 10
           done
           echo "API did not report expected version '$EXPECTED_VERSION' in time (last seen: '$CURRENT_VERSION')"
