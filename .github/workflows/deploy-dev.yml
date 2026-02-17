@@ -128,6 +128,23 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Wait for API to be ready
+        shell: bash
+        run: |
+          APP_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/health"
+          echo "Waiting for $APP_URL to respond..."
+          for i in $(seq 1 30); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$APP_URL" || true)
+            if [ "$STATUS" = "200" ]; then
+              echo "API is ready (attempt $i)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $STATUS - waiting 10s..."
+            sleep 10
+          done
+          echo "API did not become ready in time"
+          exit 1
+
       - name: Import OpenAPI spec into APIM
         shell: bash
         run: |
