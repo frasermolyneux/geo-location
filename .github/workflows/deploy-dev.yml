@@ -155,7 +155,7 @@ jobs:
             --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
-            --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net" \
+            --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1" \
             --subscription-required true
 
       - name: Add API to product
