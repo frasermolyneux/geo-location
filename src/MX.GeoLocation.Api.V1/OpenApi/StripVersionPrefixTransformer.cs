@@ -1,27 +1,26 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi.Models;
 
 namespace MX.GeoLocation.LookupWebApi.OpenApi;
 
 /// <summary>
-/// Strips the /v1 prefix from OpenAPI spec paths so that APIM segment versioning
-/// can manage the version prefix. Without this, APIM produces /v1/v1/... paths.
-/// The backend still routes with /v1/ because APIM forwards the version segment.
+/// Strips the version prefix (e.g. /v1.0, /v1.1) from OpenAPI spec paths so that
+/// APIM segment versioning can manage the version prefix. Without this, APIM
+/// produces double-versioned paths like /v1/v1/...
 /// </summary>
-public class StripVersionPrefixTransformer : IOpenApiDocumentTransformer
+public partial class StripVersionPrefixTransformer : IOpenApiDocumentTransformer
 {
+    [GeneratedRegex(@"^/v\d+(\.\d+)?", RegexOptions.IgnoreCase)]
+    private static partial Regex VersionPrefixRegex();
+
     public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
     {
         var updatedPaths = new OpenApiPaths();
 
         foreach (var (path, pathItem) in document.Paths)
         {
-            // Strip version prefixes like /v1.1 or /v1 (check longer prefix first)
-            var newPath = path;
-            if (path.StartsWith("/v1.1", StringComparison.OrdinalIgnoreCase))
-                newPath = path[5..];
-            else if (path.StartsWith("/v1", StringComparison.OrdinalIgnoreCase))
-                newPath = path[3..];
+            var newPath = VersionPrefixRegex().Replace(path, string.Empty);
 
             // Ensure the path still starts with /
             if (!newPath.StartsWith('/'))

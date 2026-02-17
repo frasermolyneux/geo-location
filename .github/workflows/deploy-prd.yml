@@ -166,7 +166,7 @@ jobs:
             --api-version-set-id "${{ needs.terraform-plan-and-apply-dev.outputs.api_version_set_id }}" \
             --protocols https \
             --specification-format OpenApiJson \
-            --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
+            --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.0.json" \
             --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1" \
             --subscription-required true
 
@@ -338,7 +338,7 @@ jobs:
             --api-version-set-id "${{ needs.terraform-plan-and-apply-prd.outputs.api_version_set_id }}" \
             --protocols https \
             --specification-format OpenApiJson \
-            --specification-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
+            --specification-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/openapi/v1.0.json" \
             --service-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/v1" \
             --subscription-required true
 
