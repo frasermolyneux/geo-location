@@ -16,5 +16,10 @@ namespace MX.GeoLocation.Api.Client.V1
         /// Gets the API info endpoint
         /// </summary>
         IApiInfoApi ApiInfo { get; }
+
+        /// <summary>
+        /// Gets the API health endpoint
+        /// </summary>
+        IApiHealthApi ApiHealth { get; }
     }
 }

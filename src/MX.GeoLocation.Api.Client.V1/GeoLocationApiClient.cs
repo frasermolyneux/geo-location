@@ -12,10 +12,12 @@ namespace MX.GeoLocation.Api.Client.V1
         /// </summary>
         /// <param name="versionedGeoLookupApi">The versioned GeoLookup API</param>
         /// <param name="apiInfoApi">The API info endpoint</param>
-        public GeoLocationApiClient(IVersionedGeoLookupApi versionedGeoLookupApi, IApiInfoApi apiInfoApi)
+        /// <param name="apiHealthApi">The API health endpoint</param>
+        public GeoLocationApiClient(IVersionedGeoLookupApi versionedGeoLookupApi, IApiInfoApi apiInfoApi, IApiHealthApi apiHealthApi)
         {
             GeoLookup = versionedGeoLookupApi;
             ApiInfo = apiInfoApi;
+            ApiHealth = apiHealthApi;
         }
 
         /// <summary>
@@ -27,5 +29,10 @@ namespace MX.GeoLocation.Api.Client.V1
         /// Gets the API info endpoint
         /// </summary>
         public IApiInfoApi ApiInfo { get; }
+
+        /// <summary>
+        /// Gets the API health endpoint
+        /// </summary>
+        public IApiHealthApi ApiHealth { get; }
     }
 }
