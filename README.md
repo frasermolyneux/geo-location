@@ -12,11 +12,12 @@
 
 ## Documentation
 
+* [API Versioning, APIM Routing & OpenAPI](docs/api-versioning-and-apim.md)
 * [Manual Steps](docs/manual-steps.md)
 
 ## Overview
 
-GeoLocation is a .NET 9 workload that fronts MaxMind lookups with an Entra-protected API and caches results in Azure Table Storage to reduce latency and cost. The API exposes versioned endpoints for single or batch hostname/IP lookups plus metadata deletion, enforcing the `LookupApiUser` role. An MVC web front end calls the API using API-key and Entra authentication, handles Cloudflare/X-Forwarded-For headers, and stores the user’s last lookup in session. Debug builds generate OpenAPI output under `openapi/`, and infrastructure/Bicep assets live in the `bicep/` and `params/` folders.
+GeoLocation is a .NET 9 workload that fronts MaxMind lookups with an Entra-protected API and caches results in Azure Table Storage to reduce latency and cost. The API exposes versioned endpoints for single or batch hostname/IP lookups plus metadata deletion, enforcing the `LookupApiUser` role. An MVC web front end calls the API using API-key and Entra authentication, handles Cloudflare/X-Forwarded-For headers, and stores the user’s last lookup in session. The API serves its OpenAPI spec at runtime at `/openapi/v1.json`, and infrastructure is managed by Terraform under `terraform/`.
 
 ## Contributing
 
