@@ -166,17 +166,6 @@ jobs:
             --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net" \
             --subscription-required true
 
-      - name: Set API-level policy
-        shell: bash
-        run: |
-          SERVICE_URL="https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net"
-          POLICY="<policies><inbound><base /><set-backend-service base-url=\"${SERVICE_URL}\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>"
-          az apim api policy create \
-            --resource-group "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_resource_group_name }}" \
-            --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}" \
-            --api-id geolocation-api-v1 \
-            --xml-policy "$POLICY"
-
       - name: Add API to product
         shell: bash
         run: |
@@ -318,17 +307,6 @@ jobs:
             --specification-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
             --service-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net" \
             --subscription-required true
-
-      - name: Set API-level policy
-        shell: bash
-        run: |
-          SERVICE_URL="https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net"
-          POLICY="<policies><inbound><base /><set-backend-service base-url=\"${SERVICE_URL}\" /></inbound><backend><base /></backend><outbound><base /></outbound><on-error><base /></on-error></policies>"
-          az apim api policy create \
-            --resource-group "${{ needs.terraform-plan-and-apply-prd.outputs.api_management_resource_group_name }}" \
-            --service-name "${{ needs.terraform-plan-and-apply-prd.outputs.api_management_name }}" \
-            --api-id geolocation-api-v1 \
-            --xml-policy "$POLICY"
 
       - name: Add API to product
         shell: bash
