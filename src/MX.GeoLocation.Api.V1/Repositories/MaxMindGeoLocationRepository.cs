@@ -25,7 +25,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         public async Task<GeoLocationDto> GetGeoLocation(string address)
         {
             using var reader = CreateClient();
-            var operation = StartOperation("MaxMindCityQuery");
+            var operation = StartOperation("MaxMindCityQuery", address);
 
             try
             {
@@ -53,7 +53,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                 };
 #pragma warning restore CS0618
 
-                return new GeoLocationDto()
+                var result = new GeoLocationDto()
                 {
                     Address = address,
                     TranslatedAddress = address,
@@ -72,6 +72,9 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                     Timezone = lookupResult.Location?.TimeZone ?? string.Empty,
                     Traits = traits
                 };
+
+                MarkSuccess(operation);
+                return result;
             }
             catch (Exception ex)
             {
@@ -87,12 +90,14 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         public async Task<CityGeoLocationDto> GetCityGeoLocation(string address)
         {
             using var reader = CreateClient();
-            var operation = StartOperation("MaxMindCityQuery");
+            var operation = StartOperation("MaxMindCityQuery", address);
 
             try
             {
                 var lookupResult = await reader.CityAsync(address);
-                return MapToCityDto(address, lookupResult);
+                var result = MapToCityDto(address, lookupResult);
+                MarkSuccess(operation);
+                return result;
             }
             catch (Exception ex)
             {
@@ -108,7 +113,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         public async Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address)
         {
             using var reader = CreateClient();
-            var operation = StartOperation("MaxMindInsightsQuery");
+            var operation = StartOperation("MaxMindInsightsQuery", address);
 
             try
             {
@@ -129,6 +134,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                     ProviderName = anonymizer?.ProviderName
                 };
 
+                MarkSuccess(operation);
                 return dto;
             }
             catch (Exception ex)
@@ -208,12 +214,19 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             return new WebServiceClient(userId, licenseKey);
         }
 
-        private IOperationHolder<DependencyTelemetry> StartOperation(string operationName)
+        private IOperationHolder<DependencyTelemetry> StartOperation(string operationName, string address)
         {
             var operation = telemetryClient.StartOperation<DependencyTelemetry>(operationName);
             operation.Telemetry.Type = "HTTP";
             operation.Telemetry.Target = "geoip.maxmind.com";
+            operation.Telemetry.Data = address;
             return operation;
+        }
+
+        private static void MarkSuccess(IOperationHolder<DependencyTelemetry> operation)
+        {
+            operation.Telemetry.Success = true;
+            operation.Telemetry.ResultCode = "200";
         }
 
         private void HandleException(IOperationHolder<DependencyTelemetry> operation, Exception ex)

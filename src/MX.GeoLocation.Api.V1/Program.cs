@@ -97,6 +97,9 @@ builder.Services.AddHealthChecks()
         tags: ["dependency"])
     .AddCheck<MaxMindConfigurationHealthCheck>(
         name: "maxmind-configuration",
+        tags: ["dependency"])
+    .AddCheck<MaxMindAvailabilityHealthCheck>(
+        name: "maxmind-availability",
         tags: ["dependency"]);
 
 var app = builder.Build();
