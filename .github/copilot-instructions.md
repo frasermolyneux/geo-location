@@ -21,6 +21,7 @@
 
 ## Key Files
 - `MX.GeoLocation.Api.V1/Program.cs` sets API versioning, OpenAPI, auth, caching, and health checks.
+- `MX.GeoLocation.Api.V1/OpenApi/StripVersionPrefixTransformer.cs` strips `/v1/` from spec paths so APIM segment versioning can manage the version prefix.
 - `MX.GeoLocation.Api.V1/OpenApi/BearerSecuritySchemeTransformer.cs` adds Bearer JWT security scheme to the OpenAPI document.
 - `Controllers/GeoLookupController.cs` implements GET/POST lookups and DELETE metadata with cache-first flow then MaxMind fallback; route is `v{version:apiVersion}`.
 - `Repositories/TableStorageGeoLocationRepository.cs` handles Azure Table persistence; `MaxMindGeoLocationRepository.cs` wraps `MaxMind.GeoIP2.WebServiceClient` with dependency telemetry.

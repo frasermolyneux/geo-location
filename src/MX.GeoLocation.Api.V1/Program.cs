@@ -69,6 +69,7 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddOpenApi("v1", options =>
 {
     options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddDocumentTransformer<StripVersionPrefixTransformer>();
 });
 
 builder.Services.AddSingleton<TableServiceClient>(sp =>
