@@ -16,9 +16,12 @@ public class StripVersionPrefixTransformer : IOpenApiDocumentTransformer
 
         foreach (var (path, pathItem) in document.Paths)
         {
-            var newPath = path.StartsWith("/v1", StringComparison.OrdinalIgnoreCase)
-                ? path[3..] // Remove "/v1" prefix
-                : path;
+            // Strip version prefixes like /v1.1 or /v1 (check longer prefix first)
+            var newPath = path;
+            if (path.StartsWith("/v1.1", StringComparison.OrdinalIgnoreCase))
+                newPath = path[5..];
+            else if (path.StartsWith("/v1", StringComparison.OrdinalIgnoreCase))
+                newPath = path[3..];
 
             // Ensure the path still starts with /
             if (!newPath.StartsWith('/'))

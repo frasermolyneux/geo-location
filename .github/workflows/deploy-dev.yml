@@ -143,7 +143,7 @@ jobs:
           echo "API did not become ready in time"
           exit 1
 
-      - name: Import OpenAPI spec into APIM
+      - name: Import OpenAPI v1 spec into APIM
         shell: bash
         run: |
           az apim api import \
@@ -158,7 +158,22 @@ jobs:
             --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1" \
             --subscription-required true
 
-      - name: Add API to product
+      - name: Import OpenAPI v1.1 spec into APIM
+        shell: bash
+        run: |
+          az apim api import \
+            --resource-group "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_resource_group_name }}" \
+            --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}" \
+            --api-id geolocation-api-v1-1 \
+            --display-name "GeoLocation Lookup API" \
+            --path geolocation \
+            --protocols https \
+            --specification-format OpenApiJson \
+            --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.1.json" \
+            --service-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.1" \
+            --subscription-required true
+
+      - name: Add v1 API to product
         shell: bash
         run: |
           az apim product api add \
@@ -166,3 +181,12 @@ jobs:
             --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}" \
             --product-id "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_product_id }}" \
             --api-id geolocation-api-v1 || true
+
+      - name: Add v1.1 API to product
+        shell: bash
+        run: |
+          az apim product api add \
+            --resource-group "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_resource_group_name }}" \
+            --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}" \
+            --product-id "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_product_id }}" \
+            --api-id geolocation-api-v1-1 || true

@@ -11,15 +11,20 @@ namespace MX.GeoLocation.Api.Client.V1
         /// <summary>
         /// Initializes a new instance of the <see cref="VersionedGeoLookupApi"/> class
         /// </summary>
-        /// <param name="v1">The V1 GeoLookup API implementation</param>
-        public VersionedGeoLookupApi(IGeoLookupApi v1)
+        public VersionedGeoLookupApi(IGeoLookupApi v1, Abstractions.Interfaces.V1_1.IGeoLookupApi v1_1)
         {
             V1 = v1;
+            V1_1 = v1_1;
         }
 
         /// <summary>
         /// Gets the V1 GeoLookup API implementation
         /// </summary>
         public IGeoLookupApi V1 { get; }
+
+        /// <summary>
+        /// Gets the V1.1 GeoLookup API implementation
+        /// </summary>
+        public Abstractions.Interfaces.V1_1.IGeoLookupApi V1_1 { get; }
     }
 }

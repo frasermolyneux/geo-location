@@ -14,6 +14,11 @@ resource "azurerm_storage_table" "geolocations" {
   storage_account_name = azurerm_storage_account.data.name
 }
 
+resource "azurerm_storage_table" "geolocationsv11" {
+  name                 = "geolocationsv11"
+  storage_account_name = azurerm_storage_account.data.name
+}
+
 resource "azurerm_role_assignment" "api_table_data_contributor" {
   scope                = azurerm_storage_account.data.id
   role_definition_name = "Storage Table Data Contributor"

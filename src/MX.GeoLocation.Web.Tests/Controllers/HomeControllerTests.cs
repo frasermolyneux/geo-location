@@ -1,13 +1,13 @@
 ﻿using System.Net;
 using System.Text;
 
-using FakeItEasy;
-
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using MX.GeoLocation.Api.Client.V1;
+using MX.GeoLocation.Abstractions.Interfaces;
+using MX.GeoLocation.Abstractions.Interfaces.V1;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Web.Controllers;
 
@@ -17,24 +17,23 @@ using Newtonsoft.Json;
 
 namespace MX.GeoLocation.Web.Tests.Controllers
 {
-    internal class HomeControllerTests
+    public class HomeControllerTests : IDisposable
     {
-        private IGeoLocationApiClient fakeGeoLocationClient;
-        private IHttpContextAccessor fakeHttpContextAccessor;
-        private IWebHostEnvironment fakeWebHostEnvironment;
+        private readonly Mock<IGeoLocationApiClient> mockGeoLocationClient;
+        private readonly Mock<IHttpContextAccessor> mockHttpContextAccessor;
+        private readonly Mock<IWebHostEnvironment> mockWebHostEnvironment;
 
-        private HomeController homeController;
+        private readonly HomeController homeController;
 
-        GeoLocationDto wellFormedGeoLocationDto;
+        private readonly GeoLocationDto wellFormedGeoLocationDto;
 
-        [SetUp]
-        public void Setup()
+        public HomeControllerTests()
         {
-            fakeGeoLocationClient = A.Fake<IGeoLocationApiClient>();
-            fakeHttpContextAccessor = A.Fake<IHttpContextAccessor>();
-            fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
+            mockGeoLocationClient = new Mock<IGeoLocationApiClient>();
+            mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
 
-            homeController = new HomeController(fakeGeoLocationClient, fakeHttpContextAccessor, fakeWebHostEnvironment);
+            homeController = new HomeController(mockGeoLocationClient.Object, mockHttpContextAccessor.Object, mockWebHostEnvironment.Object);
 
             wellFormedGeoLocationDto = new GeoLocationDto()
             {
@@ -61,118 +60,135 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             };
         }
 
-        [TestCase(404)]
-        [TestCase(500)]
+        [Theory]
+        [InlineData(HttpStatusCode.NotFound)]
+        [InlineData(HttpStatusCode.InternalServerError)]
         public async Task IndexShouldRedirectToLookupAddressWhenGetGeoLocationFails(HttpStatusCode httpStatusCode)
         {
             // Arrange
-            A.CallTo(() => fakeGeoLocationClient.GeoLookup.V1.GetGeoLocation(A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(Task.FromResult(new ApiResult<GeoLocationDto>(httpStatusCode)));
+            var mockGeoLookup = new Mock<IVersionedGeoLookupApi>();
+            var mockV1 = new Mock<IGeoLookupApi>();
+            mockV1.Setup(x => x.GetGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ApiResult<GeoLocationDto>(httpStatusCode));
+            mockGeoLookup.Setup(x => x.V1).Returns(mockV1.Object);
+            mockGeoLocationClient.Setup(x => x.GeoLookup).Returns(mockGeoLookup.Object);
 
             // Act
             var result = await homeController.Index();
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<RedirectToActionResult>());
+            Assert.NotNull(result);
+            Assert.IsType<RedirectToActionResult>(result);
 
             var redirectToActionResult = result as RedirectToActionResult;
 
-            Assert.That(redirectToActionResult, Is.Not.Null);
-            Assert.That(redirectToActionResult!.ActionName, Is.EqualTo("LookupAddress"));
+            Assert.NotNull(redirectToActionResult);
+            Assert.Equal("LookupAddress", redirectToActionResult!.ActionName);
         }
 
-        [Test]
+        [Fact]
         public async Task IndexShouldUseGeoLocationDtoFromSessionWhenItIsNotNull()
         {
             // Arrange
             byte[]? sessionData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(wellFormedGeoLocationDto));
-            A.CallTo(() => fakeHttpContextAccessor.HttpContext!.Session.TryGetValue("UserGeoLocationDto", out sessionData)).Returns(true);
+            var mockSession = new Mock<ISession>();
+            byte[]? outData = sessionData;
+            mockSession.Setup(s => s.TryGetValue("UserGeoLocationDto", out outData)).Returns(true);
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.Setup(c => c.Session).Returns(mockSession.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
 
             // Act
             var result = await homeController.Index();
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<ViewResult>());
+            Assert.NotNull(result);
+            Assert.IsType<ViewResult>(result);
 
             var viewResult = result as ViewResult;
 
-            Assert.That(viewResult, Is.Not.Null);
-            Assert.That(viewResult!.Model, Is.Not.Null);
-            Assert.That(viewResult.Model, Is.InstanceOf<GeoLocationDto>());
+            Assert.NotNull(viewResult);
+            Assert.NotNull(viewResult!.Model);
+            Assert.IsType<GeoLocationDto>(viewResult.Model);
 
             var viewResultGeoLocationDto = viewResult.Model as GeoLocationDto;
 
-            Assert.That(viewResultGeoLocationDto, Is.Not.Null);
-            Assert.Multiple(() =>
-            {
-                Assert.That(viewResultGeoLocationDto!.AccuracyRadius, Is.EqualTo(wellFormedGeoLocationDto.AccuracyRadius));
-                Assert.That(viewResultGeoLocationDto.Address, Is.EqualTo(wellFormedGeoLocationDto.Address));
-                Assert.That(viewResultGeoLocationDto.CityName, Is.EqualTo(wellFormedGeoLocationDto.CityName));
-                Assert.That(viewResultGeoLocationDto.ContinentCode, Is.EqualTo(wellFormedGeoLocationDto.ContinentCode));
-                Assert.That(viewResultGeoLocationDto.ContinentName, Is.EqualTo(wellFormedGeoLocationDto.ContinentName));
-                Assert.That(viewResultGeoLocationDto.CountryCode, Is.EqualTo(wellFormedGeoLocationDto.CountryCode));
-                Assert.That(viewResultGeoLocationDto.CountryName, Is.EqualTo(wellFormedGeoLocationDto.CountryName));
-                Assert.That(viewResultGeoLocationDto.IsEuropeanUnion, Is.EqualTo(wellFormedGeoLocationDto.IsEuropeanUnion));
-                Assert.That(viewResultGeoLocationDto.Latitude, Is.EqualTo(wellFormedGeoLocationDto.Latitude));
-                Assert.That(viewResultGeoLocationDto.Longitude, Is.EqualTo(wellFormedGeoLocationDto.Longitude));
-                Assert.That(viewResultGeoLocationDto.PostalCode, Is.EqualTo(wellFormedGeoLocationDto.PostalCode));
-                Assert.That(viewResultGeoLocationDto.RegisteredCountry, Is.EqualTo(wellFormedGeoLocationDto.RegisteredCountry));
-                Assert.That(viewResultGeoLocationDto.RepresentedCountry, Is.EqualTo(wellFormedGeoLocationDto.RepresentedCountry));
-                Assert.That(viewResultGeoLocationDto.Timezone, Is.EqualTo(wellFormedGeoLocationDto.Timezone));
-                Assert.That(viewResultGeoLocationDto.Traits, Is.EquivalentTo(wellFormedGeoLocationDto.Traits));
-            });
+            Assert.NotNull(viewResultGeoLocationDto);
+            Assert.Equal(wellFormedGeoLocationDto.AccuracyRadius, viewResultGeoLocationDto!.AccuracyRadius);
+            Assert.Equal(wellFormedGeoLocationDto.Address, viewResultGeoLocationDto.Address);
+            Assert.Equal(wellFormedGeoLocationDto.CityName, viewResultGeoLocationDto.CityName);
+            Assert.Equal(wellFormedGeoLocationDto.ContinentCode, viewResultGeoLocationDto.ContinentCode);
+            Assert.Equal(wellFormedGeoLocationDto.ContinentName, viewResultGeoLocationDto.ContinentName);
+            Assert.Equal(wellFormedGeoLocationDto.CountryCode, viewResultGeoLocationDto.CountryCode);
+            Assert.Equal(wellFormedGeoLocationDto.CountryName, viewResultGeoLocationDto.CountryName);
+            Assert.Equal(wellFormedGeoLocationDto.IsEuropeanUnion, viewResultGeoLocationDto.IsEuropeanUnion);
+            Assert.Equal(wellFormedGeoLocationDto.Latitude, viewResultGeoLocationDto.Latitude);
+            Assert.Equal(wellFormedGeoLocationDto.Longitude, viewResultGeoLocationDto.Longitude);
+            Assert.Equal(wellFormedGeoLocationDto.PostalCode, viewResultGeoLocationDto.PostalCode);
+            Assert.Equal(wellFormedGeoLocationDto.RegisteredCountry, viewResultGeoLocationDto.RegisteredCountry);
+            Assert.Equal(wellFormedGeoLocationDto.RepresentedCountry, viewResultGeoLocationDto.RepresentedCountry);
+            Assert.Equal(wellFormedGeoLocationDto.Timezone, viewResultGeoLocationDto.Timezone);
+            Assert.Equal(wellFormedGeoLocationDto.Traits, viewResultGeoLocationDto.Traits);
         }
 
-        [Test]
+        [Fact]
         public async Task IndexShouldGetGeoLocationAndStoreInSessionIfSessionDataIsNull()
         {
             // Arrange
             byte[]? nullSessionData = null;
-            byte[]? wellFormedSessionData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(wellFormedGeoLocationDto));
-            A.CallTo(() => fakeHttpContextAccessor.HttpContext!.Session.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
-            A.CallTo(() => fakeGeoLocationClient.GeoLookup.V1.GetGeoLocation(A<string>.Ignored, A<CancellationToken>.Ignored)).Returns(Task.FromResult(new ApiResult<GeoLocationDto>(HttpStatusCode.OK, new ApiResponse<GeoLocationDto>(wellFormedGeoLocationDto))));
+            var mockSession = new Mock<ISession>();
+            mockSession.Setup(s => s.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.Setup(r => r.Headers).Returns(new HeaderDictionary());
+            var mockConnection = new Mock<ConnectionInfo>();
+            mockConnection.Setup(c => c.RemoteIpAddress).Returns(System.Net.IPAddress.Parse("8.8.8.8"));
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.Setup(c => c.Session).Returns(mockSession.Object);
+            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            mockHttpContext.Setup(c => c.Connection).Returns(mockConnection.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
+
+            var mockGeoLookup = new Mock<IVersionedGeoLookupApi>();
+            var mockV1 = new Mock<IGeoLookupApi>();
+            mockV1.Setup(x => x.GetGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ApiResult<GeoLocationDto>(HttpStatusCode.OK, new ApiResponse<GeoLocationDto>(wellFormedGeoLocationDto)));
+            mockGeoLookup.Setup(x => x.V1).Returns(mockV1.Object);
+            mockGeoLocationClient.Setup(x => x.GeoLookup).Returns(mockGeoLookup.Object);
 
             // Act
             var result = await homeController.Index();
 
             // Assert
-            A.CallTo(() => fakeHttpContextAccessor.HttpContext!.Session.Set("UserGeoLocationDto", A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
+            mockSession.Verify(s => s.Set("UserGeoLocationDto", It.IsAny<byte[]>()), Times.Once);
 
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<ViewResult>());
+            Assert.NotNull(result);
+            Assert.IsType<ViewResult>(result);
 
             var viewResult = result as ViewResult;
 
-            Assert.That(viewResult, Is.Not.Null);
-            Assert.That(viewResult!.Model, Is.Not.Null);
-            Assert.That(viewResult.Model, Is.InstanceOf<GeoLocationDto>());
+            Assert.NotNull(viewResult);
+            Assert.NotNull(viewResult!.Model);
+            Assert.IsType<GeoLocationDto>(viewResult.Model);
 
             var viewResultGeoLocationDto = viewResult.Model as GeoLocationDto;
 
-            Assert.That(viewResultGeoLocationDto, Is.Not.Null);
-            Assert.Multiple(() =>
-            {
-                Assert.That(viewResultGeoLocationDto!.AccuracyRadius, Is.EqualTo(wellFormedGeoLocationDto.AccuracyRadius));
-                Assert.That(viewResultGeoLocationDto.Address, Is.EqualTo(wellFormedGeoLocationDto.Address));
-                Assert.That(viewResultGeoLocationDto.CityName, Is.EqualTo(wellFormedGeoLocationDto.CityName));
-                Assert.That(viewResultGeoLocationDto.ContinentCode, Is.EqualTo(wellFormedGeoLocationDto.ContinentCode));
-                Assert.That(viewResultGeoLocationDto.ContinentName, Is.EqualTo(wellFormedGeoLocationDto.ContinentName));
-                Assert.That(viewResultGeoLocationDto.CountryCode, Is.EqualTo(wellFormedGeoLocationDto.CountryCode));
-                Assert.That(viewResultGeoLocationDto.CountryName, Is.EqualTo(wellFormedGeoLocationDto.CountryName));
-                Assert.That(viewResultGeoLocationDto.IsEuropeanUnion, Is.EqualTo(wellFormedGeoLocationDto.IsEuropeanUnion));
-                Assert.That(viewResultGeoLocationDto.Latitude, Is.EqualTo(wellFormedGeoLocationDto.Latitude));
-                Assert.That(viewResultGeoLocationDto.Longitude, Is.EqualTo(wellFormedGeoLocationDto.Longitude));
-                Assert.That(viewResultGeoLocationDto.PostalCode, Is.EqualTo(wellFormedGeoLocationDto.PostalCode));
-                Assert.That(viewResultGeoLocationDto.RegisteredCountry, Is.EqualTo(wellFormedGeoLocationDto.RegisteredCountry));
-                Assert.That(viewResultGeoLocationDto.RepresentedCountry, Is.EqualTo(wellFormedGeoLocationDto.RepresentedCountry));
-                Assert.That(viewResultGeoLocationDto.Timezone, Is.EqualTo(wellFormedGeoLocationDto.Timezone));
-                Assert.That(viewResultGeoLocationDto.Traits, Is.EquivalentTo(wellFormedGeoLocationDto.Traits));
-            });
+            Assert.NotNull(viewResultGeoLocationDto);
+            Assert.Equal(wellFormedGeoLocationDto.AccuracyRadius, viewResultGeoLocationDto!.AccuracyRadius);
+            Assert.Equal(wellFormedGeoLocationDto.Address, viewResultGeoLocationDto.Address);
+            Assert.Equal(wellFormedGeoLocationDto.CityName, viewResultGeoLocationDto.CityName);
+            Assert.Equal(wellFormedGeoLocationDto.ContinentCode, viewResultGeoLocationDto.ContinentCode);
+            Assert.Equal(wellFormedGeoLocationDto.ContinentName, viewResultGeoLocationDto.ContinentName);
+            Assert.Equal(wellFormedGeoLocationDto.CountryCode, viewResultGeoLocationDto.CountryCode);
+            Assert.Equal(wellFormedGeoLocationDto.CountryName, viewResultGeoLocationDto.CountryName);
+            Assert.Equal(wellFormedGeoLocationDto.IsEuropeanUnion, viewResultGeoLocationDto.IsEuropeanUnion);
+            Assert.Equal(wellFormedGeoLocationDto.Latitude, viewResultGeoLocationDto.Latitude);
+            Assert.Equal(wellFormedGeoLocationDto.Longitude, viewResultGeoLocationDto.Longitude);
+            Assert.Equal(wellFormedGeoLocationDto.PostalCode, viewResultGeoLocationDto.PostalCode);
+            Assert.Equal(wellFormedGeoLocationDto.RegisteredCountry, viewResultGeoLocationDto.RegisteredCountry);
+            Assert.Equal(wellFormedGeoLocationDto.RepresentedCountry, viewResultGeoLocationDto.RepresentedCountry);
+            Assert.Equal(wellFormedGeoLocationDto.Timezone, viewResultGeoLocationDto.Timezone);
+            Assert.Equal(wellFormedGeoLocationDto.Traits, viewResultGeoLocationDto.Traits);
         }
 
-        [TearDown]
-        public void Cleanup()
+        public void Dispose()
         {
             homeController?.Dispose();
         }

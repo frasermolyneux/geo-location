@@ -1,3 +1,2 @@
-global using FakeItEasy;
-
-global using NUnit.Framework;
+global using Xunit;
+global using Moq;

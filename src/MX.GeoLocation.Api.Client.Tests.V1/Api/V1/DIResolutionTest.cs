@@ -3,16 +3,15 @@ using Microsoft.Extensions.Logging;
 using MX.GeoLocation.Api.Client.V1;
 using MX.Api.Client;
 using MX.Api.Client.Auth;
-using NUnit.Framework;
 
 namespace MX.GeoLocation.Api.Client.Tests.V1.Api.V1;
 
 /// <summary>
 /// Test to verify that the GeoLookupApi can be properly resolved from dependency injection
 /// </summary>
-internal class DIResolutionTest
+public class DIResolutionTest
 {
-    [Test]
+    [Fact]
     public void GeoLookupApi_CanBeResolvedFromDI_Successfully()
     {
         // Arrange
@@ -22,8 +21,8 @@ internal class DIResolutionTest
         services.AddLogging();
 
         // Add required dependencies
-        services.AddSingleton<IApiTokenProvider>(A.Fake<IApiTokenProvider>());
-        services.AddSingleton<IRestClientService>(A.Fake<IRestClientService>());
+        services.AddSingleton<IApiTokenProvider>(Mock.Of<IApiTokenProvider>());
+        services.AddSingleton<IRestClientService>(Mock.Of<IRestClientService>());
 
         // Add the options
         var options = new GeoLocationApiClientOptions
@@ -40,6 +39,6 @@ internal class DIResolutionTest
         // Act & Assert
         var geoLookupApi = serviceProvider.GetService<GeoLookupApi>();
 
-        Assert.That(geoLookupApi, Is.Not.Null);
+        Assert.NotNull(geoLookupApi);
     }
 }

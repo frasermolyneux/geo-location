@@ -3,9 +3,9 @@ using MX.GeoLocation.Web.Extensions;
 
 namespace MX.GeoLocation.Web.Tests.Extensions
 {
-    internal class GeoLocationDtoExtensionsTests
+    public class GeoLocationDtoExtensionsTests
     {
-        [Test]
+        [Fact]
         public void LocationSummaryShouldBeCityAndCountryWhenAllPropertiesPresent()
         {
             // Arrange
@@ -21,10 +21,10 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("London, United Kingdom"));
+            Assert.Equal("London, United Kingdom", result.ToString());
         }
 
-        [Test]
+        [Fact]
         public void LocationSummaryShouldBeCityAndCountryWhenCityAndCountryOnly()
         {
             // Arrange
@@ -38,10 +38,10 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("London, United Kingdom"));
+            Assert.Equal("London, United Kingdom", result.ToString());
         }
 
-        [Test]
+        [Fact]
         public void LocationSummaryShouldBeCountryCodeWhenCountryCodeOnly()
         {
             // Arrange
@@ -54,10 +54,10 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("GB"));
+            Assert.Equal("GB", result.ToString());
         }
 
-        [Test]
+        [Fact]
         public void LocationSummaryShouldBeRegisteredCountryWhenRegisteredCountryOnly()
         {
             // Arrange
@@ -70,10 +70,10 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("UK"));
+            Assert.Equal("UK", result.ToString());
         }
 
-        [Test]
+        [Fact]
         public void LocationSummaryShouldBeUnknownWhenNoPropertiesAreSet()
         {
             // Arrange
@@ -83,7 +83,7 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             var result = geoLocationDto.LocationSummary();
 
             // Assert
-            Assert.That(result.ToString(), Is.EqualTo("Unknown"));
+            Assert.Equal("Unknown", result.ToString());
         }
     }
 }

@@ -5,23 +5,23 @@ using Microsoft.Extensions.Logging;
 
 using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1;
-using MX.GeoLocation.LookupWebApi.Controllers;
+using MX.GeoLocation.LookupWebApi.Controllers.V1;
 using MX.GeoLocation.LookupWebApi.Repositories;
 
 namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
 {
-    public class GeoLookupControllerTests
+    public class GeoLookupControllerTests : IDisposable
     {
-        private GeoLookupController geoLookupController;
+        private readonly GeoLookupController geoLookupController;
 
-        [SetUp]
-        public void Setup()
+        public GeoLookupControllerTests()
         {
-            geoLookupController = new GeoLookupController(A.Fake<ILogger<GeoLookupController>>(), A.Fake<ITableStorageGeoLocationRepository>(), A.Fake<IMaxMindGeoLocationRepository>());
+            geoLookupController = new GeoLookupController(Mock.Of<ILogger<GeoLookupController>>(), Mock.Of<ITableStorageGeoLocationRepository>(), Mock.Of<IMaxMindGeoLocationRepository>());
         }
 
-        [TestCase("abcdefg")]
-        [TestCase("a.b.c.d")]
+        [Theory]
+        [InlineData("abcdefg")]
+        [InlineData("a.b.c.d")]
         public async Task TestGetGeoLocationHandlesInvalidHostname(string invalidHostname)
         {
             // Arrange
@@ -31,25 +31,27 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             var result = await geoLookupController.GetGeoLocation(invalidHostname);
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<ObjectResult>());
+            Assert.NotNull(result);
+            Assert.IsType<ObjectResult>(result);
 
             var objectResult = result as ObjectResult;
 
-            Assert.That(objectResult, Is.Not.Null);
-            Assert.That(objectResult!.StatusCode, Is.EqualTo(400));
+            Assert.NotNull(objectResult);
+            Assert.Equal(400, objectResult!.StatusCode);
 
-            Assert.That(objectResult.Value, Is.InstanceOf<ApiResponse<GeoLocationDto>>());
+            Assert.IsType<ApiResponse<GeoLocationDto>>(objectResult.Value);
 
             var apiResponseDto = objectResult.Value as ApiResponse<GeoLocationDto>;
-            Assert.That(apiResponseDto, Is.Not.Null);
+            Assert.NotNull(apiResponseDto);
 
-            Assert.That(apiResponseDto!.Errors, Is.Not.Null.And.Not.Empty);
-            Assert.That(apiResponseDto.Errors!.First().Message, Is.EqualTo("The address provided is invalid. IP or DNS is acceptable."));
+            Assert.NotNull(apiResponseDto!.Errors);
+            Assert.NotEmpty(apiResponseDto.Errors!);
+            Assert.Equal("The address provided is invalid. IP or DNS is acceptable.", apiResponseDto.Errors!.First().Message);
         }
 
-        [TestCase("localhost")]
-        [TestCase("127.0.0.1")]
+        [Theory]
+        [InlineData("localhost")]
+        [InlineData("127.0.0.1")]
         public async Task TestGetGeoLocationHandlesLocalhost(string localhost)
         {
             // Arrange
@@ -59,25 +61,25 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             var result = await geoLookupController.GetGeoLocation(localhost);
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Is.InstanceOf<ObjectResult>());
+            Assert.NotNull(result);
+            Assert.IsType<ObjectResult>(result);
 
             var objectResult = result as ObjectResult;
 
-            Assert.That(objectResult, Is.Not.Null);
-            Assert.That(objectResult!.StatusCode, Is.EqualTo((int)HttpStatusCode.BadRequest));
+            Assert.NotNull(objectResult);
+            Assert.Equal((int)HttpStatusCode.BadRequest, objectResult!.StatusCode);
 
-            Assert.That(objectResult.Value, Is.InstanceOf<ApiResponse<GeoLocationDto>>());
+            Assert.IsType<ApiResponse<GeoLocationDto>>(objectResult.Value);
 
             var apiResponseDto = objectResult.Value as ApiResponse<GeoLocationDto>;
-            Assert.That(apiResponseDto, Is.Not.Null);
+            Assert.NotNull(apiResponseDto);
 
-            //apiResponseDto?.Errors.Should().NotBeNullOrEmpty();
-            //apiResponseDto?.Errors.First().Message.Should().Be("Hostname is a loopback or local address, geo location data is unavailable");
+            Assert.NotNull(apiResponseDto!.Errors);
+            Assert.NotEmpty(apiResponseDto.Errors!);
+            Assert.Equal("Local addresses are not supported for geo location", apiResponseDto.Errors!.First().Message);
         }
 
-        [TearDown]
-        public void Cleanup()
+        public void Dispose()
         {
             geoLookupController?.Dispose();
         }

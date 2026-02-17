@@ -72,6 +72,12 @@ builder.Services.AddOpenApi("v1", options =>
     options.AddDocumentTransformer<StripVersionPrefixTransformer>();
 });
 
+builder.Services.AddOpenApi("v1.1", options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddDocumentTransformer<StripVersionPrefixTransformer>();
+});
+
 builder.Services.AddSingleton<TableServiceClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();

@@ -15,7 +15,7 @@ using MX.GeoLocation.LookupWebApi.Repositories;
 
 using Newtonsoft.Json;
 
-namespace MX.GeoLocation.LookupWebApi.Controllers
+namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 {
     [ApiController]
     [ApiVersion("1.0")]
@@ -35,7 +35,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             IMaxMindGeoLocationRepository maxMindGeoLocationRepository)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            this.tableStorageGeoLocationRepository = tableStorageGeoLocationRepository;
+            this.tableStorageGeoLocationRepository = tableStorageGeoLocationRepository ?? throw new ArgumentNullException(nameof(tableStorageGeoLocationRepository));
             this.maxMindGeoLocationRepository = maxMindGeoLocationRepository ?? throw new ArgumentNullException(nameof(maxMindGeoLocationRepository));
         }
 
@@ -242,14 +242,12 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                     }
 
                     var deletedCount = 0;
-                    List<string> messages = [];
 
                     // Delete by resolved IP address (primary method since RowKey is TranslatedAddress)
                     var deleted = await tableStorageGeoLocationRepository.DeleteGeoLocation(validatedAddress);
                     if (deleted)
                     {
                         deletedCount++;
-                        messages.Add($"Deleted data for IP address: {validatedAddress}");
                     }
 
                     // If hostname is different from resolved IP, also try to delete by hostname
@@ -260,7 +258,6 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
                         if (deletedByHostname)
                         {
                             deletedCount++;
-                            messages.Add($"Deleted data for hostname: {hostname}");
                         }
                     }
 
@@ -280,13 +277,14 @@ namespace MX.GeoLocation.LookupWebApi.Controllers
             }
             catch (Exception ex)
             {
-                return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, $"An error occurred while deleting data: {ex.Message}")).ToApiResult(HttpStatusCode.InternalServerError);
+                _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", hostname);
+                return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, "An error occurred while deleting data")).ToApiResult(HttpStatusCode.InternalServerError);
             }
         }
 
         private bool ValidateHostname(string address)
         {
-            if (IPAddress.TryParse(address, out var ipAddress))
+            if (IPAddress.TryParse(address, out _))
             {
                 return true;
             }

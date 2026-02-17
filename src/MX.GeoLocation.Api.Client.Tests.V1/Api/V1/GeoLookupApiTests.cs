@@ -11,30 +11,29 @@ using RestSharp;
 
 namespace MX.GeoLocation.Api.Client.Tests.V1
 {
-    internal class GeoLookupApiTests
+    public class GeoLookupApiTests : IDisposable
     {
-        private ILogger<BaseApi<GeoLocationApiClientOptions>> fakeLogger = null!;
-        private IApiTokenProvider fakeApiTokenProvider = null!;
-        private IRestClientService fakeRestClientService = null!;
+        private readonly ILogger<BaseApi<GeoLocationApiClientOptions>> fakeLogger;
+        private readonly IApiTokenProvider fakeApiTokenProvider;
+        private readonly Mock<IRestClientService> mockRestClientService;
 
-        private GeoLookupApi geoLookupApi = null!;
+        private readonly GeoLookupApi geoLookupApi;
 
         private GeoLocationApiClientOptions validGeoLocationApiClientOptions => new GeoLocationApiClientOptions()
         {
             BaseUrl = "https://google.co.uk"
         };
 
-        [SetUp]
-        public void SetUp()
+        public GeoLookupApiTests()
         {
-            fakeLogger = A.Fake<ILogger<BaseApi<GeoLocationApiClientOptions>>>();
-            fakeApiTokenProvider = A.Fake<IApiTokenProvider>();
-            fakeRestClientService = A.Fake<IRestClientService>();
+            fakeLogger = Mock.Of<ILogger<BaseApi<GeoLocationApiClientOptions>>>();
+            fakeApiTokenProvider = Mock.Of<IApiTokenProvider>();
+            mockRestClientService = new Mock<IRestClientService>();
 
-            geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, fakeRestClientService, validGeoLocationApiClientOptions);
+            geoLookupApi = new GeoLookupApi(fakeLogger, fakeApiTokenProvider, mockRestClientService.Object, validGeoLocationApiClientOptions);
         }
 
-        [Test]
+        [Fact]
         public async Task GetGeoLocationShouldPassThroughApiResponse()
         {
             // Arrange
@@ -46,20 +45,20 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
                 Content = jsonPayload
             };
 
-            A.CallTo(() => fakeRestClientService.ExecuteAsync(A<string>.Ignored, A<RestRequest>.Ignored, default(CancellationToken)))
-                .Returns(Task.FromResult(restResponse));
+            mockRestClientService.Setup(x => x.ExecuteAsync(It.IsAny<string>(), It.IsAny<RestRequest>(), default(CancellationToken)))
+                .ReturnsAsync(restResponse);
 
             // Act
             var result = await geoLookupApi.GetGeoLocation("google.co.uk");
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(result.Result?.Data?.Address, Is.EqualTo("google.co.uk"));
+            Assert.NotNull(result);
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.Equal("google.co.uk", result.Result?.Data?.Address);
         }
 
 
-        [Test]
+        [Fact]
         public async Task GetGeoLocationsShouldPassThroughApiResponse()
         {
             // Arrange
@@ -71,23 +70,22 @@ namespace MX.GeoLocation.Api.Client.Tests.V1
                 Content = jsonPayload
             };
 
-            A.CallTo(() => fakeRestClientService.ExecuteAsync(A<string>.Ignored, A<RestRequest>.Ignored, default(CancellationToken)))
-                .Returns(Task.FromResult(restResponse));
+            mockRestClientService.Setup(x => x.ExecuteAsync(It.IsAny<string>(), It.IsAny<RestRequest>(), default(CancellationToken)))
+                .ReturnsAsync(restResponse);
 
             // Act
             var result = await geoLookupApi.GetGeoLocations(["13.64.69.151", "2603:1040:1302::580", "google.co.uk"]);
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
-            Assert.That(result.Result?.Data?.Items, Is.Not.Null);
-            Assert.That(result.Result!.Data!.Items!.Count(), Is.EqualTo(3));
+            Assert.NotNull(result);
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            Assert.NotNull(result.Result?.Data?.Items);
+            Assert.Equal(3, result.Result!.Data!.Items!.Count());
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
-            fakeRestClientService?.Dispose();
+            mockRestClientService.Object?.Dispose();
         }
     }
 }
