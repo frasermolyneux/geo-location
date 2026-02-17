@@ -158,9 +158,11 @@ jobs:
         run: |
           az apim api import \
             --resource-group "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_resource_group_name }}" \
-            --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}"\
+            --service-name "${{ needs.terraform-plan-and-apply-dev.outputs.api_management_name }}" \
             --api-id geolocation-api-v1 \
+            --display-name "GeoLocation Lookup API" \
             --path geolocation \
+            --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
             --api-version v1 \
@@ -302,9 +304,11 @@ jobs:
         run: |
           az apim api import \
             --resource-group "${{ needs.terraform-plan-and-apply-prd.outputs.api_management_resource_group_name }}" \
-            --service-name "${{ needs.terraform-plan-and-apply-prd.outputs.api_management_name }}"\
+            --service-name "${{ needs.terraform-plan-and-apply-prd.outputs.api_management_name }}" \
             --api-id geolocation-api-v1 \
+            --display-name "GeoLocation Lookup API" \
             --path geolocation \
+            --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
             --api-version v1 \

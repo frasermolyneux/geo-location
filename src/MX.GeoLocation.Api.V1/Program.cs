@@ -60,8 +60,8 @@ builder.Services.AddApiVersioning(options =>
 })
 .AddApiExplorer(options =>
 {
-    // Format the version as "'v'major[.minor]" (e.g. v1.0)
-    options.GroupNameFormat = "'v'VVV";
+    // Format the version as "'v'major" (e.g. v1)
+    options.GroupNameFormat = "'v'V";
     options.SubstituteApiVersionInUrl = true;
 });
 

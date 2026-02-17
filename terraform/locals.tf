@@ -20,6 +20,11 @@ locals {
 
   api_management_name = "apim-${var.workload}-${var.environment}-${var.location}-${random_id.environment_id.hex}"
 
+  app_insights_sampling_percentage = {
+    dev = 25
+    prd = 75
+  }
+
   entra_api_app_display_name = "geolocation-api-${var.environment}"
   entra_api_identifier_uri   = format("api://%s/%s", data.azuread_client_config.current.tenant_id, local.entra_api_app_display_name)
   entra_web_app_display_name = "geolocation-web-${var.environment}"
