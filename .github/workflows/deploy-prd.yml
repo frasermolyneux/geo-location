@@ -78,6 +78,7 @@ jobs:
       api_management_name: ${{ steps.terraform-output-dev.outputs.api_management_name }}
       api_management_resource_group_name: ${{ steps.terraform-output-dev.outputs.api_management_resource_group_name }}
       api_management_product_id: ${{ steps.terraform-output-dev.outputs.api_management_product_id }}
+      api_version_set_id: ${{ steps.terraform-output-dev.outputs.api_version_set_id }}
 
   app-service-deploy-api-dev:
     permissions:
@@ -160,6 +161,8 @@ jobs:
             --api-id geolocation-api-v1 \
             --display-name "GeoLocation Lookup API" \
             --path geolocation \
+            --api-version v1 \
+            --api-version-set-id "${{ needs.terraform-plan-and-apply-dev.outputs.api_version_set_id }}" \
             --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
@@ -175,6 +178,8 @@ jobs:
             --api-id geolocation-api-v1-1 \
             --display-name "GeoLocation Lookup API" \
             --path geolocation \
+            --api-version v1.1 \
+            --api-version-set-id "${{ needs.terraform-plan-and-apply-dev.outputs.api_version_set_id }}" \
             --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/openapi/v1.1.json" \
@@ -244,6 +249,7 @@ jobs:
       api_management_name: ${{ steps.terraform-output-prd.outputs.api_management_name }}
       api_management_resource_group_name: ${{ steps.terraform-output-prd.outputs.api_management_resource_group_name }}
       api_management_product_id: ${{ steps.terraform-output-prd.outputs.api_management_product_id }}
+      api_version_set_id: ${{ steps.terraform-output-prd.outputs.api_version_set_id }}
 
   app-service-deploy-api-prd:
     permissions:
@@ -326,6 +332,8 @@ jobs:
             --api-id geolocation-api-v1 \
             --display-name "GeoLocation Lookup API" \
             --path geolocation \
+            --api-version v1 \
+            --api-version-set-id "${{ needs.terraform-plan-and-apply-prd.outputs.api_version_set_id }}" \
             --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/openapi/v1.json" \
@@ -341,6 +349,8 @@ jobs:
             --api-id geolocation-api-v1-1 \
             --display-name "GeoLocation Lookup API" \
             --path geolocation \
+            --api-version v1.1 \
+            --api-version-set-id "${{ needs.terraform-plan-and-apply-prd.outputs.api_version_set_id }}" \
             --protocols https \
             --specification-format OpenApiJson \
             --specification-url "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/openapi/v1.1.json" \
