@@ -3,11 +3,8 @@
     public class LookupAddressTests : TestBase
     {
         [Theory]
-        [InlineData("13.64.69.151", "San Jose, United States")]
-        [InlineData("51.107.144.68", "Geneva, Switzerland")]
-        [InlineData("2603:1040:1302::580", "Taipei, Taiwan")]
-        [InlineData("20.21.82.128", "Doha, Qatar")]
-        [InlineData("40.78.195.16", "Chennai, India")]
+        [InlineData("8.8.8.8", "Mountain View, United States")]
+        [InlineData("1.1.1.1", "Los Angeles, United States")]
         public async Task CanPerformLookupOfWellKnownAddress(string address, string expectedLocation)
         {
             await PageFactory!.LookupAddressPage.GoToPageAsync(true);

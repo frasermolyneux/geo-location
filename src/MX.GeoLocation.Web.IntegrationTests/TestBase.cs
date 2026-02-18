@@ -7,22 +7,30 @@ namespace MX.GeoLocation.Web.IntegrationTests
     {
         private IPlaywright? _playwright;
         private IBrowser? _browser;
+        private WebAppFactory? _webAppFactory;
         protected Microsoft.Playwright.IPage? Page { get; private set; }
         protected PageFactory? PageFactory { get; private set; }
         protected IConfiguration Configuration { get; private set; }
 
         protected TestBase()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = new ConfigurationBuilder().Build();
         }
 
         public async Task InitializeAsync()
         {
+            // Start the web app on a random local port with mocked dependencies
+            _webAppFactory = new WebAppFactory();
+            await _webAppFactory.StartAsync();
+
+            // Update configuration to point at the locally-hosted app
+            Configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["SiteUrl"] = _webAppFactory.BaseUrl
+                })
+                .Build();
+
             _playwright = await Playwright.CreateAsync();
 
             _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
@@ -49,6 +57,9 @@ namespace MX.GeoLocation.Web.IntegrationTests
                 await _browser.CloseAsync();
 
             _playwright?.Dispose();
+
+            if (_webAppFactory is not null)
+                await _webAppFactory.DisposeAsync();
         }
     }
 }

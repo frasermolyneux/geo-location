@@ -80,3 +80,6 @@ app.MapControllerRoute(
 app.MapHealthChecks("/api/health").AllowAnonymous();
 
 app.Run();
+
+// Make Program accessible for WebApplicationFactory in integration tests
+public partial class Program { }

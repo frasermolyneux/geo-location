@@ -22,6 +22,12 @@ jobs:
             10.0.x
           src-folder: "src"
 
+      - name: Install Playwright browsers
+        run: pwsh src/MX.GeoLocation.Web.IntegrationTests/bin/Release/net9.0/playwright.ps1 install --with-deps chromium
+
+      - name: Run integration tests
+        run: dotnet test src/MX.GeoLocation.sln --configuration Release --no-build --filter "FullyQualifiedName~IntegrationTests"
+
   terraform-plan-dev:
     permissions:
       contents: read

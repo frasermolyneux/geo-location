@@ -60,6 +60,69 @@
                 "${workspaceFolder}/src/MX.GeoLocation.sln"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test-unit",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "--filter",
+                "FullyQualifiedName!~IntegrationTests"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test-integration-api",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.GeoLocation.Api.IntegrationTests/MX.GeoLocation.Api.IntegrationTests.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test-integration-client",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.GeoLocation.Api.Client.IntegrationTests/MX.GeoLocation.Api.Client.IntegrationTests.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test-integration-web",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.GeoLocation.Web.IntegrationTests/MX.GeoLocation.Web.IntegrationTests.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "test-all",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.GeoLocation.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "playwright-install",
+            "command": "pwsh",
+            "type": "process",
+            "args": [
+                "${workspaceFolder}/src/MX.GeoLocation.Web.IntegrationTests/bin/Debug/net9.0/playwright.ps1",
+                "install",
+                "chromium"
+            ],
+            "problemMatcher": []
         }
     ]
 }
