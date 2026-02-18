@@ -26,6 +26,12 @@ jobs:
           src-folder: "src"
           skip-nuget-artifact-upload: "true"
 
+      - name: Install Playwright browsers
+        run: pwsh src/MX.GeoLocation.Web.IntegrationTests/bin/Release/net9.0/playwright.ps1 install --with-deps chromium
+
+      - name: Run integration tests
+        run: dotnet test src/MX.GeoLocation.sln --configuration Release --no-build --filter "FullyQualifiedName~IntegrationTests"
+
     outputs:
       build_version: ${{ steps.api-ci.outputs.build_version }}
 
