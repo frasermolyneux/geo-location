@@ -69,6 +69,9 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
             }
 
+            // Remove real health checks that fail without live Azure/MaxMind services
+            services.RemoveAll<Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck>();
+
             // Replace authentication with test scheme
             services.AddAuthentication("Test")
                 .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("Test", options => { });

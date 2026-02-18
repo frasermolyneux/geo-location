@@ -81,6 +81,16 @@ public class WebAppFactory : IAsyncDisposable
             ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://localhost"
         });
 
+        // Remove ServiceProfiler hosted services to avoid noisy "Instrumentation Key is empty" errors
+        var profilerDescriptors = builder.Services
+            .Where(d => d.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService) &&
+                        d.ImplementationType?.FullName?.Contains("Profiler") == true)
+            .ToList();
+        foreach (var descriptor in profilerDescriptors)
+        {
+            builder.Services.Remove(descriptor);
+        }
+
         _app = builder.Build();
 
         _app.UseSession();
