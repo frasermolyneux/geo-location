@@ -13,6 +13,7 @@
 ## Documentation
 
 * [API Versioning, APIM Routing & OpenAPI](docs/api-versioning-and-apim.md)
+* [Testing with the GeoLocation API Client](docs/testing.md)
 * [Manual Steps](docs/manual-steps.md)
 
 ## Overview
@@ -23,6 +24,14 @@ GeoLocation is a .NET 9 workload that fronts MaxMind lookups with an Entra-prote
 - **v1.1**: City and Insights lookups with typed DTOs and MaxMind Anonymizer support — cached in the `geolocationsv11` table (city: permanent, insights: configurable TTL)
 
 Both versions enforce the `LookupApiUser` Entra role. An MVC web front end calls the API using API-key and Entra authentication, handles Cloudflare/X-Forwarded-For headers, and stores the user’s last lookup in session. The API serves its OpenAPI specs at runtime at `/openapi/v1.0.json` and `/openapi/v1.1.json`, and infrastructure is managed by Terraform under `terraform/`. Build versioning uses Nerdbank.GitVersioning.
+
+## NuGet Packages
+
+| Package | Description |
+|---|---|
+| `MX.GeoLocation.LookupApi.Abstractions` | Interfaces and models for the GeoLocation API |
+| `MX.GeoLocation.Api.Client.V1` | Typed HTTP client with DI registration via `AddGeoLocationApiClient()` |
+| `MX.GeoLocation.Api.Client.Testing` | In-memory fakes and DTO factory helpers for consumer test projects — see [testing docs](docs/testing.md) |
 
 ## Contributing
 

@@ -31,6 +31,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MX.GeoLocation.Api.Integrat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MX.GeoLocation.Api.Client.IntegrationTests", "MX.GeoLocation.Api.Client.IntegrationTests\MX.GeoLocation.Api.Client.IntegrationTests.csproj", "{6AD78C48-3366-4EE6-9A42-17DC23F48DD5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MX.GeoLocation.Api.Client.Testing", "MX.GeoLocation.Api.Client.Testing\MX.GeoLocation.Api.Client.Testing.csproj", "{58C381C7-C4B1-4AB5-98F8-736C7176AD05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MX.GeoLocation.Api.Client.Testing.Tests", "MX.GeoLocation.Api.Client.Testing.Tests\MX.GeoLocation.Api.Client.Testing.Tests.csproj", "{AB410201-5AFC-4DA5-8316-ED185FD507F5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +165,30 @@ Global
 		{6AD78C48-3366-4EE6-9A42-17DC23F48DD5}.Release|x64.Build.0 = Release|Any CPU
 		{6AD78C48-3366-4EE6-9A42-17DC23F48DD5}.Release|x86.ActiveCfg = Release|Any CPU
 		{6AD78C48-3366-4EE6-9A42-17DC23F48DD5}.Release|x86.Build.0 = Release|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Debug|x64.Build.0 = Debug|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Debug|x86.Build.0 = Debug|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Release|x64.ActiveCfg = Release|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Release|x64.Build.0 = Release|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Release|x86.ActiveCfg = Release|Any CPU
+		{58C381C7-C4B1-4AB5-98F8-736C7176AD05}.Release|x86.Build.0 = Release|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Debug|x64.Build.0 = Debug|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Debug|x86.Build.0 = Debug|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Release|x64.Build.0 = Release|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Release|x86.ActiveCfg = Release|Any CPU
+		{AB410201-5AFC-4DA5-8316-ED185FD507F5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

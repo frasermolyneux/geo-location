@@ -1,7 +1,8 @@
 # Copilot Instructions
 
 ## Architecture
-- .NET 9 solution in `src/MX.GeoLocation.sln` with API (`MX.GeoLocation.Api.V1`) and MVC web (`MX.GeoLocation.Web`) projects plus abstractions and a generated API client.
+- .NET 9 solution in `src/MX.GeoLocation.sln` with API (`MX.GeoLocation.Api.V1`) and MVC web (`MX.GeoLocation.Web`) projects plus abstractions, a generated API client, and a testing package.
+- Three NuGet packages are published: `MX.GeoLocation.LookupApi.Abstractions` (interfaces/models), `MX.GeoLocation.Api.Client.V1` (typed HTTP client), and `MX.GeoLocation.Api.Client.Testing` (in-memory fakes and DTO factories for consumer test projects).
 - API uses MaxMind GeoIP2 and caches responses in Azure Table Storage:
   - **v1.0**: `geolocations` table with `GeoLocationTableEntity` (permanent cache)
   - **v1.1**: `geolocationsv11` table with `CityGeoLocationTableEntity` (city: permanent, insights: configurable TTL via `Caching:InsightsCacheDays`, default 7 days)
@@ -17,7 +18,8 @@
 
 ## Workflows
 - Build: `dotnet build src/MX.GeoLocation.sln`
-- Test: `dotnet test src/MX.GeoLocation.sln` (API/Web unit tests plus API client tests; Web integration tests are present). Test framework: xUnit + Moq + native assertions.
+- Test: `dotnet test src/MX.GeoLocation.sln` (API/Web unit tests plus API client tests; Web Playwright integration tests and API integration tests are present). Test framework: xUnit + Moq + Playwright + native assertions.
+- Playwright integration tests run via the `frasermolyneux/actions/dotnet-playwright-tests` reusable action in CI workflows.
 - OpenAPI spec is generated at runtime by the deployed app — no build-time generation or source-controlled spec files.
 - APIM API definitions are imported via `az apim api import --specification-url` in the deploy workflows after the API App Service is deployed. Both v1.0 and v1.1 specs are imported separately with `--api-version` and `--api-version-set-id` to share the same version set.
 - The APIM import uses `--service-url` with a version suffix (e.g. `/v1`, `/v1.1`) to bridge the version-free spec paths back to the versioned backend routes.
@@ -41,6 +43,7 @@
 - `Repositories/MaxMindGeoLocationRepository.cs` wraps `MaxMind.GeoIP2.WebServiceClient` with dependency telemetry; provides `GetGeoLocation` (v1), `GetCityGeoLocation` and `GetInsightsGeoLocation` (v1.1).
 - `Models/CityGeoLocationTableEntity.cs` is the table entity for v1.1 DTOs, serializing complex fields (Subdivisions, NetworkTraits, Anonymizer) as JSON columns.
 - `MX.GeoLocation.Web/Program.cs` wires the API client and sessions; `HomeController.cs` drives lookup, batch lookup, and data removal flows.
+- `MX.GeoLocation.Api.Client.Testing/` provides `FakeGeoLocationApiClient` (in-memory fake of `IGeoLocationApiClient`), `GeoLocationDtoFactory` (factory methods to create DTOs with internal setters), and `AddFakeGeoLocationApiClient()` DI extension for integration tests. See [docs/testing.md](../docs/testing.md).
 
 ## Infrastructure
 - Terraform under `terraform/` builds App Services (API + Web on shared platform-hosting plan), API Management (Consumption), Key Vault, Storage (including both `geolocations` and `geolocationsv11` tables), DNS, Entra ID apps, and Application Insights (per-environment tfvars/backends). GitHub Actions workflows cover build/test, codequality, PR verify, deploy-dev/prd, destroy-development/environment, dependabot-automerge, and copilot-setup-steps.

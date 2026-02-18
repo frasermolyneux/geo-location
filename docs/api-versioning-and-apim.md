@@ -118,6 +118,10 @@ Client paths include the version prefix (e.g. `v1/lookup/{hostname}`, `v1.1/look
 - **Direct to App Service**: `BaseUrl` = `https://{app-service}.azurewebsites.net` → `/v1/lookup/...` ✅
 - **Through APIM**: `BaseUrl` = `https://{apim-gateway}/geolocation` → `/geolocation/v1/lookup/...` ✅
 
+### Testing
+
+The `MX.GeoLocation.Api.Client.Testing` package provides in-memory fakes (`FakeGeoLocationApiClient`) and DTO factory methods (`GeoLocationDtoFactory`) so consumer apps can test against the client without mocking frameworks. See [testing docs](testing.md) for full usage examples.
+
 ## Key Design Decisions
 
 1. **Spec paths are version-free** — The `StripVersionPrefixTransformer` removes the version prefix from the OpenAPI spec so APIM segment versioning can own the version prefix without duplication.

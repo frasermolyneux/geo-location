@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>13</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Authors>Fraser Molyneux</Authors>
+		<Product>GeoLocation Client Testing</Product>
+		<Description>Test helpers for consumer apps: in-memory fakes of IGeoLocationApiClient, DTO factory methods, and DI extensions for integration tests.</Description>
+		<Copyright>GNUv3</Copyright>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
+		<RepositoryType>Git</RepositoryType>
+		<PackageId>MX.GeoLocation.Api.Client.Testing</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MX.Api.Abstractions" Version="2.0.195.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj" />
+		<ProjectReference Include="..\MX.GeoLocation.Api.Client.V1\MX.GeoLocation.Api.Client.V1.csproj" />
+	</ItemGroup>
+
+</Project>
