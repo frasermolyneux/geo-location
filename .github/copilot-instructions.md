@@ -12,7 +12,7 @@
 - Controllers are differentiated by namespace (`Controllers.V1`, `Controllers.V1_1`), both named `GeoLookupController`.
 - API security is Entra ID via `Microsoft.Identity.Web`; the `LookupApiUser` role is required for controller access. The `/v1.0/info` and `/v1.0/health` endpoints are `[AllowAnonymous]`.
 - OpenAPI specs are served at runtime at `/openapi/v1.0.json` and `/openapi/v1.1.json`. Scalar provides interactive API docs at `/scalar`.
-- Web front end uses `MX.GeoLocation.Api.Client.V1` with API-key + Entra authentication, stores the last lookup in session, and respects `CF-Connecting-IP`/`X-Forwarded-For` headers (defaults to `8.8.8.8` in development).
+- Web front end uses `MX.GeoLocation.Api.Client.V1` with API-key + Entra authentication, stores the last lookup in session, and resolves client IPs via ASP.NET Core `ForwardedHeaders` middleware for `X-Forwarded-For` with a `CF-Connecting-IP` fallback for Cloudflare (defaults to `8.8.8.8` in development). In production, `KnownProxies`/`KnownNetworks` should be configured on `ForwardedHeadersOptions`.
 - Application Insights telemetry is enabled with custom adaptive sampling (exceptions excluded) and Service Profiler in both API and Web.
 - Build versioning uses Nerdbank.GitVersioning (`version.json` at repo root).
 
@@ -35,13 +35,14 @@
 - `MX.GeoLocation.Api.V1/Program.cs` sets API versioning (GroupNameFormat `'v'VV`), OpenAPI documents (`v1.0`, `v1.1`), auth, table storage, and health checks.
 - `MX.GeoLocation.Api.V1/OpenApi/StripVersionPrefixTransformer.cs` strips version prefix (regex `^/v\d+(\.\d+)?`) from spec paths so APIM segment versioning can manage the version prefix without producing `/v1/v1/...` paths. Uses source-generated regex via `partial class` with `[GeneratedRegex]`.
 - `MX.GeoLocation.Api.V1/OpenApi/BearerSecuritySchemeTransformer.cs` adds Bearer JWT security scheme to the OpenAPI document.
-- `Controllers/V1/GeoLookupController.cs` implements GET/POST lookups and DELETE metadata with cache-first flow then MaxMind fallback.
+- `Controllers/V1/GeoLookupController.cs` implements GET/POST lookups and DELETE metadata with cache-first flow then MaxMind fallback. Input validation returns `BadRequest` for null/empty hostnames. DNS resolution (`ValidateHostname`, `ConvertHostname`) is fully async.
 - `Controllers/V1/ApiInfoController.cs` implements the `/v1.0/info` endpoint returning build version information (anonymous access).
 - `Controllers/V1/HealthController.cs` implements the `/v1.0/health` endpoint wrapping the ASP.NET health check service (anonymous access).
-- `Controllers/V1_1/GeoLookupController.cs` implements city and insights lookups with cache-first flow and configurable insights TTL.
-- `Repositories/TableStorageGeoLocationRepository.cs` handles Azure Table persistence for both v1.0 (`geolocations`) and v1.1 (`geolocationsv11`) tables.
-- `Repositories/MaxMindGeoLocationRepository.cs` wraps `MaxMind.GeoIP2.WebServiceClient` with dependency telemetry; provides `GetGeoLocation` (v1), `GetCityGeoLocation` and `GetInsightsGeoLocation` (v1.1).
-- `Models/CityGeoLocationTableEntity.cs` is the table entity for v1.1 DTOs, serializing complex fields (Subdivisions, NetworkTraits, Anonymizer) as JSON columns.
+- `Controllers/V1_1/GeoLookupController.cs` implements city and insights lookups with cache-first flow and configurable insights TTL. Input validation returns `BadRequest` for null/empty hostnames.
+- `Repositories/TableStorageGeoLocationRepository.cs` handles Azure Table persistence for both v1.0 (`geolocations`) and v1.1 (`geolocationsv11`) tables. All async methods accept `CancellationToken` and validate `address` input with `ArgumentException.ThrowIfNullOrWhiteSpace`.
+- `Repositories/MaxMindGeoLocationRepository.cs` wraps `MaxMind.GeoIP2.WebServiceClient` with dependency telemetry; provides `GetGeoLocation` (v1), `GetCityGeoLocation` and `GetInsightsGeoLocation` (v1.1). Catches `GeoIP2Exception` specifically (not broad `Exception`). All async methods accept `CancellationToken`.
+- `Models/CityGeoLocationTableEntity.cs` is the table entity for v1.1 DTOs, serializing complex fields (Subdivisions, NetworkTraits, Anonymizer) as JSON columns with safe deserialization (graceful fallback on malformed JSON).
+- `Models/GeoLocationTableEntity.cs` uses lazy-initialized backing field for the `Traits` property (deserialized once from JSON, cached).
 - `MX.GeoLocation.Web/Program.cs` wires the API client and sessions; `HomeController.cs` drives lookup, batch lookup, and data removal flows.
 - `MX.GeoLocation.Api.Client.Testing/` provides `FakeGeoLocationApiClient` (in-memory fake of `IGeoLocationApiClient`), `GeoLocationDtoFactory` (factory methods to create DTOs with internal setters), and `AddFakeGeoLocationApiClient()` DI extension for integration tests. See [docs/testing.md](../docs/testing.md).
 

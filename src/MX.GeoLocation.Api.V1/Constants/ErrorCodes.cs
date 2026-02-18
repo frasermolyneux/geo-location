@@ -47,6 +47,16 @@ namespace MX.GeoLocation.LookupWebApi.Constants
         public const string NOT_FOUND = "NOT_FOUND";
 
         /// <summary>
+        /// The hostname parameter was null, empty, or whitespace.
+        /// </summary>
+        public const string EMPTY_HOSTNAME = "EMPTY_HOSTNAME";
+
+        /// <summary>
+        /// The request list was empty.
+        /// </summary>
+        public const string EMPTY_REQUEST_LIST = "EMPTY_REQUEST_LIST";
+
+        /// <summary>
         /// An internal server error occurred while processing the request.
         /// </summary>
         public const string INTERNAL_ERROR = "INTERNAL_ERROR";

@@ -32,8 +32,8 @@ public class V1BatchLookupTests : IDisposable
         var dto1 = new GeoLocationDto { Address = "8.8.8.8", TranslatedAddress = "8.8.8.8", CityName = "Mountain View", CountryName = "United States" };
         var dto2 = new GeoLocationDto { Address = "1.1.1.1", TranslatedAddress = "1.1.1.1", CityName = "Sydney", CountryName = "Australia" };
 
-        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("8.8.8.8")).ReturnsAsync(dto1);
-        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("1.1.1.1")).ReturnsAsync(dto2);
+        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>())).ReturnsAsync(dto1);
+        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>())).ReturnsAsync(dto2);
 
         var hostnames = JsonConvert.SerializeObject(new[] { "8.8.8.8", "1.1.1.1" });
         var content = new StringContent(hostnames, Encoding.UTF8, "application/json");
@@ -56,7 +56,7 @@ public class V1BatchLookupTests : IDisposable
     {
         // Arrange
         var dto = new GeoLocationDto { Address = "8.8.8.8", TranslatedAddress = "8.8.8.8", CityName = "Mountain View", CountryName = "United States" };
-        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("8.8.8.8")).ReturnsAsync(dto);
+        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>())).ReturnsAsync(dto);
 
         var hostnames = JsonConvert.SerializeObject(new[] { "8.8.8.8", "localhost" });
         var content = new StringContent(hostnames, Encoding.UTF8, "application/json");

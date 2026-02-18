@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Sockets;
 
 using MaxMind.GeoIP2.Exceptions;
 
@@ -41,8 +42,15 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 
         [HttpGet]
         [Route("lookup/{hostname}")]
-        public async Task<IActionResult> GetGeoLocation(string hostname)
+        public async Task<IActionResult> GetGeoLocation(string hostname, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                var badRequestResponse = new ApiResponse<GeoLocationDto>(
+                    new ApiError(ErrorCodes.EMPTY_HOSTNAME, ErrorMessages.EMPTY_HOSTNAME));
+                return badRequestResponse.ToApiResult(HttpStatusCode.BadRequest).ToHttpResult();
+            }
+
             using var scope = _logger.BeginScope(new Dictionary<string, object>
             {
                 ["Hostname"] = hostname,
@@ -51,7 +59,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 
             _logger.LogInformation("Getting geolocation for hostname {Hostname}", hostname);
 
-            if (!ValidateHostname(hostname))
+            if (!await ValidateHostname(hostname, cancellationToken))
             {
                 _logger.LogWarning("Invalid hostname provided: {Hostname}", hostname);
                 var errorResponse = new ApiResponse<GeoLocationDto>(
@@ -59,7 +67,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                 return errorResponse.ToApiResult(HttpStatusCode.BadRequest).ToHttpResult();
             }
 
-            var response = await ((IGeoLookupApi)this).GetGeoLocation(hostname, default);
+            var response = await ((IGeoLookupApi)this).GetGeoLocation(hostname, cancellationToken);
             return response.ToHttpResult();
         }
 
@@ -69,7 +77,8 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
             {
                 _logger.LogInformation("Processing geolocation lookup for {Hostname}", hostname);
 
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
+                var (convertSuccess, validatedAddress) = await ConvertHostname(hostname, cancellationToken);
+                if (convertSuccess && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -80,7 +89,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                     }
 
                     // Try cache first
-                    var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
+                    var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress, cancellationToken);
 
                     if (geoLocationDto is not null)
                     {
@@ -90,10 +99,10 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 
                     // Fallback to MaxMind
                     _logger.LogInformation("No cached data found, querying MaxMind for {ValidatedAddress}", validatedAddress);
-                    geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
+                    geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress, cancellationToken);
                     geoLocationDto.Address = hostname; // Set the address to be the original hostname query
 
-                    await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
+                    await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto, cancellationToken);
                     _logger.LogInformation("Successfully stored geolocation data for {ValidatedAddress}", validatedAddress);
 
                     return new ApiResponse<GeoLocationDto>(geoLocationDto).ToApiResult();
@@ -131,16 +140,17 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 
         [HttpPost]
         [Route("lookup")]
-        public async Task<IActionResult> GetGeoLocations()
+        public async Task<IActionResult> GetGeoLocations(CancellationToken cancellationToken)
         {
-            var requestBody = await new StreamReader(Request.Body).ReadToEndAsync();
+            using var reader = new StreamReader(Request.Body, leaveOpen: true);
+            var requestBody = await reader.ReadToEndAsync(cancellationToken);
 
             List<string>? hostnames;
             try
             {
                 hostnames = JsonConvert.DeserializeObject<List<string>>(requestBody);
             }
-            catch
+            catch (JsonException)
             {
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.INVALID_JSON, ErrorMessages.INVALID_JSON)).ToBadRequestResult().ToHttpResult();
             }
@@ -148,7 +158,10 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
             if (hostnames is null)
                 return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.NULL_REQUEST, ErrorMessages.NULL_REQUEST)).ToBadRequestResult().ToHttpResult();
 
-            var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames, default);
+            if (hostnames.Count == 0)
+                return new ApiResponse<CollectionModel<GeoLocationDto>>(new ApiError(ErrorCodes.EMPTY_REQUEST_LIST, ErrorMessages.EMPTY_REQUEST_LIST)).ToBadRequestResult().ToHttpResult();
+
+            var response = await ((IGeoLookupApi)this).GetGeoLocations(hostnames, cancellationToken);
 
             return response.ToHttpResult();
         }
@@ -162,7 +175,8 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
             {
                 try
                 {
-                    if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
+                    var (convertSuccess, validatedAddress) = await ConvertHostname(hostname, cancellationToken);
+                    if (convertSuccess && validatedAddress is not null)
                     {
                         if (localOverrides.Contains(hostname))
                         {
@@ -170,18 +184,18 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                             continue;
                         }
 
-                        var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress);
+                        var geoLocationDto = await tableStorageGeoLocationRepository.GetGeoLocation(validatedAddress, cancellationToken);
 
                         if (geoLocationDto is not null)
                             entries.Add(geoLocationDto);
                         else
                         {
-                            geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress);
+                            geoLocationDto = await maxMindGeoLocationRepository.GetGeoLocation(validatedAddress, cancellationToken);
                             geoLocationDto.Address = hostname; // Set the address to be the original hostname query
 
                             entries.Add(geoLocationDto);
 
-                            await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto);
+                            await tableStorageGeoLocationRepository.StoreGeoLocation(geoLocationDto, cancellationToken);
                         }
                     }
                     else
@@ -213,28 +227,35 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 
         [HttpDelete]
         [Route("lookup/{hostname}")]
-        public async Task<IActionResult> DeleteMetadata(string hostname)
+        public async Task<IActionResult> DeleteMetadata(string hostname, CancellationToken cancellationToken)
         {
-            var response = await ((IGeoLookupApi)this).DeleteMetadata(hostname, default);
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                var badRequestResponse = new ApiResponse(new ApiError(ErrorCodes.EMPTY_HOSTNAME, ErrorMessages.EMPTY_HOSTNAME));
+                return badRequestResponse.ToBadRequestResult().ToHttpResult();
+            }
+
+            var response = await ((IGeoLookupApi)this).DeleteMetadata(hostname, cancellationToken);
 
             return response.ToHttpResult();
         }
 
         Task<ApiResult> IGeoLookupApi.DeleteMetadata(string hostname, CancellationToken cancellationToken)
         {
-            return DeleteMetadataInternal(hostname);
+            return DeleteMetadataInternal(hostname, cancellationToken);
         }
 
-        private async Task<ApiResult> DeleteMetadataInternal(string hostname)
+        private async Task<ApiResult> DeleteMetadataInternal(string hostname, CancellationToken cancellationToken)
         {
             try
             {
-                if (!ValidateHostname(hostname))
+                if (!await ValidateHostname(hostname, cancellationToken))
                 {
                     return new ApiResponse(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToBadRequestResult();
                 }
 
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
+                var (convertSuccess, validatedAddress) = await ConvertHostname(hostname, cancellationToken);
+                if (convertSuccess && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -244,7 +265,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                     var deletedCount = 0;
 
                     // Delete by resolved IP address (primary method since RowKey is TranslatedAddress)
-                    var deleted = await tableStorageGeoLocationRepository.DeleteGeoLocation(validatedAddress);
+                    var deleted = await tableStorageGeoLocationRepository.DeleteGeoLocation(validatedAddress, cancellationToken);
                     if (deleted)
                     {
                         deletedCount++;
@@ -254,7 +275,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                     // (in case there's legacy data stored with hostname as key)
                     if (!string.Equals(hostname, validatedAddress, StringComparison.OrdinalIgnoreCase))
                     {
-                        var deletedByHostname = await tableStorageGeoLocationRepository.DeleteGeoLocation(hostname);
+                        var deletedByHostname = await tableStorageGeoLocationRepository.DeleteGeoLocation(hostname, cancellationToken);
                         if (deletedByHostname)
                         {
                             deletedCount++;
@@ -282,7 +303,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
             }
         }
 
-        private bool ValidateHostname(string address)
+        private async Task<bool> ValidateHostname(string address, CancellationToken cancellationToken)
         {
             if (IPAddress.TryParse(address, out _))
             {
@@ -291,14 +312,14 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
 
             try
             {
-                var hostEntry = Dns.GetHostEntry(address);
+                var hostEntry = await Dns.GetHostEntryAsync(address, cancellationToken);
 
                 if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
                     return true;
                 }
             }
-            catch
+            catch (SocketException)
             {
                 return false;
             }
@@ -306,32 +327,28 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
             return false;
         }
 
-        private bool ConvertHostname(string address, out string? validatedAddress)
+        private async Task<(bool Success, string? ValidatedAddress)> ConvertHostname(string address, CancellationToken cancellationToken)
         {
             if (IPAddress.TryParse(address, out var ipAddress))
             {
-                validatedAddress = ipAddress.ToString();
-                return true;
+                return (true, ipAddress.ToString());
             }
 
             try
             {
-                var hostEntry = Dns.GetHostEntry(address);
+                var hostEntry = await Dns.GetHostEntryAsync(address, cancellationToken);
 
                 if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
-                    validatedAddress = hostEntry.AddressList.First().ToString();
-                    return true;
+                    return (true, hostEntry.AddressList.First().ToString());
                 }
             }
-            catch
+            catch (SocketException)
             {
-                validatedAddress = null;
-                return false;
+                return (false, null);
             }
 
-            validatedAddress = null;
-            return false;
+            return (false, null);
         }
     }
 }

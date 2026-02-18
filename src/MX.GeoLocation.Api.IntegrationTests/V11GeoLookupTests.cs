@@ -37,7 +37,7 @@ public class V11GeoLookupTests : IDisposable
         };
 
         _factory.MockTableStorage
-            .Setup(x => x.GetCityGeoLocation("8.8.8.8"))
+            .Setup(x => x.GetCityGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedDto);
 
         // Act
@@ -52,7 +52,7 @@ public class V11GeoLookupTests : IDisposable
         Assert.NotNull(apiResponse?.Data);
         Assert.Equal("Mountain View", apiResponse.Data!.CityName);
 
-        _factory.MockMaxMind.Verify(x => x.GetCityGeoLocation(It.IsAny<string>()), Times.Never);
+        _factory.MockMaxMind.Verify(x => x.GetCityGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class V11GeoLookupTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.GetCityGeoLocation("1.1.1.1"))
+            .Setup(x => x.GetCityGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((CityGeoLocationDto?)null);
 
         var maxMindDto = new CityGeoLocationDto
@@ -72,7 +72,7 @@ public class V11GeoLookupTests : IDisposable
         };
 
         _factory.MockMaxMind
-            .Setup(x => x.GetCityGeoLocation("1.1.1.1"))
+            .Setup(x => x.GetCityGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(maxMindDto);
 
         // Act
@@ -81,8 +81,8 @@ public class V11GeoLookupTests : IDisposable
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        _factory.MockMaxMind.Verify(x => x.GetCityGeoLocation("1.1.1.1"), Times.Once);
-        _factory.MockTableStorage.Verify(x => x.StoreCityGeoLocation(It.IsAny<CityGeoLocationDto>()), Times.Once);
+        _factory.MockMaxMind.Verify(x => x.GetCityGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()), Times.Once);
+        _factory.MockTableStorage.Verify(x => x.StoreCityGeoLocation(It.IsAny<CityGeoLocationDto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class V11GeoLookupTests : IDisposable
         };
 
         _factory.MockTableStorage
-            .Setup(x => x.GetInsightsGeoLocation("8.8.8.8", It.IsAny<TimeSpan>()))
+            .Setup(x => x.GetInsightsGeoLocation("8.8.8.8", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedDto);
 
         // Act
@@ -108,7 +108,7 @@ public class V11GeoLookupTests : IDisposable
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        _factory.MockMaxMind.Verify(x => x.GetInsightsGeoLocation(It.IsAny<string>()), Times.Never);
+        _factory.MockMaxMind.Verify(x => x.GetInsightsGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class V11GeoLookupTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.GetInsightsGeoLocation("1.1.1.1", It.IsAny<TimeSpan>()))
+            .Setup(x => x.GetInsightsGeoLocation("1.1.1.1", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((InsightsGeoLocationDto?)null);
 
         var maxMindDto = new InsightsGeoLocationDto
@@ -129,7 +129,7 @@ public class V11GeoLookupTests : IDisposable
         };
 
         _factory.MockMaxMind
-            .Setup(x => x.GetInsightsGeoLocation("1.1.1.1"))
+            .Setup(x => x.GetInsightsGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(maxMindDto);
 
         // Act
@@ -138,8 +138,8 @@ public class V11GeoLookupTests : IDisposable
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        _factory.MockMaxMind.Verify(x => x.GetInsightsGeoLocation("1.1.1.1"), Times.Once);
-        _factory.MockTableStorage.Verify(x => x.StoreInsightsGeoLocation(It.IsAny<InsightsGeoLocationDto>()), Times.Once);
+        _factory.MockMaxMind.Verify(x => x.GetInsightsGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()), Times.Once);
+        _factory.MockTableStorage.Verify(x => x.StoreInsightsGeoLocation(It.IsAny<InsightsGeoLocationDto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]

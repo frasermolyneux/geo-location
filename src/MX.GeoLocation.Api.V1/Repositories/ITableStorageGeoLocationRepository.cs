@@ -5,14 +5,14 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 {
     public interface ITableStorageGeoLocationRepository
     {
-        Task<GeoLocationDto?> GetGeoLocation(string address);
-        Task StoreGeoLocation(GeoLocationDto geoLocationDto);
-        Task<bool> DeleteGeoLocation(string address);
+        Task<GeoLocationDto?> GetGeoLocation(string address, CancellationToken cancellationToken = default);
+        Task StoreGeoLocation(GeoLocationDto geoLocationDto, CancellationToken cancellationToken = default);
+        Task<bool> DeleteGeoLocation(string address, CancellationToken cancellationToken = default);
 
-        Task<CityGeoLocationDto?> GetCityGeoLocation(string address);
-        Task StoreCityGeoLocation(CityGeoLocationDto dto);
+        Task<CityGeoLocationDto?> GetCityGeoLocation(string address, CancellationToken cancellationToken = default);
+        Task StoreCityGeoLocation(CityGeoLocationDto dto, CancellationToken cancellationToken = default);
 
-        Task<InsightsGeoLocationDto?> GetInsightsGeoLocation(string address, TimeSpan maxAge);
-        Task StoreInsightsGeoLocation(InsightsGeoLocationDto dto);
+        Task<InsightsGeoLocationDto?> GetInsightsGeoLocation(string address, TimeSpan maxAge, CancellationToken cancellationToken = default);
+        Task StoreInsightsGeoLocation(InsightsGeoLocationDto dto, CancellationToken cancellationToken = default);
     }
 }

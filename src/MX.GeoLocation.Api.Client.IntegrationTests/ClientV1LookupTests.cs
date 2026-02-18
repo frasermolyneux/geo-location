@@ -43,7 +43,7 @@ public class ClientV1LookupTests : IDisposable
         };
 
         _factory.MockTableStorage
-            .Setup(x => x.GetGeoLocation("8.8.8.8"))
+            .Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedDto);
 
         // Act
@@ -74,8 +74,8 @@ public class ClientV1LookupTests : IDisposable
         var dto1 = new GeoLocationDto { Address = "8.8.8.8", TranslatedAddress = "8.8.8.8", CityName = "Mountain View", CountryName = "United States" };
         var dto2 = new GeoLocationDto { Address = "1.1.1.1", TranslatedAddress = "1.1.1.1", CityName = "Sydney", CountryName = "Australia" };
 
-        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("8.8.8.8")).ReturnsAsync(dto1);
-        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("1.1.1.1")).ReturnsAsync(dto2);
+        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>())).ReturnsAsync(dto1);
+        _factory.MockTableStorage.Setup(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>())).ReturnsAsync(dto2);
 
         // Act
         var result = await _geoLookupApi.GetGeoLocations(["8.8.8.8", "1.1.1.1"]);
@@ -92,7 +92,7 @@ public class ClientV1LookupTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.DeleteGeoLocation("8.8.8.8"))
+            .Setup(x => x.DeleteGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         // Act

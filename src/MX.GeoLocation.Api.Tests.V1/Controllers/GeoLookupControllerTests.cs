@@ -20,6 +20,52 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
         }
 
         [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task TestGetGeoLocationReturnsBadRequestForNullOrEmptyHostname(string? hostname)
+        {
+            // Act
+            var result = await geoLookupController.GetGeoLocation(hostname!, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.IsType<ObjectResult>(result);
+
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(400, objectResult!.StatusCode);
+
+            var apiResponseDto = objectResult.Value as ApiResponse<GeoLocationDto>;
+            Assert.NotNull(apiResponseDto);
+            Assert.NotNull(apiResponseDto!.Errors);
+            Assert.NotEmpty(apiResponseDto.Errors!);
+            Assert.Equal("The hostname parameter is required and cannot be empty.", apiResponseDto.Errors!.First().Message);
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task TestDeleteMetadataReturnsBadRequestForNullOrEmptyHostname(string? hostname)
+        {
+            // Act
+            var result = await geoLookupController.DeleteMetadata(hostname!, CancellationToken.None);
+
+            // Assert
+            Assert.NotNull(result);
+
+            var statusCode = result switch
+            {
+                ObjectResult obj => obj.StatusCode,
+                StatusCodeResult sc => sc.StatusCode,
+                _ => null
+            };
+
+            Assert.Equal(400, statusCode);
+        }
+
+        [Theory]
         [InlineData("abcdefg")]
         [InlineData("a.b.c.d")]
         public async Task TestGetGeoLocationHandlesInvalidHostname(string invalidHostname)
@@ -28,7 +74,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
 
 
             // Act
-            var result = await geoLookupController.GetGeoLocation(invalidHostname);
+            var result = await geoLookupController.GetGeoLocation(invalidHostname, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -58,7 +104,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
 
 
             // Act
-            var result = await geoLookupController.GetGeoLocation(localhost);
+            var result = await geoLookupController.GetGeoLocation(localhost, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);

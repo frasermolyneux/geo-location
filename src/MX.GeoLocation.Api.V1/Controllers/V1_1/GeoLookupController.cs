@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Sockets;
 
 using MaxMind.GeoIP2.Exceptions;
 
@@ -43,18 +44,25 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
 
         [HttpGet]
         [Route("lookup/city/{hostname}")]
-        public async Task<IActionResult> GetCityGeoLocationAction(string hostname)
+        public async Task<IActionResult> GetCityGeoLocationAction(string hostname, CancellationToken cancellationToken)
         {
-            var response = await ((Abstractions.Interfaces.V1_1.IGeoLookupApi)this).GetCityGeoLocation(hostname, default);
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                var badRequestResponse = new ApiResponse<CityGeoLocationDto>(
+                    new ApiError(ErrorCodes.EMPTY_HOSTNAME, ErrorMessages.EMPTY_HOSTNAME));
+                return badRequestResponse.ToApiResult(HttpStatusCode.BadRequest).ToHttpResult();
+            }
+
+            var response = await ((Abstractions.Interfaces.V1_1.IGeoLookupApi)this).GetCityGeoLocation(hostname, cancellationToken);
             return response.ToHttpResult();
         }
 
         async Task<ApiResult<CityGeoLocationDto>> Abstractions.Interfaces.V1_1.IGeoLookupApi.GetCityGeoLocation(string hostname, CancellationToken cancellationToken)
         {
-            return await ExecuteLookup(hostname, async address =>
+            return await ExecuteLookup(hostname, cancellationToken, async address =>
             {
                 // Try cache first
-                var cached = await tableStorageGeoLocationRepository.GetCityGeoLocation(address);
+                var cached = await tableStorageGeoLocationRepository.GetCityGeoLocation(address, cancellationToken);
                 if (cached is not null)
                 {
                     _logger.LogInformation("Found cached city geolocation data for {Address}", address);
@@ -64,10 +72,10 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
 
                 // Fallback to MaxMind
                 _logger.LogInformation("No cached data found, querying MaxMind city for {Address}", address);
-                var result = await maxMindGeoLocationRepository.GetCityGeoLocation(address);
+                var result = await maxMindGeoLocationRepository.GetCityGeoLocation(address, cancellationToken);
                 result.Address = hostname;
 
-                await tableStorageGeoLocationRepository.StoreCityGeoLocation(result);
+                await tableStorageGeoLocationRepository.StoreCityGeoLocation(result, cancellationToken);
                 _logger.LogInformation("Stored city geolocation data for {Address}", address);
 
                 return new ApiResponse<CityGeoLocationDto>(result).ToApiResult();
@@ -76,18 +84,25 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
 
         [HttpGet]
         [Route("lookup/insights/{hostname}")]
-        public async Task<IActionResult> GetInsightsGeoLocationAction(string hostname)
+        public async Task<IActionResult> GetInsightsGeoLocationAction(string hostname, CancellationToken cancellationToken)
         {
-            var response = await ((Abstractions.Interfaces.V1_1.IGeoLookupApi)this).GetInsightsGeoLocation(hostname, default);
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                var badRequestResponse = new ApiResponse<InsightsGeoLocationDto>(
+                    new ApiError(ErrorCodes.EMPTY_HOSTNAME, ErrorMessages.EMPTY_HOSTNAME));
+                return badRequestResponse.ToApiResult(HttpStatusCode.BadRequest).ToHttpResult();
+            }
+
+            var response = await ((Abstractions.Interfaces.V1_1.IGeoLookupApi)this).GetInsightsGeoLocation(hostname, cancellationToken);
             return response.ToHttpResult();
         }
 
         async Task<ApiResult<InsightsGeoLocationDto>> Abstractions.Interfaces.V1_1.IGeoLookupApi.GetInsightsGeoLocation(string hostname, CancellationToken cancellationToken)
         {
-            return await ExecuteLookup(hostname, async address =>
+            return await ExecuteLookup(hostname, cancellationToken, async address =>
             {
                 // Try cache first (with TTL check)
-                var cached = await tableStorageGeoLocationRepository.GetInsightsGeoLocation(address, insightsCacheDuration);
+                var cached = await tableStorageGeoLocationRepository.GetInsightsGeoLocation(address, insightsCacheDuration, cancellationToken);
                 if (cached is not null)
                 {
                     _logger.LogInformation("Found cached insights geolocation data for {Address}", address);
@@ -97,21 +112,22 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
 
                 // Fallback to MaxMind
                 _logger.LogInformation("No cached data found, querying MaxMind insights for {Address}", address);
-                var result = await maxMindGeoLocationRepository.GetInsightsGeoLocation(address);
+                var result = await maxMindGeoLocationRepository.GetInsightsGeoLocation(address, cancellationToken);
                 result.Address = hostname;
 
-                await tableStorageGeoLocationRepository.StoreInsightsGeoLocation(result);
+                await tableStorageGeoLocationRepository.StoreInsightsGeoLocation(result, cancellationToken);
                 _logger.LogInformation("Stored insights geolocation data for {Address}", address);
 
                 return new ApiResponse<InsightsGeoLocationDto>(result).ToApiResult();
             });
         }
 
-        private async Task<ApiResult<T>> ExecuteLookup<T>(string hostname, Func<string, Task<ApiResult<T>>> lookupFunc) where T : class
+        private async Task<ApiResult<T>> ExecuteLookup<T>(string hostname, CancellationToken cancellationToken, Func<string, Task<ApiResult<T>>> lookupFunc) where T : class
         {
             try
             {
-                if (ConvertHostname(hostname, out var validatedAddress) && validatedAddress is not null)
+                var (convertSuccess, validatedAddress) = await ConvertHostname(hostname, cancellationToken);
+                if (convertSuccess && validatedAddress is not null)
                 {
                     if (localOverrides.Contains(hostname))
                     {
@@ -153,31 +169,27 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
             }
         }
 
-        private bool ConvertHostname(string address, out string? validatedAddress)
+        private async Task<(bool Success, string? ValidatedAddress)> ConvertHostname(string address, CancellationToken cancellationToken)
         {
             if (IPAddress.TryParse(address, out var ipAddress))
             {
-                validatedAddress = ipAddress.ToString();
-                return true;
+                return (true, ipAddress.ToString());
             }
 
             try
             {
-                var hostEntry = Dns.GetHostEntry(address);
+                var hostEntry = await Dns.GetHostEntryAsync(address, cancellationToken);
                 if (hostEntry.AddressList.FirstOrDefault() is not null)
                 {
-                    validatedAddress = hostEntry.AddressList.First().ToString();
-                    return true;
+                    return (true, hostEntry.AddressList.First().ToString());
                 }
             }
-            catch
+            catch (SocketException)
             {
-                validatedAddress = null;
-                return false;
+                return (false, null);
             }
 
-            validatedAddress = null;
-            return false;
+            return (false, null);
         }
     }
 }

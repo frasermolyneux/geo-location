@@ -73,7 +73,7 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             mockGeoLocationClient.Setup(x => x.GeoLookup).Returns(mockGeoLookup.Object);
 
             // Act
-            var result = await homeController.Index();
+            var result = await homeController.Index(CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -98,7 +98,7 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
 
             // Act
-            var result = await homeController.Index();
+            var result = await homeController.Index(CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -154,7 +154,7 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             mockGeoLocationClient.Setup(x => x.GeoLookup).Returns(mockGeoLookup.Object);
 
             // Act
-            var result = await homeController.Index();
+            var result = await homeController.Index(CancellationToken.None);
 
             // Assert
             mockSession.Verify(s => s.Set("UserGeoLocationDto", It.IsAny<byte[]>()), Times.Once);

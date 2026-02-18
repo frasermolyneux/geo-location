@@ -1,6 +1,7 @@
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
+using Microsoft.AspNetCore.HttpOverrides;
 using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
@@ -51,12 +52,23 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSession();
 
+// Configure ForwardedHeaders to securely process X-Forwarded-For and X-Forwarded-Proto via middleware
+// instead of manually parsing these headers in controllers.
+// NOTE: In production, configure options.KnownProxies or options.KnownNetworks to restrict
+// which reverse proxy IPs are trusted (e.g. your Azure Front Door or load balancer IPs).
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
+
 builder.Services.AddHealthChecks()
     .AddCheck<GeoLocationApiHealthCheck>(
         name: "geolocation-api",
         tags: ["dependency"]);
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

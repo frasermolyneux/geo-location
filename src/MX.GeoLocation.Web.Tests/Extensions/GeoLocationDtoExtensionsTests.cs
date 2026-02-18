@@ -85,5 +85,39 @@ namespace MX.GeoLocation.Web.Tests.Extensions
             // Assert
             Assert.Equal("Unknown", result.ToString());
         }
+
+        [Fact]
+        public void LocationSummaryShouldEncodeHtmlInCityAndCountry()
+        {
+            // Arrange
+            var geoLocationDto = new GeoLocationDto()
+            {
+                CityName = "<script>alert('xss')</script>",
+                CountryName = "<img onerror=alert(1) src=x>"
+            };
+
+            // Act
+            var result = geoLocationDto.LocationSummary();
+
+            // Assert
+            Assert.DoesNotContain("<script>", result.ToString());
+            Assert.Equal("&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;, &lt;img onerror=alert(1) src=x&gt;", result.ToString());
+        }
+
+        [Fact]
+        public void FlagImageShouldEncodeHtmlInCountryCode()
+        {
+            // Arrange
+            var geoLocationDto = new GeoLocationDto()
+            {
+                CountryCode = "\"><script>alert('xss')</script>"
+            };
+
+            // Act
+            var result = geoLocationDto.FlagImage();
+
+            // Assert
+            Assert.DoesNotContain("<script>", result.ToString());
+        }
     }
 }

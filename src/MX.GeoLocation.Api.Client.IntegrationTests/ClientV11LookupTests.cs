@@ -42,7 +42,7 @@ public class ClientV11LookupTests : IDisposable
         };
 
         _factory.MockTableStorage
-            .Setup(x => x.GetCityGeoLocation("8.8.8.8"))
+            .Setup(x => x.GetCityGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedDto);
 
         // Act
@@ -69,7 +69,7 @@ public class ClientV11LookupTests : IDisposable
         };
 
         _factory.MockTableStorage
-            .Setup(x => x.GetInsightsGeoLocation("8.8.8.8", It.IsAny<TimeSpan>()))
+            .Setup(x => x.GetInsightsGeoLocation("8.8.8.8", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedDto);
 
         // Act

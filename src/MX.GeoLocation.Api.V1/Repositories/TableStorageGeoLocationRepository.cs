@@ -18,11 +18,13 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             v11TableClient = tableServiceClient.GetTableClient("geolocationsv11");
         }
 
-        public async Task<GeoLocationDto?> GetGeoLocation(string address)
+        public async Task<GeoLocationDto?> GetGeoLocation(string address, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             try
             {
-                var entry = await tableClient.GetEntityAsync<GeoLocationTableEntity>("addresses", address);
+                var entry = await tableClient.GetEntityAsync<GeoLocationTableEntity>("addresses", address, cancellationToken: cancellationToken);
                 return entry.Value.GeoLocationDto();
             }
             catch (RequestFailedException ex)
@@ -34,17 +36,19 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             return null;
         }
 
-        public async Task StoreGeoLocation(GeoLocationDto geoLocationDto)
+        public async Task StoreGeoLocation(GeoLocationDto geoLocationDto, CancellationToken cancellationToken = default)
         {
             var entity = new GeoLocationTableEntity(geoLocationDto);
-            await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
+            await tableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace, cancellationToken);
         }
 
-        public async Task<bool> DeleteGeoLocation(string address)
+        public async Task<bool> DeleteGeoLocation(string address, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             try
             {
-                await tableClient.DeleteEntityAsync("addresses", address);
+                await tableClient.DeleteEntityAsync("addresses", address, cancellationToken: cancellationToken);
                 return true;
             }
             catch (RequestFailedException ex)
@@ -56,11 +60,13 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             }
         }
 
-        public async Task<CityGeoLocationDto?> GetCityGeoLocation(string address)
+        public async Task<CityGeoLocationDto?> GetCityGeoLocation(string address, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             try
             {
-                var entry = await v11TableClient.GetEntityAsync<CityGeoLocationTableEntity>("addresses", address);
+                var entry = await v11TableClient.GetEntityAsync<CityGeoLocationTableEntity>("addresses", address, cancellationToken: cancellationToken);
                 return entry.Value.ToCityDto();
             }
             catch (RequestFailedException ex)
@@ -72,17 +78,19 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             return null;
         }
 
-        public async Task StoreCityGeoLocation(CityGeoLocationDto dto)
+        public async Task StoreCityGeoLocation(CityGeoLocationDto dto, CancellationToken cancellationToken = default)
         {
             var entity = new CityGeoLocationTableEntity(dto);
-            await v11TableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
+            await v11TableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace, cancellationToken);
         }
 
-        public async Task<InsightsGeoLocationDto?> GetInsightsGeoLocation(string address, TimeSpan maxAge)
+        public async Task<InsightsGeoLocationDto?> GetInsightsGeoLocation(string address, TimeSpan maxAge, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             try
             {
-                var entry = await v11TableClient.GetEntityAsync<CityGeoLocationTableEntity>("addresses", address);
+                var entry = await v11TableClient.GetEntityAsync<CityGeoLocationTableEntity>("addresses", address, cancellationToken: cancellationToken);
                 var entity = entry.Value;
 
                 if (!entity.HasAnonymizerData)
@@ -103,10 +111,10 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             return null;
         }
 
-        public async Task StoreInsightsGeoLocation(InsightsGeoLocationDto dto)
+        public async Task StoreInsightsGeoLocation(InsightsGeoLocationDto dto, CancellationToken cancellationToken = default)
         {
             var entity = new CityGeoLocationTableEntity(dto);
-            await v11TableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace);
+            await v11TableClient.UpsertEntityAsync(entity, TableUpdateMode.Replace, cancellationToken);
         }
     }
 }

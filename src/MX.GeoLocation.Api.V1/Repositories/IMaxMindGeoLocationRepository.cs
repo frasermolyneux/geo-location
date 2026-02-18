@@ -5,8 +5,8 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 {
     public interface IMaxMindGeoLocationRepository
     {
-        Task<GeoLocationDto> GetGeoLocation(string address);
-        Task<CityGeoLocationDto> GetCityGeoLocation(string address);
-        Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address);
+        Task<GeoLocationDto> GetGeoLocation(string address, CancellationToken cancellationToken = default);
+        Task<CityGeoLocationDto> GetCityGeoLocation(string address, CancellationToken cancellationToken = default);
+        Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address, CancellationToken cancellationToken = default);
     }
 }

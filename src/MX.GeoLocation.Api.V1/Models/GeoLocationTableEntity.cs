@@ -27,7 +27,7 @@ namespace MX.GeoLocation.LookupWebApi.Models
         public GeoLocationTableEntity(GeoLocationDto geoLocationDto)
         {
             PartitionKey = "addresses";
-            RowKey = geoLocationDto.TranslatedAddress ?? throw new NullReferenceException(nameof(geoLocationDto.TranslatedAddress));
+            RowKey = geoLocationDto.TranslatedAddress ?? throw new ArgumentNullException(nameof(geoLocationDto.TranslatedAddress));
 
             Address = geoLocationDto.Address;
             TranslatedAddress = geoLocationDto.TranslatedAddress;
@@ -70,14 +70,33 @@ namespace MX.GeoLocation.LookupWebApi.Models
 
         public string? TraitsSerialised { get; set; }
 
+        private Dictionary<string, string?>? _traits;
+
         [IgnoreDataMember]
         public Dictionary<string, string?> Traits
         {
             get
             {
+                if (_traits is not null)
+                    return _traits;
+
                 if (TraitsSerialised is not null)
-                    return JsonConvert.DeserializeObject<Dictionary<string, string?>>(TraitsSerialised) ?? new();
-                return new();
+                {
+                    try
+                    {
+                        _traits = JsonConvert.DeserializeObject<Dictionary<string, string?>>(TraitsSerialised) ?? new();
+                    }
+                    catch (Newtonsoft.Json.JsonException)
+                    {
+                        _traits = new();
+                    }
+                }
+                else
+                {
+                    _traits = new();
+                }
+
+                return _traits;
             }
             private set { }
         }

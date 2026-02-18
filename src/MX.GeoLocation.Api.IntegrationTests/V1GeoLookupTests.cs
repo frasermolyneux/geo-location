@@ -40,7 +40,7 @@ public class V1GeoLookupTests : IDisposable
         };
 
         _factory.MockTableStorage
-            .Setup(x => x.GetGeoLocation("8.8.8.8"))
+            .Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
             .ReturnsAsync(cachedDto);
 
         // Act
@@ -56,7 +56,7 @@ public class V1GeoLookupTests : IDisposable
         Assert.Equal("Mountain View", apiResponse.Data!.CityName);
         Assert.Equal("United States", apiResponse.Data.CountryName);
 
-        _factory.MockMaxMind.Verify(x => x.GetGeoLocation(It.IsAny<string>()), Times.Never);
+        _factory.MockMaxMind.Verify(x => x.GetGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class V1GeoLookupTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.GetGeoLocation("1.1.1.1"))
+            .Setup(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((GeoLocationDto?)null);
 
         var maxMindDto = new GeoLocationDto
@@ -76,7 +76,7 @@ public class V1GeoLookupTests : IDisposable
         };
 
         _factory.MockMaxMind
-            .Setup(x => x.GetGeoLocation("1.1.1.1"))
+            .Setup(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(maxMindDto);
 
         // Act
@@ -91,8 +91,8 @@ public class V1GeoLookupTests : IDisposable
         Assert.NotNull(apiResponse?.Data);
         Assert.Equal("1.1.1.1", apiResponse.Data!.Address);
 
-        _factory.MockMaxMind.Verify(x => x.GetGeoLocation("1.1.1.1"), Times.Once);
-        _factory.MockTableStorage.Verify(x => x.StoreGeoLocation(It.IsAny<GeoLocationDto>()), Times.Once);
+        _factory.MockMaxMind.Verify(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()), Times.Once);
+        _factory.MockTableStorage.Verify(x => x.StoreGeoLocation(It.IsAny<GeoLocationDto>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Theory]
@@ -130,11 +130,11 @@ public class V1GeoLookupTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.GetGeoLocation("198.51.100.1"))
+            .Setup(x => x.GetGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((GeoLocationDto?)null);
 
         _factory.MockMaxMind
-            .Setup(x => x.GetGeoLocation("198.51.100.1"))
+            .Setup(x => x.GetGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new AddressNotFoundException("Address not found"));
 
         // Act
@@ -149,11 +149,11 @@ public class V1GeoLookupTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.GetGeoLocation("203.0.113.1"))
+            .Setup(x => x.GetGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync((GeoLocationDto?)null);
 
         _factory.MockMaxMind
-            .Setup(x => x.GetGeoLocation("203.0.113.1"))
+            .Setup(x => x.GetGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new GeoIP2Exception("GeoIP2 service error"));
 
         // Act

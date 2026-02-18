@@ -55,5 +55,15 @@ namespace MX.GeoLocation.LookupWebApi.Constants
         /// Error message for batch lookup local address.
         /// </summary>
         public const string LOCAL_ADDRESS_BATCH = "Hostname is a loopback or local address, geo location data is unavailable";
+
+        /// <summary>
+        /// Error message for null or whitespace hostname parameter.
+        /// </summary>
+        public const string EMPTY_HOSTNAME = "The hostname parameter is required and cannot be empty.";
+
+        /// <summary>
+        /// Error message for empty request list.
+        /// </summary>
+        public const string EMPTY_REQUEST_LIST = "The request must contain at least one hostname.";
     }
 }

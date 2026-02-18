@@ -107,13 +107,27 @@ namespace MX.GeoLocation.LookupWebApi.Models
         private static List<string> DeserializeList(string? json)
         {
             if (json is null) return [];
-            return JsonConvert.DeserializeObject<List<string>>(json) ?? [];
+            try
+            {
+                return JsonConvert.DeserializeObject<List<string>>(json) ?? [];
+            }
+            catch (Newtonsoft.Json.JsonException)
+            {
+                return [];
+            }
         }
 
         private static T DeserializeOrDefault<T>(string? json) where T : new()
         {
             if (json is null) return new T();
-            return JsonConvert.DeserializeObject<T>(json) ?? new T();
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json) ?? new T();
+            }
+            catch (Newtonsoft.Json.JsonException)
+            {
+                return new T();
+            }
         }
     }
 }

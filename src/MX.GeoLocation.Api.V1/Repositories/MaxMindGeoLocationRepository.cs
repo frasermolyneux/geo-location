@@ -1,4 +1,5 @@
 ﻿using MaxMind.GeoIP2;
+using MaxMind.GeoIP2.Exceptions;
 
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
@@ -22,8 +23,10 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             this.telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }
 
-        public async Task<GeoLocationDto> GetGeoLocation(string address)
+        public async Task<GeoLocationDto> GetGeoLocation(string address, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             using var reader = CreateClient();
             var operation = StartOperation("MaxMindCityQuery", address);
 
@@ -76,7 +79,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                 MarkSuccess(operation);
                 return result;
             }
-            catch (Exception ex)
+            catch (GeoIP2Exception ex)
             {
                 HandleException(operation, ex);
                 throw;
@@ -87,8 +90,10 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             }
         }
 
-        public async Task<CityGeoLocationDto> GetCityGeoLocation(string address)
+        public async Task<CityGeoLocationDto> GetCityGeoLocation(string address, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             using var reader = CreateClient();
             var operation = StartOperation("MaxMindCityQuery", address);
 
@@ -99,7 +104,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                 MarkSuccess(operation);
                 return result;
             }
-            catch (Exception ex)
+            catch (GeoIP2Exception ex)
             {
                 HandleException(operation, ex);
                 throw;
@@ -110,8 +115,10 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
             }
         }
 
-        public async Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address)
+        public async Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address, CancellationToken cancellationToken = default)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
             using var reader = CreateClient();
             var operation = StartOperation("MaxMindInsightsQuery", address);
 
@@ -137,7 +144,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                 MarkSuccess(operation);
                 return dto;
             }
-            catch (Exception ex)
+            catch (GeoIP2Exception ex)
             {
                 HandleException(operation, ex);
                 throw;

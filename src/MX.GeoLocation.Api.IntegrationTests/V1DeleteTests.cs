@@ -29,7 +29,7 @@ public class V1DeleteTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.DeleteGeoLocation("8.8.8.8"))
+            .Setup(x => x.DeleteGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         // Act
@@ -44,7 +44,7 @@ public class V1DeleteTests : IDisposable
     {
         // Arrange
         _factory.MockTableStorage
-            .Setup(x => x.DeleteGeoLocation("192.0.2.1"))
+            .Setup(x => x.DeleteGeoLocation("192.0.2.1", It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         // Act
