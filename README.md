@@ -29,7 +29,7 @@ Both versions enforce the `LookupApiUser` Entra role. An MVC web front end calls
 
 | Package | Description |
 |---|---|
-| `MX.GeoLocation.LookupApi.Abstractions` | Interfaces and models for the GeoLocation API |
+| `MX.GeoLocation.Abstractions.V1` | Interfaces and models for the GeoLocation API |
 | `MX.GeoLocation.Api.Client.V1` | Typed HTTP client with DI registration via `AddGeoLocationApiClient()` |
 | `MX.GeoLocation.Api.Client.Testing` | In-memory fakes and DTO factory helpers for consumer test projects — see [testing docs](docs/testing.md) |
 

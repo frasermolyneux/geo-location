@@ -2,7 +2,7 @@
 
 ## Architecture
 - .NET 9 solution in `src/MX.GeoLocation.sln` with API (`MX.GeoLocation.Api.V1`) and MVC web (`MX.GeoLocation.Web`) projects plus abstractions, a generated API client, and a testing package.
-- Three NuGet packages are published: `MX.GeoLocation.LookupApi.Abstractions` (interfaces/models), `MX.GeoLocation.Api.Client.V1` (typed HTTP client), and `MX.GeoLocation.Api.Client.Testing` (in-memory fakes and DTO factories for consumer test projects).
+- Three NuGet packages are published: `MX.GeoLocation.Abstractions.V1` (interfaces/models), `MX.GeoLocation.Api.Client.V1` (typed HTTP client), and `MX.GeoLocation.Api.Client.Testing` (in-memory fakes and DTO factories for consumer test projects).
 - API uses MaxMind GeoIP2 and caches responses in Azure Table Storage:
   - **v1.0**: `geolocations` table with `GeoLocationTableEntity` (permanent cache)
   - **v1.1**: `geolocationsv11` table with `CityGeoLocationTableEntity` (city: permanent, insights: configurable TTL via `Caching:InsightsCacheDays`, default 7 days)
