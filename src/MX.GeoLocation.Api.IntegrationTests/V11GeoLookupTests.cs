@@ -1,5 +1,7 @@
 using System.Net;
 
+using MaxMind.GeoIP2.Exceptions;
+
 using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1_1;
 
@@ -175,6 +177,82 @@ public class V11GeoLookupTests : IDisposable
     public async Task GetInsightsGeoLocation_LocalAddress_ReturnsBadRequest(string localAddress)
     {
         var response = await _client.GetAsync($"/v1.1/lookup/insights/{localAddress}");
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCityGeoLocation_AddressNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        _factory.MockTableStorage
+            .Setup(x => x.GetCityGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((CityGeoLocationDto?)null);
+
+        _factory.MockMaxMind
+            .Setup(x => x.GetCityGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new AddressNotFoundException("Address not found"));
+
+        // Act
+        var response = await _client.GetAsync("/v1.1/lookup/city/198.51.100.1");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetCityGeoLocation_GeoIP2Exception_ReturnsBadRequest()
+    {
+        // Arrange
+        _factory.MockTableStorage
+            .Setup(x => x.GetCityGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((CityGeoLocationDto?)null);
+
+        _factory.MockMaxMind
+            .Setup(x => x.GetCityGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new GeoIP2Exception("GeoIP2 service error"));
+
+        // Act
+        var response = await _client.GetAsync("/v1.1/lookup/city/203.0.113.1");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetInsightsGeoLocation_AddressNotFound_ReturnsNotFound()
+    {
+        // Arrange
+        _factory.MockTableStorage
+            .Setup(x => x.GetInsightsGeoLocation("198.51.100.1", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InsightsGeoLocationDto?)null);
+
+        _factory.MockMaxMind
+            .Setup(x => x.GetInsightsGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new AddressNotFoundException("Address not found"));
+
+        // Act
+        var response = await _client.GetAsync("/v1.1/lookup/insights/198.51.100.1");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetInsightsGeoLocation_GeoIP2Exception_ReturnsBadRequest()
+    {
+        // Arrange
+        _factory.MockTableStorage
+            .Setup(x => x.GetInsightsGeoLocation("203.0.113.1", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InsightsGeoLocationDto?)null);
+
+        _factory.MockMaxMind
+            .Setup(x => x.GetInsightsGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new GeoIP2Exception("GeoIP2 service error"));
+
+        // Act
+        var response = await _client.GetAsync("/v1.1/lookup/insights/203.0.113.1");
+
+        // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 }

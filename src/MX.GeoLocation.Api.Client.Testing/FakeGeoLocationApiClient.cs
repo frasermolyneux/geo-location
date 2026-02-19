@@ -60,7 +60,14 @@ public class FakeGeoLocationApiClient : IGeoLocationApiClient
     /// </summary>
     public FakeApiHealthApi HealthApi { get; } = new();
 
-    public IVersionedGeoLookupApi GeoLookup => new FakeVersionedGeoLookupApi(V1Lookup, V1_1Lookup);
+    private readonly Lazy<FakeVersionedGeoLookupApi> _geoLookup;
+
+    public FakeGeoLocationApiClient()
+    {
+        _geoLookup = new Lazy<FakeVersionedGeoLookupApi>(() => new FakeVersionedGeoLookupApi(V1Lookup, V1_1Lookup));
+    }
+
+    public IVersionedGeoLookupApi GeoLookup => _geoLookup.Value;
     public IApiInfoApi ApiInfo => InfoApi;
     public IApiHealthApi ApiHealth => HealthApi;
 }

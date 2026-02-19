@@ -111,23 +111,8 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             Assert.IsType<GeoLocationDto>(viewResult.Model);
 
             var viewResultGeoLocationDto = viewResult.Model as GeoLocationDto;
-
             Assert.NotNull(viewResultGeoLocationDto);
-            Assert.Equal(wellFormedGeoLocationDto.AccuracyRadius, viewResultGeoLocationDto!.AccuracyRadius);
-            Assert.Equal(wellFormedGeoLocationDto.Address, viewResultGeoLocationDto.Address);
-            Assert.Equal(wellFormedGeoLocationDto.CityName, viewResultGeoLocationDto.CityName);
-            Assert.Equal(wellFormedGeoLocationDto.ContinentCode, viewResultGeoLocationDto.ContinentCode);
-            Assert.Equal(wellFormedGeoLocationDto.ContinentName, viewResultGeoLocationDto.ContinentName);
-            Assert.Equal(wellFormedGeoLocationDto.CountryCode, viewResultGeoLocationDto.CountryCode);
-            Assert.Equal(wellFormedGeoLocationDto.CountryName, viewResultGeoLocationDto.CountryName);
-            Assert.Equal(wellFormedGeoLocationDto.IsEuropeanUnion, viewResultGeoLocationDto.IsEuropeanUnion);
-            Assert.Equal(wellFormedGeoLocationDto.Latitude, viewResultGeoLocationDto.Latitude);
-            Assert.Equal(wellFormedGeoLocationDto.Longitude, viewResultGeoLocationDto.Longitude);
-            Assert.Equal(wellFormedGeoLocationDto.PostalCode, viewResultGeoLocationDto.PostalCode);
-            Assert.Equal(wellFormedGeoLocationDto.RegisteredCountry, viewResultGeoLocationDto.RegisteredCountry);
-            Assert.Equal(wellFormedGeoLocationDto.RepresentedCountry, viewResultGeoLocationDto.RepresentedCountry);
-            Assert.Equal(wellFormedGeoLocationDto.Timezone, viewResultGeoLocationDto.Timezone);
-            Assert.Equal(wellFormedGeoLocationDto.Traits, viewResultGeoLocationDto.Traits);
+            AssertGeoLocationDtoEquals(wellFormedGeoLocationDto, viewResultGeoLocationDto!);
         }
 
         [Fact]
@@ -169,23 +154,27 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             Assert.IsType<GeoLocationDto>(viewResult.Model);
 
             var viewResultGeoLocationDto = viewResult.Model as GeoLocationDto;
-
             Assert.NotNull(viewResultGeoLocationDto);
-            Assert.Equal(wellFormedGeoLocationDto.AccuracyRadius, viewResultGeoLocationDto!.AccuracyRadius);
-            Assert.Equal(wellFormedGeoLocationDto.Address, viewResultGeoLocationDto.Address);
-            Assert.Equal(wellFormedGeoLocationDto.CityName, viewResultGeoLocationDto.CityName);
-            Assert.Equal(wellFormedGeoLocationDto.ContinentCode, viewResultGeoLocationDto.ContinentCode);
-            Assert.Equal(wellFormedGeoLocationDto.ContinentName, viewResultGeoLocationDto.ContinentName);
-            Assert.Equal(wellFormedGeoLocationDto.CountryCode, viewResultGeoLocationDto.CountryCode);
-            Assert.Equal(wellFormedGeoLocationDto.CountryName, viewResultGeoLocationDto.CountryName);
-            Assert.Equal(wellFormedGeoLocationDto.IsEuropeanUnion, viewResultGeoLocationDto.IsEuropeanUnion);
-            Assert.Equal(wellFormedGeoLocationDto.Latitude, viewResultGeoLocationDto.Latitude);
-            Assert.Equal(wellFormedGeoLocationDto.Longitude, viewResultGeoLocationDto.Longitude);
-            Assert.Equal(wellFormedGeoLocationDto.PostalCode, viewResultGeoLocationDto.PostalCode);
-            Assert.Equal(wellFormedGeoLocationDto.RegisteredCountry, viewResultGeoLocationDto.RegisteredCountry);
-            Assert.Equal(wellFormedGeoLocationDto.RepresentedCountry, viewResultGeoLocationDto.RepresentedCountry);
-            Assert.Equal(wellFormedGeoLocationDto.Timezone, viewResultGeoLocationDto.Timezone);
-            Assert.Equal(wellFormedGeoLocationDto.Traits, viewResultGeoLocationDto.Traits);
+            AssertGeoLocationDtoEquals(wellFormedGeoLocationDto, viewResultGeoLocationDto!);
+        }
+
+        private static void AssertGeoLocationDtoEquals(GeoLocationDto expected, GeoLocationDto actual)
+        {
+            Assert.Equal(expected.AccuracyRadius, actual.AccuracyRadius);
+            Assert.Equal(expected.Address, actual.Address);
+            Assert.Equal(expected.CityName, actual.CityName);
+            Assert.Equal(expected.ContinentCode, actual.ContinentCode);
+            Assert.Equal(expected.ContinentName, actual.ContinentName);
+            Assert.Equal(expected.CountryCode, actual.CountryCode);
+            Assert.Equal(expected.CountryName, actual.CountryName);
+            Assert.Equal(expected.IsEuropeanUnion, actual.IsEuropeanUnion);
+            Assert.Equal(expected.Latitude, actual.Latitude);
+            Assert.Equal(expected.Longitude, actual.Longitude);
+            Assert.Equal(expected.PostalCode, actual.PostalCode);
+            Assert.Equal(expected.RegisteredCountry, actual.RegisteredCountry);
+            Assert.Equal(expected.RepresentedCountry, actual.RepresentedCountry);
+            Assert.Equal(expected.Timezone, actual.Timezone);
+            Assert.Equal(expected.Traits, actual.Traits);
         }
 
         public void Dispose()
