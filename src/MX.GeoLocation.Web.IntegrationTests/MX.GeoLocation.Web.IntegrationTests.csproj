@@ -18,6 +18,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="8.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="coverlet.collector" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MX.GeoLocation.Web\MX.GeoLocation.Web.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Api.Client.Testing\MX.GeoLocation.Api.Client.Testing.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="appsettings.json">

@@ -6,6 +6,7 @@ using MX.Api.Client.Auth;
 
 namespace MX.GeoLocation.Api.Client.Tests.V1
 {
+    [Trait("Category", "Unit")]
     public class BaseApiTests : IDisposable
     {
         private readonly ILogger<BaseApi<GeoLocationApiClientOptions>> fakeLogger;

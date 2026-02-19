@@ -11,6 +11,7 @@ using RestSharp;
 
 namespace MX.GeoLocation.Api.Client.Tests.V1
 {
+    [Trait("Category", "Unit")]
     public class GeoLookupApiTests : IDisposable
     {
         private readonly ILogger<BaseApi<GeoLocationApiClientOptions>> fakeLogger;

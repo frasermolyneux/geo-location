@@ -1,5 +1,6 @@
 ﻿namespace MX.GeoLocation.Web.IntegrationTests
 {
+    [Trait("Category", "Integration")]
     public class LookupAddressTests : TestBase
     {
         [Theory]

@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 
 namespace MX.GeoLocation.Web.Tests.Controllers
 {
+    [Trait("Category", "Unit")]
     public class HomeControllerTests
     {
         private readonly FakeGeoLocationApiClient fakeGeoLocationClient;

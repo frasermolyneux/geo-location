@@ -11,8 +11,9 @@ using MX.GeoLocation.LookupWebApi.Controllers.V1;
 using MX.GeoLocation.LookupWebApi.Repositories;
 using MX.GeoLocation.LookupWebApi.Services;
 
-namespace MX.GeoLocation.LookupWebApi.Tests.Controllers;
+namespace MX.GeoLocation.Api.Tests.V1.Controllers;
 
+[Trait("Category", "Unit")]
 public class GeoLookupControllerCacheTests
 {
     private readonly Mock<ITableStorageGeoLocationRepository> _mockTableStorage;

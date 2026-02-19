@@ -7,8 +7,9 @@ using MX.GeoLocation.LookupWebApi.Controllers.V1_1;
 using MX.GeoLocation.LookupWebApi.Repositories;
 using MX.GeoLocation.LookupWebApi.Services;
 
-namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
+namespace MX.GeoLocation.Api.Tests.V1.Controllers.V1_1
 {
+    [Trait("Category", "Unit")]
     public class GeoLookupControllerTests
     {
         private readonly Mock<IMaxMindGeoLocationRepository> mockMaxMind;

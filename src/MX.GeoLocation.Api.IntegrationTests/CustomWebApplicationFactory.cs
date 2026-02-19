@@ -27,7 +27,23 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     public CustomWebApplicationFactory()
     {
-        // Default: IP addresses resolve to themselves
+        SetupDefaultHostnameResolver();
+    }
+
+    /// <summary>
+    /// Resets all mocks to their default state. Call this between tests when using IClassFixture
+    /// to prevent mock state from leaking between test methods.
+    /// </summary>
+    public void ResetMocks()
+    {
+        MockMaxMind.Reset();
+        MockTableStorage.Reset();
+        MockHostnameResolver.Reset();
+        SetupDefaultHostnameResolver();
+    }
+
+    private void SetupDefaultHostnameResolver()
+    {
         MockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns<string, CancellationToken>((addr, _) =>
             {

@@ -3,6 +3,7 @@ using MX.GeoLocation.Web.Extensions;
 
 namespace MX.GeoLocation.Web.Tests.Extensions
 {
+    [Trait("Category", "Unit")]
     public class GeoLocationDtoExtensionsTests
     {
         [Fact]

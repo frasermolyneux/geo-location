@@ -8,6 +8,7 @@ using V1_1 = MX.GeoLocation.Abstractions.Interfaces.V1_1;
 
 namespace MX.GeoLocation.Api.Client.Testing.Tests;
 
+[Trait("Category", "Unit")]
 public class ServiceCollectionExtensionsTests
 {
     [Fact]

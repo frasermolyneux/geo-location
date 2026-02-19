@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>MX.GeoLocation.LookupWebApi.Tests</RootNamespace>
+    <RootNamespace>MX.GeoLocation.Api.Tests.V1</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 

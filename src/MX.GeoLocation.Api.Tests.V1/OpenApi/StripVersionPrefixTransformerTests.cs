@@ -1,8 +1,9 @@
 using Microsoft.OpenApi.Models;
 using MX.GeoLocation.LookupWebApi.OpenApi;
 
-namespace MX.GeoLocation.LookupWebApi.Tests.OpenApi;
+namespace MX.GeoLocation.Api.Tests.V1.OpenApi;
 
+[Trait("Category", "Unit")]
 public class StripVersionPrefixTransformerTests
 {
     private readonly StripVersionPrefixTransformer _transformer = new();

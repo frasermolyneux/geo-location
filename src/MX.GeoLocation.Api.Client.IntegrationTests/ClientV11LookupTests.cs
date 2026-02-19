@@ -10,16 +10,19 @@ using MX.GeoLocation.Api.IntegrationTests;
 
 namespace MX.GeoLocation.Api.Client.IntegrationTests;
 
-public class ClientV11LookupTests : IDisposable
+[Trait("Category", "Integration")]
+public class ClientV11LookupTests : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory;
+    private readonly HttpClient _httpClient;
     private readonly GeoLookupApiV1_1 _geoLookupApi;
 
-    public ClientV11LookupTests()
+    public ClientV11LookupTests(CustomWebApplicationFactory factory)
     {
-        _factory = new CustomWebApplicationFactory();
-        var httpClient = _factory.CreateClient();
-        var restClientService = new TestServerRestClientService(httpClient);
+        _factory = factory;
+        _factory.ResetMocks();
+        _httpClient = _factory.CreateClient();
+        var restClientService = new TestServerRestClientService(_httpClient);
         var options = new GeoLocationApiClientOptions { BaseUrl = "http://localhost" };
 
         _geoLookupApi = new GeoLookupApiV1_1(
@@ -28,6 +31,8 @@ public class ClientV11LookupTests : IDisposable
             restClientService,
             options);
     }
+
+    public Task InitializeAsync() => Task.CompletedTask;
 
     [Fact]
     public async Task GetCityGeoLocation_CacheHit_ReturnsData()
@@ -81,8 +86,9 @@ public class ClientV11LookupTests : IDisposable
         Assert.NotNull(result.Result?.Data);
     }
 
-    public void Dispose()
+    public Task DisposeAsync()
     {
-        _factory.Dispose();
+        _httpClient.Dispose();
+        return Task.CompletedTask;
     }
 }

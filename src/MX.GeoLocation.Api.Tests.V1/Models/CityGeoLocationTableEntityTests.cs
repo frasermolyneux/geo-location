@@ -1,8 +1,9 @@
 using MX.GeoLocation.LookupWebApi.Models;
 using MX.GeoLocation.Abstractions.Models.V1_1;
 
-namespace MX.GeoLocation.LookupWebApi.Tests.Models;
+namespace MX.GeoLocation.Api.Tests.V1.Models;
 
+[Trait("Category", "Unit")]
 public class CityGeoLocationTableEntityTests
 {
     [Fact]

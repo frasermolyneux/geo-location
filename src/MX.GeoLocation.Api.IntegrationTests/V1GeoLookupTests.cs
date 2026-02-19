@@ -10,21 +10,25 @@ using Newtonsoft.Json;
 
 namespace MX.GeoLocation.Api.IntegrationTests;
 
-public class V1GeoLookupTests : IDisposable
+[Trait("Category", "Integration")]
+public class V1GeoLookupTests : IClassFixture<CustomWebApplicationFactory>, IAsyncLifetime
 {
     private readonly CustomWebApplicationFactory _factory;
     private readonly HttpClient _client;
 
-    public V1GeoLookupTests()
+    public V1GeoLookupTests(CustomWebApplicationFactory factory)
     {
-        _factory = new CustomWebApplicationFactory();
+        _factory = factory;
+        _factory.ResetMocks();
         _client = _factory.CreateClient();
     }
 
-    public void Dispose()
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public Task DisposeAsync()
     {
         _client.Dispose();
-        _factory.Dispose();
+        return Task.CompletedTask;
     }
 
     [Fact]

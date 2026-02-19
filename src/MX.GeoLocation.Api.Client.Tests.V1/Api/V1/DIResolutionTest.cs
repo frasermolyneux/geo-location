@@ -9,6 +9,7 @@ namespace MX.GeoLocation.Api.Client.Tests.V1.Api.V1;
 /// <summary>
 /// Test to verify that the GeoLookupApi can be properly resolved from dependency injection
 /// </summary>
+[Trait("Category", "Unit")]
 public class DIResolutionTest
 {
     [Fact]

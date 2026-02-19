@@ -1,5 +1,6 @@
 namespace MX.GeoLocation.Web.IntegrationTests
 {
+    [Trait("Category", "Integration")]
     public class NavigationTests : TestBase
     {
         [Fact]

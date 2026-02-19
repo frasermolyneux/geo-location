@@ -2,8 +2,9 @@ using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.LookupWebApi.Models;
 using Newtonsoft.Json;
 
-namespace MX.GeoLocation.LookupWebApi.Tests.Models;
+namespace MX.GeoLocation.Api.Tests.V1.Models;
 
+[Trait("Category", "Unit")]
 public class GeoLocationTableEntityTests
 {
     [Fact]

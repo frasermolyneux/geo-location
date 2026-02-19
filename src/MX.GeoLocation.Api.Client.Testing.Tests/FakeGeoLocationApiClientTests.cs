@@ -5,6 +5,7 @@ using MX.GeoLocation.Abstractions.Interfaces.V1;
 
 namespace MX.GeoLocation.Api.Client.Testing.Tests;
 
+[Trait("Category", "Unit")]
 public class FakeGeoLocationApiClientTests
 {
     [Fact]
