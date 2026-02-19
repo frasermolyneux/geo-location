@@ -40,7 +40,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="MX.Api.Abstractions" Version="2.2.40" />
+	  <PackageReference Include="MX.Api.Abstractions" Version="2.3.25" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 
