@@ -65,4 +65,23 @@ public class FakeGeoLocationApiClientTests
         Assert.NotNull(client.ApiInfo);
         Assert.NotNull(client.ApiHealth);
     }
+
+    [Fact]
+    public async Task Reset_ClearsAllFakeState()
+    {
+        var client = new FakeGeoLocationApiClient();
+        client.V1Lookup.AddResponse("8.8.8.8",
+            GeoLocationDtoFactory.CreateGeoLocation(cityName: "Configured"));
+        client.V1_1Lookup.AddCityResponse("8.8.8.8",
+            GeoLocationDtoFactory.CreateCityGeoLocation(cityName: "Configured"));
+        await client.GeoLookup.V1.GetGeoLocation("8.8.8.8");
+
+        client.Reset();
+
+        Assert.Empty(client.V1Lookup.LookedUpAddresses);
+        var result = await client.GeoLookup.V1.GetGeoLocation("8.8.8.8");
+        Assert.Equal("Test City", result.Result!.Data!.CityName);
+        var cityResult = await client.GeoLookup.V1_1.GetCityGeoLocation("8.8.8.8");
+        Assert.Equal("Test City", cityResult.Result!.Data!.CityName);
+    }
 }

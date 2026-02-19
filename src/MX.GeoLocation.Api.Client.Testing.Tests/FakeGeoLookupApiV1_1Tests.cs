@@ -115,4 +115,68 @@ public class FakeGeoLookupApiV1_1Tests
         Assert.Equal("City Result", cityResult.Result!.Data!.CityName);
         Assert.Equal("Insights Result", insightsResult.Result!.Data!.CityName);
     }
+
+    [Fact]
+    public async Task Reset_ClearsAllState()
+    {
+        var fake = new FakeGeoLookupApiV1_1();
+        fake.AddCityResponse("8.8.8.8", GeoLocationDtoFactory.CreateCityGeoLocation(cityName: "Configured"));
+        fake.AddInsightsResponse("8.8.8.8", GeoLocationDtoFactory.CreateInsightsGeoLocation(cityName: "Configured"));
+        fake.AddCityErrorResponse("bad", System.Net.HttpStatusCode.BadRequest, "ERR", "Error");
+        await fake.GetCityGeoLocation("8.8.8.8");
+        await fake.GetInsightsGeoLocation("8.8.8.8");
+
+        fake.Reset();
+
+        Assert.Empty(fake.CityLookedUpAddresses);
+        Assert.Empty(fake.InsightsLookedUpAddresses);
+        var cityResult = await fake.GetCityGeoLocation("8.8.8.8");
+        Assert.Equal("Test City", cityResult.Result!.Data!.CityName);
+        var errorResult = await fake.GetCityGeoLocation("bad");
+        Assert.Equal(System.Net.HttpStatusCode.OK, errorResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task SetDefaultBehavior_ReturnError_UnconfiguredCityReturnsError()
+    {
+        var fake = new FakeGeoLookupApiV1_1();
+        fake.SetDefaultBehavior(DefaultLookupBehavior.ReturnError);
+        fake.AddCityResponse("8.8.8.8", GeoLocationDtoFactory.CreateCityGeoLocation(cityName: "Allowed"));
+
+        var configuredResult = await fake.GetCityGeoLocation("8.8.8.8");
+        Assert.Equal(System.Net.HttpStatusCode.OK, configuredResult.StatusCode);
+
+        var unconfiguredResult = await fake.GetCityGeoLocation("unknown");
+        Assert.Equal(System.Net.HttpStatusCode.NotFound, unconfiguredResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task SetDefaultBehavior_ReturnError_UnconfiguredInsightsReturnsError()
+    {
+        var fake = new FakeGeoLookupApiV1_1();
+        fake.SetDefaultBehavior(DefaultLookupBehavior.ReturnError,
+            errorStatusCode: System.Net.HttpStatusCode.Forbidden,
+            errorCode: "FORBIDDEN",
+            errorMessage: "Access denied");
+        fake.AddInsightsResponse("8.8.8.8", GeoLocationDtoFactory.CreateInsightsGeoLocation(cityName: "Allowed"));
+
+        var configuredResult = await fake.GetInsightsGeoLocation("8.8.8.8");
+        Assert.Equal(System.Net.HttpStatusCode.OK, configuredResult.StatusCode);
+
+        var unconfiguredResult = await fake.GetInsightsGeoLocation("unknown");
+        Assert.Equal(System.Net.HttpStatusCode.Forbidden, unconfiguredResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task Reset_AlsoResetsDefaultBehavior()
+    {
+        var fake = new FakeGeoLookupApiV1_1();
+        fake.SetDefaultBehavior(DefaultLookupBehavior.ReturnError);
+
+        fake.Reset();
+
+        var result = await fake.GetCityGeoLocation("any");
+        Assert.Equal(System.Net.HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal("Test City", result.Result!.Data!.CityName);
+    }
 }

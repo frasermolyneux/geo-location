@@ -19,6 +19,10 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
     private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _insightsErrorResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentBag<string> _cityLookedUpAddresses = [];
     private readonly ConcurrentBag<string> _insightsLookedUpAddresses = [];
+    private DefaultLookupBehavior _defaultBehavior = DefaultLookupBehavior.ReturnGenericSuccess;
+    private HttpStatusCode _defaultErrorStatusCode = HttpStatusCode.NotFound;
+    private string _defaultErrorCode = "NOT_FOUND";
+    private string _defaultErrorMessage = "Address not configured in fake";
 
     /// <summary>
     /// Registers a canned city response for a specific address.
@@ -57,6 +61,43 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
     }
 
     /// <summary>
+    /// Configures how unconfigured addresses are handled.
+    /// When set to <see cref="DefaultLookupBehavior.ReturnError"/>, lookups for addresses
+    /// without a canned response will return an error instead of a generic success.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 SetDefaultBehavior(
+        DefaultLookupBehavior behavior,
+        HttpStatusCode errorStatusCode = HttpStatusCode.NotFound,
+        string errorCode = "NOT_FOUND",
+        string errorMessage = "Address not configured in fake")
+    {
+        _defaultBehavior = behavior;
+        _defaultErrorStatusCode = errorStatusCode;
+        _defaultErrorCode = errorCode;
+        _defaultErrorMessage = errorMessage;
+        return this;
+    }
+
+    /// <summary>
+    /// Clears all configured responses, error responses, and tracking state.
+    /// Resets default behavior to <see cref="DefaultLookupBehavior.ReturnGenericSuccess"/>.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 Reset()
+    {
+        _cityResponses.Clear();
+        _insightsResponses.Clear();
+        _cityErrorResponses.Clear();
+        _insightsErrorResponses.Clear();
+        while (_cityLookedUpAddresses.TryTake(out _)) { }
+        while (_insightsLookedUpAddresses.TryTake(out _)) { }
+        _defaultBehavior = DefaultLookupBehavior.ReturnGenericSuccess;
+        _defaultErrorStatusCode = HttpStatusCode.NotFound;
+        _defaultErrorCode = "NOT_FOUND";
+        _defaultErrorMessage = "Address not configured in fake";
+        return this;
+    }
+
+    /// <summary>
     /// Returns the set of addresses looked up via <see cref="GetCityGeoLocation"/>.
     /// </summary>
     public IReadOnlyCollection<string> CityLookedUpAddresses => _cityLookedUpAddresses.ToArray();
@@ -76,9 +117,18 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
                 new ApiResponse<CityGeoLocationDto>(error.Error)));
         }
 
-        var dto = _cityResponses.GetValueOrDefault(hostname)
-            ?? GeoLocationDtoFactory.CreateCityGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
+        if (_cityResponses.TryGetValue(hostname, out var dto))
+        {
+            return Task.FromResult(new ApiResult<CityGeoLocationDto>(HttpStatusCode.OK, new ApiResponse<CityGeoLocationDto>(dto)));
+        }
 
+        if (_defaultBehavior == DefaultLookupBehavior.ReturnError)
+        {
+            return Task.FromResult(new ApiResult<CityGeoLocationDto>(_defaultErrorStatusCode,
+                new ApiResponse<CityGeoLocationDto>(new ApiError(_defaultErrorCode, _defaultErrorMessage))));
+        }
+
+        dto = GeoLocationDtoFactory.CreateCityGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
         return Task.FromResult(new ApiResult<CityGeoLocationDto>(HttpStatusCode.OK, new ApiResponse<CityGeoLocationDto>(dto)));
     }
 
@@ -92,9 +142,18 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
                 new ApiResponse<InsightsGeoLocationDto>(error.Error)));
         }
 
-        var dto = _insightsResponses.GetValueOrDefault(hostname)
-            ?? GeoLocationDtoFactory.CreateInsightsGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
+        if (_insightsResponses.TryGetValue(hostname, out var dto))
+        {
+            return Task.FromResult(new ApiResult<InsightsGeoLocationDto>(HttpStatusCode.OK, new ApiResponse<InsightsGeoLocationDto>(dto)));
+        }
 
+        if (_defaultBehavior == DefaultLookupBehavior.ReturnError)
+        {
+            return Task.FromResult(new ApiResult<InsightsGeoLocationDto>(_defaultErrorStatusCode,
+                new ApiResponse<InsightsGeoLocationDto>(new ApiError(_defaultErrorCode, _defaultErrorMessage))));
+        }
+
+        dto = GeoLocationDtoFactory.CreateInsightsGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
         return Task.FromResult(new ApiResult<InsightsGeoLocationDto>(HttpStatusCode.OK, new ApiResponse<InsightsGeoLocationDto>(dto)));
     }
 }

@@ -70,4 +70,16 @@ public class FakeGeoLocationApiClient : IGeoLocationApiClient
     public IVersionedGeoLookupApi GeoLookup => _geoLookup.Value;
     public IApiInfoApi ApiInfo => InfoApi;
     public IApiHealthApi ApiHealth => HealthApi;
+
+    /// <summary>
+    /// Resets all fakes to their initial state, clearing configured responses,
+    /// error responses, and tracking state. Useful when sharing a fake instance
+    /// across tests via IClassFixture or similar patterns.
+    /// </summary>
+    public FakeGeoLocationApiClient Reset()
+    {
+        V1Lookup.Reset();
+        V1_1Lookup.Reset();
+        return this;
+    }
 }
