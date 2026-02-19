@@ -1,11 +1,11 @@
-# MX.GeoLocation.LookupApi.Abstractions
+# MX.GeoLocation.Abstractions.V1
 
 Core abstractions library providing interfaces and models for the GeoLocation lookup service. This package defines the API contracts consumed by `MX.GeoLocation.Api.Client.V1` and tested with `MX.GeoLocation.Api.Client.Testing`.
 
 ## Installation
 
 ```shell
-dotnet add package MX.GeoLocation.LookupApi.Abstractions
+dotnet add package MX.GeoLocation.Abstractions.V1
 ```
 
 ## Key Interfaces
