@@ -18,7 +18,8 @@ locals {
 
   public_hostname = "${var.dns.web_subdomain}.${var.dns.domain}"
 
-  api_management_name = "apim-${var.workload}-${var.environment}-${var.location}-${random_id.environment_id.hex}"
+  api_management_name      = "apim-${var.workload}-${var.environment}-${var.location}-${random_id.environment_id.hex}"
+  api_management_root_path = "geolocation-api"
 
   app_insights_sampling_percentage = {
     dev = 25
