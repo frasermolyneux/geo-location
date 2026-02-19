@@ -27,7 +27,7 @@ namespace MX.GeoLocation.Api.Client.V1
         {
             try
             {
-                var request = await CreateRequestAsync($"v1.1/lookup/city/{hostname}", Method.Get, cancellationToken);
+                var request = await CreateRequestAsync($"v1.1/lookup/city/{Uri.EscapeDataString(hostname)}", Method.Get, cancellationToken);
                 var response = await ExecuteAsync(request, cancellationToken);
 
                 return response.ToApiResult<CityGeoLocationDto>();
@@ -44,7 +44,7 @@ namespace MX.GeoLocation.Api.Client.V1
         {
             try
             {
-                var request = await CreateRequestAsync($"v1.1/lookup/insights/{hostname}", Method.Get, cancellationToken);
+                var request = await CreateRequestAsync($"v1.1/lookup/insights/{Uri.EscapeDataString(hostname)}", Method.Get, cancellationToken);
                 var response = await ExecuteAsync(request, cancellationToken);
 
                 return response.ToApiResult<InsightsGeoLocationDto>();

@@ -27,14 +27,20 @@ public class GeoLookupControllerCacheTests
         _mockHostnameResolver = new Mock<IHostnameResolver>();
 
         _mockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
+        _mockHostnameResolver.Setup(x => x.IsPrivateOrReservedAddress(It.IsAny<string>())).Returns(false);
         _mockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Returns<string, CancellationToken>((addr, _) => Task.FromResult<(bool, string?)>((true, addr)));
+
+        var geoLookupService = new GeoLookupService(
+            Mock.Of<ILogger<GeoLookupService>>(),
+            _mockHostnameResolver.Object);
 
         _controller = new GeoLookupController(
             Mock.Of<ILogger<GeoLookupController>>(),
             _mockTableStorage.Object,
             _mockMaxMind.Object,
-            _mockHostnameResolver.Object);
+            _mockHostnameResolver.Object,
+            geoLookupService);
     }
 
     [Fact]

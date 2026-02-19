@@ -23,16 +23,23 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             mockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
             mockHostnameResolver.Setup(x => x.IsLocalAddress("localhost")).Returns(true);
             mockHostnameResolver.Setup(x => x.IsLocalAddress("127.0.0.1")).Returns(true);
+            mockHostnameResolver.Setup(x => x.IsPrivateOrReservedAddress(It.IsAny<string>())).Returns(false);
+            mockHostnameResolver.Setup(x => x.IsPrivateOrReservedAddress("127.0.0.1")).Returns(true);
             mockHostnameResolver.Setup(x => x.ResolveHostname("localhost", It.IsAny<CancellationToken>()))
                 .ReturnsAsync((true, "127.0.0.1"));
             mockHostnameResolver.Setup(x => x.ResolveHostname("127.0.0.1", It.IsAny<CancellationToken>()))
                 .ReturnsAsync((true, "127.0.0.1"));
 
+            var mockGeoLookupService = new GeoLookupService(
+                Mock.Of<ILogger<GeoLookupService>>(),
+                mockHostnameResolver.Object);
+
             geoLookupController = new GeoLookupController(
                 Mock.Of<ILogger<GeoLookupController>>(),
                 Mock.Of<ITableStorageGeoLocationRepository>(),
                 Mock.Of<IMaxMindGeoLocationRepository>(),
-                mockHostnameResolver.Object);
+                mockHostnameResolver.Object,
+                mockGeoLookupService);
         }
 
         [Theory]

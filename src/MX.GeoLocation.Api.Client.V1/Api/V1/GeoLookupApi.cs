@@ -29,7 +29,7 @@ namespace MX.GeoLocation.Api.Client.V1
         {
             try
             {
-                var request = await CreateRequestAsync($"v1/lookup/{hostname}", Method.Get, cancellationToken);
+                var request = await CreateRequestAsync($"v1/lookup/{Uri.EscapeDataString(hostname)}", Method.Get, cancellationToken);
                 var response = await ExecuteAsync(request, cancellationToken);
 
                 var result = response.ToApiResult<GeoLocationDto>();
@@ -70,7 +70,7 @@ namespace MX.GeoLocation.Api.Client.V1
         {
             try
             {
-                var request = await CreateRequestAsync($"v1/lookup/{hostname}", Method.Delete, cancellationToken);
+                var request = await CreateRequestAsync($"v1/lookup/{Uri.EscapeDataString(hostname)}", Method.Delete, cancellationToken);
                 var response = await ExecuteAsync(request, cancellationToken);
 
                 var result = response.ToApiResult();

@@ -94,6 +94,7 @@ builder.Services.AddSingleton<TableServiceClient>(sp =>
 builder.Services.AddSingleton<ITableStorageGeoLocationRepository, TableStorageGeoLocationRepository>();
 builder.Services.AddSingleton<IMaxMindGeoLocationRepository, MaxMindGeoLocationRepository>();
 builder.Services.AddSingleton<IHostnameResolver, HostnameResolver>();
+builder.Services.AddSingleton<IGeoLookupService, GeoLookupService>();
 
 builder.Services.AddSingleton<WebServiceClient>(sp =>
 {
@@ -102,7 +103,11 @@ builder.Services.AddSingleton<WebServiceClient>(sp =>
     if (!int.TryParse(userIdString, out var userId))
         throw new InvalidOperationException($"The 'maxmind_userid' configuration value '{userIdString}' is not a valid integer.");
     var licenseKey = configuration["maxmind_apikey"] ?? throw new InvalidOperationException("The 'maxmind_apikey' configuration value is not set.");
-    return new WebServiceClient(userId, licenseKey);
+    var handler = new SocketsHttpHandler
+    {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+    };
+    return new WebServiceClient(userId, licenseKey, httpMessageHandler: handler);
 });
 
 builder.Services.AddHealthChecks()

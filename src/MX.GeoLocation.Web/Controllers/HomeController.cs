@@ -179,7 +179,7 @@ namespace MX.GeoLocation.Web.Controllers
                 return View(model);
             }
 
-            if (addresses.Count >= 20)
+            if (addresses.Count > 20)
             {
                 ModelState.AddModelError(nameof(model.AddressData),
                     "You can only search for a maximum of 20 addresses in one request");

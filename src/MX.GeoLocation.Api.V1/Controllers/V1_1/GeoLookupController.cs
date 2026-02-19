@@ -1,7 +1,5 @@
 using System.Net;
 
-using MaxMind.GeoIP2.Exceptions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
@@ -21,23 +19,20 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
     [Authorize(Roles = "LookupApiUser")]
     public class GeoLookupController : ControllerBase
     {
-        private readonly ILogger<GeoLookupController> _logger;
         private readonly IMaxMindGeoLocationRepository _maxMind;
         private readonly ITableStorageGeoLocationRepository _tableStorage;
-        private readonly IHostnameResolver _hostnameResolver;
+        private readonly IGeoLookupService _geoLookupService;
         private readonly TimeSpan _insightsCacheDuration;
 
         public GeoLookupController(
-            ILogger<GeoLookupController> logger,
             IMaxMindGeoLocationRepository maxMind,
             ITableStorageGeoLocationRepository tableStorage,
-            IHostnameResolver hostnameResolver,
+            IGeoLookupService geoLookupService,
             IConfiguration configuration)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _maxMind = maxMind ?? throw new ArgumentNullException(nameof(maxMind));
             _tableStorage = tableStorage ?? throw new ArgumentNullException(nameof(tableStorage));
-            _hostnameResolver = hostnameResolver ?? throw new ArgumentNullException(nameof(hostnameResolver));
+            _geoLookupService = geoLookupService ?? throw new ArgumentNullException(nameof(geoLookupService));
 
             var days = configuration.GetValue("Caching:InsightsCacheDays", 7);
             _insightsCacheDuration = TimeSpan.FromDays(days);
@@ -50,7 +45,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
             if (string.IsNullOrWhiteSpace(hostname))
                 return ErrorResult<CityGeoLocationDto>(HttpStatusCode.BadRequest, ErrorCodes.EMPTY_HOSTNAME, ErrorMessages.EMPTY_HOSTNAME);
 
-            var response = await ExecuteLookup<CityGeoLocationDto>(hostname, cancellationToken, async address =>
+            var response = await _geoLookupService.ExecuteLookup<CityGeoLocationDto>(hostname, cancellationToken, async address =>
             {
                 var cached = await _tableStorage.GetCityGeoLocation(address, cancellationToken);
                 if (cached is not null)
@@ -76,7 +71,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
             if (string.IsNullOrWhiteSpace(hostname))
                 return ErrorResult<InsightsGeoLocationDto>(HttpStatusCode.BadRequest, ErrorCodes.EMPTY_HOSTNAME, ErrorMessages.EMPTY_HOSTNAME);
 
-            var response = await ExecuteLookup<InsightsGeoLocationDto>(hostname, cancellationToken, async address =>
+            var response = await _geoLookupService.ExecuteLookup<InsightsGeoLocationDto>(hostname, cancellationToken, async address =>
             {
                 var cached = await _tableStorage.GetInsightsGeoLocation(address, _insightsCacheDuration, cancellationToken);
                 if (cached is not null)
@@ -93,36 +88,6 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1_1
             });
 
             return response.ToHttpResult();
-        }
-
-        private async Task<ApiResult<T>> ExecuteLookup<T>(string hostname, CancellationToken cancellationToken, Func<string, Task<ApiResult<T>>> lookupFunc) where T : class
-        {
-            try
-            {
-                var (success, address) = await _hostnameResolver.ResolveHostname(hostname, cancellationToken);
-                if (!success || address is null)
-                    return new ApiResponse<T>(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToApiResult(HttpStatusCode.BadRequest);
-
-                if (_hostnameResolver.IsLocalAddress(hostname))
-                    return new ApiResponse<T>(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS)).ToApiResult(HttpStatusCode.BadRequest);
-
-                return await lookupFunc(address);
-            }
-            catch (AddressNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Address not found for {Hostname}", hostname);
-                return new ApiResponse<T>(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND)).ToApiResult(HttpStatusCode.NotFound);
-            }
-            catch (GeoIP2Exception ex)
-            {
-                _logger.LogError(ex, "GeoIP2 error for {Hostname}", hostname);
-                return new ApiResponse<T>(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message)).ToApiResult(HttpStatusCode.BadRequest);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error during geolocation lookup for {Hostname}", hostname);
-                return new ApiResponse<T>(new ApiError(ErrorCodes.INTERNAL_ERROR, "An unexpected error occurred")).ToApiResult(HttpStatusCode.InternalServerError);
-            }
         }
 
         private static IActionResult ErrorResult<T>(HttpStatusCode statusCode, string code, string message) where T : class

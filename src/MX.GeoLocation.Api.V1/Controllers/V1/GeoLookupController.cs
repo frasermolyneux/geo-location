@@ -27,17 +27,20 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
         private readonly ITableStorageGeoLocationRepository _tableStorage;
         private readonly IMaxMindGeoLocationRepository _maxMind;
         private readonly IHostnameResolver _hostnameResolver;
+        private readonly IGeoLookupService _geoLookupService;
 
         public GeoLookupController(
             ILogger<GeoLookupController> logger,
             ITableStorageGeoLocationRepository tableStorage,
             IMaxMindGeoLocationRepository maxMind,
-            IHostnameResolver hostnameResolver)
+            IHostnameResolver hostnameResolver,
+            IGeoLookupService geoLookupService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _tableStorage = tableStorage ?? throw new ArgumentNullException(nameof(tableStorage));
             _maxMind = maxMind ?? throw new ArgumentNullException(nameof(maxMind));
             _hostnameResolver = hostnameResolver ?? throw new ArgumentNullException(nameof(hostnameResolver));
+            _geoLookupService = geoLookupService ?? throw new ArgumentNullException(nameof(geoLookupService));
         }
 
         [HttpGet]
@@ -53,7 +56,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                 ["Operation"] = "GetGeoLocation"
             });
 
-            var response = await ExecuteLookup<GeoLocationDto>(hostname, cancellationToken, async address =>
+            var response = await _geoLookupService.ExecuteLookup<GeoLocationDto>(hostname, cancellationToken, async address =>
             {
                 var dto = await _tableStorage.GetGeoLocation(address, cancellationToken);
                 if (dto is not null)
@@ -85,42 +88,45 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
             List<GeoLocationDto> entries = [];
             List<ApiError> errors = [];
 
-            foreach (var hostname in hostnames)
+            await Parallel.ForEachAsync(
+                hostnames,
+                new ParallelOptions { MaxDegreeOfParallelism = 5, CancellationToken = cancellationToken },
+                async (hostname, ct) =>
             {
                 try
                 {
-                    var (success, address) = await _hostnameResolver.ResolveHostname(hostname, cancellationToken);
+                    var (success, address) = await _hostnameResolver.ResolveHostname(hostname, ct);
                     if (!success || address is null)
                     {
-                        errors.Add(new ApiError(ErrorCodes.INVALID_HOSTNAME, $"The hostname provided '{hostname}' is invalid"));
-                        continue;
+                        lock (errors) errors.Add(new ApiError(ErrorCodes.INVALID_HOSTNAME, $"The hostname provided '{hostname}' is invalid"));
+                        return;
                     }
 
-                    if (_hostnameResolver.IsLocalAddress(hostname))
+                    if (_hostnameResolver.IsLocalAddress(hostname) || _hostnameResolver.IsPrivateOrReservedAddress(address))
                     {
-                        errors.Add(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS_BATCH));
-                        continue;
+                        lock (errors) errors.Add(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS_BATCH));
+                        return;
                     }
 
-                    var dto = await _tableStorage.GetGeoLocation(address, cancellationToken);
+                    var dto = await _tableStorage.GetGeoLocation(address, ct);
                     if (dto is null)
                     {
-                        dto = await _maxMind.GetGeoLocation(address, cancellationToken);
+                        dto = await _maxMind.GetGeoLocation(address, ct);
                         dto.Address = hostname;
-                        await _tableStorage.StoreGeoLocation(dto, cancellationToken);
+                        await _tableStorage.StoreGeoLocation(dto, ct);
                     }
 
-                    entries.Add(dto);
+                    lock (entries) entries.Add(dto);
                 }
                 catch (AddressNotFoundException ex)
                 {
-                    errors.Add(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ex.Message));
+                    lock (errors) errors.Add(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ex.Message));
                 }
                 catch (GeoIP2Exception ex)
                 {
-                    errors.Add(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message));
+                    lock (errors) errors.Add(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message));
                 }
-            }
+            });
 
             var result = new ApiResponse<CollectionModel<GeoLocationDto>>(
                 new CollectionModel<GeoLocationDto> { Items = entries })
@@ -145,7 +151,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                 if (!success || address is null)
                     return new ApiResponse(new ApiError(ErrorCodes.HOSTNAME_RESOLUTION_FAILED, ErrorMessages.HOSTNAME_RESOLUTION_FAILED_DELETE)).ToBadRequestResult().ToHttpResult();
 
-                if (_hostnameResolver.IsLocalAddress(hostname))
+                if (_hostnameResolver.IsLocalAddress(hostname) || _hostnameResolver.IsPrivateOrReservedAddress(address))
                     return new ApiResponse(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS_DELETE)).ToBadRequestResult().ToHttpResult();
 
                 var deleted = await _tableStorage.DeleteGeoLocation(address, cancellationToken);
@@ -162,36 +168,6 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                 _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", hostname);
                 return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, "An error occurred while deleting data"))
                     .ToApiResult(HttpStatusCode.InternalServerError).ToHttpResult();
-            }
-        }
-
-        private async Task<ApiResult<T>> ExecuteLookup<T>(string hostname, CancellationToken cancellationToken, Func<string, Task<ApiResult<T>>> lookupFunc) where T : class
-        {
-            try
-            {
-                var (success, address) = await _hostnameResolver.ResolveHostname(hostname, cancellationToken);
-                if (!success || address is null)
-                    return new ApiResponse<T>(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToApiResult(HttpStatusCode.BadRequest);
-
-                if (_hostnameResolver.IsLocalAddress(hostname))
-                    return new ApiResponse<T>(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS)).ToApiResult(HttpStatusCode.BadRequest);
-
-                return await lookupFunc(address);
-            }
-            catch (AddressNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Address not found for {Hostname}", hostname);
-                return new ApiResponse<T>(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND)).ToApiResult(HttpStatusCode.NotFound);
-            }
-            catch (GeoIP2Exception ex)
-            {
-                _logger.LogError(ex, "GeoIP2 error for {Hostname}", hostname);
-                return new ApiResponse<T>(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message)).ToApiResult(HttpStatusCode.BadRequest);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error during geolocation lookup for {Hostname}", hostname);
-                return new ApiResponse<T>(new ApiError(ErrorCodes.INTERNAL_ERROR, "An unexpected error occurred")).ToApiResult(HttpStatusCode.InternalServerError);
             }
         }
 
