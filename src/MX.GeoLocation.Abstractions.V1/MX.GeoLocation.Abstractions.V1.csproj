@@ -1,19 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>net9.0;net10.0</TargetFrameworks>
 		<RootNamespace>MX.GeoLocation.LookupApi.Abstractions</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Authors>Fraser Molyneux</Authors>
-		<Product>GeoLocation Client Abstractions</Product>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>MX.GeoLocation.LookupApi.Abstractions</PackageId>
+		<Product>Molyneux.IO GeoLocation</Product>
+		<Title>GeoLocation Lookup API Abstractions</Title>
 		<Description>This package provides an abstraction layer for interfaces and models for the GeoLocation service.</Description>
-		<Copyright>GNUv3</Copyright>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
-		<RepositoryType>Git</RepositoryType>
-		<PackageId>MX.GeoLocation.LookupApi.Abstractions</PackageId>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -43,6 +42,10 @@
 	<ItemGroup>
 	  <PackageReference Include="MX.Api.Abstractions" Version="2.2.40" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 	
 </Project>

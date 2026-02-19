@@ -1,18 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>net9.0;net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Authors>Fraser Molyneux</Authors>
-		<Product>GeoLocation Client Testing</Product>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>MX.GeoLocation.Api.Client.Testing</PackageId>
+		<Product>Molyneux.IO GeoLocation</Product>
+		<Title>GeoLocation API Client Testing</Title>
 		<Description>Test helpers for consumer apps: in-memory fakes of IGeoLocationApiClient, DTO factory methods, and DI extensions for integration tests.</Description>
-		<Copyright>GNUv3</Copyright>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageProjectUrl>https://github.com/frasermolyneux/geo-location</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/frasermolyneux/geo-location</RepositoryUrl>
-		<RepositoryType>Git</RepositoryType>
-		<PackageId>MX.GeoLocation.Api.Client.Testing</PackageId>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -23,6 +22,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj" />
 		<ProjectReference Include="..\MX.GeoLocation.Api.Client.V1\MX.GeoLocation.Api.Client.V1.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 
 </Project>
