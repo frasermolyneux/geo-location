@@ -14,7 +14,9 @@ namespace MX.GeoLocation.Api.Client.Testing;
 public class FakeGeoLookupApi : IGeoLookupApi
 {
     private readonly ConcurrentDictionary<string, GeoLocationDto> _responses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _errorResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentBag<string> _deletedAddresses = [];
+    private readonly ConcurrentBag<string> _lookedUpAddresses = [];
 
     /// <summary>
     /// Registers a canned response for a specific address.
@@ -26,12 +28,34 @@ public class FakeGeoLookupApi : IGeoLookupApi
     }
 
     /// <summary>
+    /// Registers a canned error response for a specific address.
+    /// </summary>
+    public FakeGeoLookupApi AddErrorResponse(string address, HttpStatusCode statusCode, string errorCode, string errorMessage)
+    {
+        _errorResponses[address] = (statusCode, new ApiError(errorCode, errorMessage));
+        return this;
+    }
+
+    /// <summary>
     /// Returns the set of addresses that had <see cref="DeleteMetadata"/> called on them.
     /// </summary>
     public IReadOnlyCollection<string> DeletedAddresses => _deletedAddresses.ToArray();
 
+    /// <summary>
+    /// Returns the set of addresses that were looked up via <see cref="GetGeoLocation"/> or <see cref="GetGeoLocations"/>.
+    /// </summary>
+    public IReadOnlyCollection<string> LookedUpAddresses => _lookedUpAddresses.ToArray();
+
     public Task<ApiResult<GeoLocationDto>> GetGeoLocation(string hostname, CancellationToken cancellationToken = default)
     {
+        _lookedUpAddresses.Add(hostname);
+
+        if (_errorResponses.TryGetValue(hostname, out var error))
+        {
+            return Task.FromResult(new ApiResult<GeoLocationDto>(error.StatusCode,
+                new ApiResponse<GeoLocationDto>(error.Error)));
+        }
+
         var dto = _responses.GetValueOrDefault(hostname)
             ?? GeoLocationDtoFactory.CreateGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
 
@@ -40,6 +64,8 @@ public class FakeGeoLookupApi : IGeoLookupApi
 
     public Task<ApiResult<CollectionModel<GeoLocationDto>>> GetGeoLocations(List<string> hostnames, CancellationToken cancellationToken = default)
     {
+        foreach (var h in hostnames) _lookedUpAddresses.Add(h);
+
         var items = hostnames.Select(h =>
             _responses.GetValueOrDefault(h)
             ?? GeoLocationDtoFactory.CreateGeoLocation(address: h, cityName: "Test City", countryName: "Test Country"))

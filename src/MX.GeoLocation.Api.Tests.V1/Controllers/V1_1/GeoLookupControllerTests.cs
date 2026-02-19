@@ -5,19 +5,34 @@ using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1_1;
 using MX.GeoLocation.LookupWebApi.Controllers.V1_1;
 using MX.GeoLocation.LookupWebApi.Repositories;
+using MX.GeoLocation.LookupWebApi.Services;
 
 namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
 {
-    public class GeoLookupControllerTests : IDisposable
+    public class GeoLookupControllerTests
     {
         private readonly Mock<IMaxMindGeoLocationRepository> mockMaxMind;
         private readonly Mock<ITableStorageGeoLocationRepository> mockTableStorage;
+        private readonly Mock<IHostnameResolver> mockHostnameResolver;
         private readonly GeoLookupController geoLookupController;
 
         public GeoLookupControllerTests()
         {
             mockMaxMind = new Mock<IMaxMindGeoLocationRepository>();
             mockTableStorage = new Mock<ITableStorageGeoLocationRepository>();
+            mockHostnameResolver = new Mock<IHostnameResolver>();
+
+            mockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((false, (string?)null));
+            mockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
+            mockHostnameResolver.Setup(x => x.IsLocalAddress("localhost")).Returns(true);
+            mockHostnameResolver.Setup(x => x.IsLocalAddress("127.0.0.1")).Returns(true);
+            mockHostnameResolver.Setup(x => x.ResolveHostname("localhost", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "127.0.0.1"));
+            mockHostnameResolver.Setup(x => x.ResolveHostname("127.0.0.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "127.0.0.1"));
+            mockHostnameResolver.Setup(x => x.ResolveHostname("8.8.8.8", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "8.8.8.8"));
 
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
@@ -30,6 +45,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
                 Mock.Of<ILogger<GeoLookupController>>(),
                 mockMaxMind.Object,
                 mockTableStorage.Object,
+                mockHostnameResolver.Object,
                 config);
         }
 
@@ -40,7 +56,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
         public async Task TestGetCityGeoLocationReturnsBadRequestForNullOrEmptyHostname(string? hostname)
         {
             // Act
-            var result = await geoLookupController.GetCityGeoLocationAction(hostname!, CancellationToken.None);
+            var result = await geoLookupController.GetCityGeoLocation(hostname!, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -58,7 +74,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
         public async Task TestGetInsightsGeoLocationReturnsBadRequestForNullOrEmptyHostname(string? hostname)
         {
             // Act
-            var result = await geoLookupController.GetInsightsGeoLocationAction(hostname!, CancellationToken.None);
+            var result = await geoLookupController.GetInsightsGeoLocation(hostname!, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -75,7 +91,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
         public async Task TestGetCityGeoLocationHandlesInvalidHostname(string invalidHostname)
         {
             // Act
-            var result = await geoLookupController.GetCityGeoLocationAction(invalidHostname, CancellationToken.None);
+            var result = await geoLookupController.GetCityGeoLocation(invalidHostname, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -92,7 +108,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
         public async Task TestGetInsightsGeoLocationHandlesInvalidHostname(string invalidHostname)
         {
             // Act
-            var result = await geoLookupController.GetInsightsGeoLocationAction(invalidHostname, CancellationToken.None);
+            var result = await geoLookupController.GetInsightsGeoLocation(invalidHostname, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -109,7 +125,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
         public async Task TestGetCityGeoLocationHandlesLocalhost(string localhost)
         {
             // Act
-            var result = await geoLookupController.GetCityGeoLocationAction(localhost, CancellationToken.None);
+            var result = await geoLookupController.GetCityGeoLocation(localhost, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -126,7 +142,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
         public async Task TestGetInsightsGeoLocationHandlesLocalhost(string localhost)
         {
             // Act
-            var result = await geoLookupController.GetInsightsGeoLocationAction(localhost, CancellationToken.None);
+            var result = await geoLookupController.GetInsightsGeoLocation(localhost, CancellationToken.None);
 
             // Assert
             Assert.NotNull(result);
@@ -154,7 +170,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
                 .ReturnsAsync(cachedDto);
 
             // Act
-            var result = await geoLookupController.GetCityGeoLocationAction("8.8.8.8", CancellationToken.None);
+            var result = await geoLookupController.GetCityGeoLocation("8.8.8.8", CancellationToken.None);
 
             // Assert
             var objectResult = result as ObjectResult;
@@ -186,7 +202,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
                 .ReturnsAsync(maxMindDto);
 
             // Act
-            var result = await geoLookupController.GetCityGeoLocationAction("8.8.8.8", CancellationToken.None);
+            var result = await geoLookupController.GetCityGeoLocation("8.8.8.8", CancellationToken.None);
 
             // Assert
             var objectResult = result as ObjectResult;
@@ -217,7 +233,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
                 .ReturnsAsync(cachedDto);
 
             // Act
-            var result = await geoLookupController.GetInsightsGeoLocationAction("8.8.8.8", CancellationToken.None);
+            var result = await geoLookupController.GetInsightsGeoLocation("8.8.8.8", CancellationToken.None);
 
             // Assert
             var objectResult = result as ObjectResult;
@@ -250,7 +266,7 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
                 .ReturnsAsync(maxMindDto);
 
             // Act
-            var result = await geoLookupController.GetInsightsGeoLocationAction("8.8.8.8", CancellationToken.None);
+            var result = await geoLookupController.GetInsightsGeoLocation("8.8.8.8", CancellationToken.None);
 
             // Assert
             var objectResult = result as ObjectResult;
@@ -263,9 +279,146 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers.V1_1
             mockTableStorage.Verify(x => x.StoreInsightsGeoLocation(It.IsAny<InsightsGeoLocationDto>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
-        public void Dispose()
+        [Fact]
+        public async Task TestGetCityGeoLocation_AddressNotFound_ReturnsNotFound()
         {
-            geoLookupController?.Dispose();
+            // Arrange
+            mockTableStorage
+                .Setup(x => x.GetCityGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((CityGeoLocationDto?)null);
+
+            mockMaxMind
+                .Setup(x => x.GetCityGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new MaxMind.GeoIP2.Exceptions.AddressNotFoundException("Address not found"));
+
+            mockHostnameResolver
+                .Setup(x => x.ResolveHostname("198.51.100.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "198.51.100.1"));
+
+            // Act
+            var result = await geoLookupController.GetCityGeoLocation("198.51.100.1", CancellationToken.None);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(404, objectResult!.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestGetCityGeoLocation_GeoIP2Exception_ReturnsBadRequest()
+        {
+            // Arrange
+            mockTableStorage
+                .Setup(x => x.GetCityGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((CityGeoLocationDto?)null);
+
+            mockMaxMind
+                .Setup(x => x.GetCityGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new MaxMind.GeoIP2.Exceptions.GeoIP2Exception("Service error"));
+
+            mockHostnameResolver
+                .Setup(x => x.ResolveHostname("203.0.113.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "203.0.113.1"));
+
+            // Act
+            var result = await geoLookupController.GetCityGeoLocation("203.0.113.1", CancellationToken.None);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(400, objectResult!.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestGetCityGeoLocation_UnexpectedException_ReturnsInternalServerError()
+        {
+            // Arrange
+            mockTableStorage
+                .Setup(x => x.GetCityGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((CityGeoLocationDto?)null);
+
+            mockMaxMind
+                .Setup(x => x.GetCityGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Unexpected"));
+
+            // Act
+            var result = await geoLookupController.GetCityGeoLocation("8.8.8.8", CancellationToken.None);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(500, objectResult!.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestGetInsightsGeoLocation_AddressNotFound_ReturnsNotFound()
+        {
+            // Arrange
+            mockTableStorage
+                .Setup(x => x.GetInsightsGeoLocation("198.51.100.1", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((InsightsGeoLocationDto?)null);
+
+            mockMaxMind
+                .Setup(x => x.GetInsightsGeoLocation("198.51.100.1", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new MaxMind.GeoIP2.Exceptions.AddressNotFoundException("Address not found"));
+
+            mockHostnameResolver
+                .Setup(x => x.ResolveHostname("198.51.100.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "198.51.100.1"));
+
+            // Act
+            var result = await geoLookupController.GetInsightsGeoLocation("198.51.100.1", CancellationToken.None);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(404, objectResult!.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestGetInsightsGeoLocation_GeoIP2Exception_ReturnsBadRequest()
+        {
+            // Arrange
+            mockTableStorage
+                .Setup(x => x.GetInsightsGeoLocation("203.0.113.1", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((InsightsGeoLocationDto?)null);
+
+            mockMaxMind
+                .Setup(x => x.GetInsightsGeoLocation("203.0.113.1", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new MaxMind.GeoIP2.Exceptions.GeoIP2Exception("Service error"));
+
+            mockHostnameResolver
+                .Setup(x => x.ResolveHostname("203.0.113.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "203.0.113.1"));
+
+            // Act
+            var result = await geoLookupController.GetInsightsGeoLocation("203.0.113.1", CancellationToken.None);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(400, objectResult!.StatusCode);
+        }
+
+        [Fact]
+        public async Task TestGetInsightsGeoLocation_UnexpectedException_ReturnsInternalServerError()
+        {
+            // Arrange
+            mockTableStorage
+                .Setup(x => x.GetInsightsGeoLocation("8.8.8.8", It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((InsightsGeoLocationDto?)null);
+
+            mockMaxMind
+                .Setup(x => x.GetInsightsGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Unexpected"));
+
+            // Act
+            var result = await geoLookupController.GetInsightsGeoLocation("8.8.8.8", CancellationToken.None);
+
+            // Assert
+            var objectResult = result as ObjectResult;
+            Assert.NotNull(objectResult);
+            Assert.Equal(500, objectResult!.StatusCode);
         }
     }
 }

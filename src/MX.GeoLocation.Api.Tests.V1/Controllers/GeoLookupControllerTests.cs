@@ -7,16 +7,32 @@ using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.LookupWebApi.Controllers.V1;
 using MX.GeoLocation.LookupWebApi.Repositories;
+using MX.GeoLocation.LookupWebApi.Services;
 
 namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
 {
-    public class GeoLookupControllerTests : IDisposable
+    public class GeoLookupControllerTests
     {
         private readonly GeoLookupController geoLookupController;
 
         public GeoLookupControllerTests()
         {
-            geoLookupController = new GeoLookupController(Mock.Of<ILogger<GeoLookupController>>(), Mock.Of<ITableStorageGeoLocationRepository>(), Mock.Of<IMaxMindGeoLocationRepository>());
+            var mockHostnameResolver = new Mock<IHostnameResolver>();
+            mockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((false, (string?)null));
+            mockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
+            mockHostnameResolver.Setup(x => x.IsLocalAddress("localhost")).Returns(true);
+            mockHostnameResolver.Setup(x => x.IsLocalAddress("127.0.0.1")).Returns(true);
+            mockHostnameResolver.Setup(x => x.ResolveHostname("localhost", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "127.0.0.1"));
+            mockHostnameResolver.Setup(x => x.ResolveHostname("127.0.0.1", It.IsAny<CancellationToken>()))
+                .ReturnsAsync((true, "127.0.0.1"));
+
+            geoLookupController = new GeoLookupController(
+                Mock.Of<ILogger<GeoLookupController>>(),
+                Mock.Of<ITableStorageGeoLocationRepository>(),
+                Mock.Of<IMaxMindGeoLocationRepository>(),
+                mockHostnameResolver.Object);
         }
 
         [Theory]
@@ -125,9 +141,5 @@ namespace MX.GeoLocation.LookupWebApi.Tests.Controllers
             Assert.Equal("Local addresses are not supported for geo location", apiResponseDto.Errors!.First().Message);
         }
 
-        public void Dispose()
-        {
-            geoLookupController?.Dispose();
-        }
     }
 }

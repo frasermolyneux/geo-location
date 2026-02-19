@@ -12,14 +12,14 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 {
     public class MaxMindGeoLocationRepository : IMaxMindGeoLocationRepository
     {
-        private readonly IConfiguration configuration;
+        private readonly WebServiceClient webServiceClient;
         private readonly TelemetryClient telemetryClient;
 
         public MaxMindGeoLocationRepository(
-            IConfiguration configuration,
+            WebServiceClient webServiceClient,
             TelemetryClient telemetryClient)
         {
-            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.webServiceClient = webServiceClient ?? throw new ArgumentNullException(nameof(webServiceClient));
             this.telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
         }
 
@@ -27,12 +27,11 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(address);
 
-            using var reader = CreateClient();
             var operation = StartOperation("MaxMindCityQuery", address);
 
             try
             {
-                var lookupResult = await reader.CityAsync(address);
+                var lookupResult = await webServiceClient.CityAsync(address);
 
 #pragma warning disable CS0618 // Deprecated Traits properties — v1 API uses string dictionary for backward compatibility
                 var traits = new Dictionary<string, string?>
@@ -94,12 +93,11 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(address);
 
-            using var reader = CreateClient();
             var operation = StartOperation("MaxMindCityQuery", address);
 
             try
             {
-                var lookupResult = await reader.CityAsync(address);
+                var lookupResult = await webServiceClient.CityAsync(address);
                 var result = MapToCityDto(address, lookupResult);
                 MarkSuccess(operation);
                 return result;
@@ -119,12 +117,11 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(address);
 
-            using var reader = CreateClient();
             var operation = StartOperation("MaxMindInsightsQuery", address);
 
             try
             {
-                var lookupResult = await reader.InsightsAsync(address);
+                var lookupResult = await webServiceClient.InsightsAsync(address);
                 var anonymizer = lookupResult.Anonymizer;
 
                 var dto = MapToInsightsDto(address, lookupResult);
@@ -209,16 +206,6 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
                 UserCount = traits?.UserCount,
                 UserType = traits?.UserType
             };
-        }
-
-        private WebServiceClient CreateClient()
-        {
-            var userIdString = configuration["maxmind_userid"];
-            if (!int.TryParse(userIdString, out var userId))
-                throw new InvalidOperationException($"The 'maxmind_userid' configuration value '{userIdString}' is not a valid integer.");
-
-            var licenseKey = configuration["maxmind_apikey"] ?? throw new InvalidOperationException("The 'maxmind_apikey' configuration value is not set.");
-            return new WebServiceClient(userId, licenseKey);
         }
 
         private IOperationHolder<DependencyTelemetry> StartOperation(string operationName, string address)

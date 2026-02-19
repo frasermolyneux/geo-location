@@ -15,6 +15,10 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
 {
     private readonly ConcurrentDictionary<string, CityGeoLocationDto> _cityResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, InsightsGeoLocationDto> _insightsResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _cityErrorResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _insightsErrorResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentBag<string> _cityLookedUpAddresses = [];
+    private readonly ConcurrentBag<string> _insightsLookedUpAddresses = [];
 
     /// <summary>
     /// Registers a canned city response for a specific address.
@@ -34,8 +38,44 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
         return this;
     }
 
+    /// <summary>
+    /// Registers a canned error response for city lookups of a specific address.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 AddCityErrorResponse(string address, HttpStatusCode statusCode, string errorCode, string errorMessage)
+    {
+        _cityErrorResponses[address] = (statusCode, new ApiError(errorCode, errorMessage));
+        return this;
+    }
+
+    /// <summary>
+    /// Registers a canned error response for insights lookups of a specific address.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 AddInsightsErrorResponse(string address, HttpStatusCode statusCode, string errorCode, string errorMessage)
+    {
+        _insightsErrorResponses[address] = (statusCode, new ApiError(errorCode, errorMessage));
+        return this;
+    }
+
+    /// <summary>
+    /// Returns the set of addresses looked up via <see cref="GetCityGeoLocation"/>.
+    /// </summary>
+    public IReadOnlyCollection<string> CityLookedUpAddresses => _cityLookedUpAddresses.ToArray();
+
+    /// <summary>
+    /// Returns the set of addresses looked up via <see cref="GetInsightsGeoLocation"/>.
+    /// </summary>
+    public IReadOnlyCollection<string> InsightsLookedUpAddresses => _insightsLookedUpAddresses.ToArray();
+
     public Task<ApiResult<CityGeoLocationDto>> GetCityGeoLocation(string hostname, CancellationToken cancellationToken = default)
     {
+        _cityLookedUpAddresses.Add(hostname);
+
+        if (_cityErrorResponses.TryGetValue(hostname, out var error))
+        {
+            return Task.FromResult(new ApiResult<CityGeoLocationDto>(error.StatusCode,
+                new ApiResponse<CityGeoLocationDto>(error.Error)));
+        }
+
         var dto = _cityResponses.GetValueOrDefault(hostname)
             ?? GeoLocationDtoFactory.CreateCityGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
 
@@ -44,6 +84,14 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
 
     public Task<ApiResult<InsightsGeoLocationDto>> GetInsightsGeoLocation(string hostname, CancellationToken cancellationToken = default)
     {
+        _insightsLookedUpAddresses.Add(hostname);
+
+        if (_insightsErrorResponses.TryGetValue(hostname, out var error))
+        {
+            return Task.FromResult(new ApiResult<InsightsGeoLocationDto>(error.StatusCode,
+                new ApiResponse<InsightsGeoLocationDto>(error.Error)));
+        }
+
         var dto = _insightsResponses.GetValueOrDefault(hostname)
             ?? GeoLocationDtoFactory.CreateInsightsGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
 

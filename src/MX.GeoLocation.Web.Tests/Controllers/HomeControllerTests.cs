@@ -6,20 +6,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 using MX.GeoLocation.Api.Client.V1;
-using MX.GeoLocation.Abstractions.Interfaces;
-using MX.GeoLocation.Abstractions.Interfaces.V1;
+using MX.GeoLocation.Api.Client.Testing;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Web.Controllers;
-
-using MX.Api.Abstractions;
 
 using Newtonsoft.Json;
 
 namespace MX.GeoLocation.Web.Tests.Controllers
 {
-    public class HomeControllerTests : IDisposable
+    public class HomeControllerTests
     {
-        private readonly Mock<IGeoLocationApiClient> mockGeoLocationClient;
+        private readonly FakeGeoLocationApiClient fakeGeoLocationClient;
         private readonly Mock<IHttpContextAccessor> mockHttpContextAccessor;
         private readonly Mock<IWebHostEnvironment> mockWebHostEnvironment;
 
@@ -29,35 +26,32 @@ namespace MX.GeoLocation.Web.Tests.Controllers
 
         public HomeControllerTests()
         {
-            mockGeoLocationClient = new Mock<IGeoLocationApiClient>();
+            fakeGeoLocationClient = new FakeGeoLocationApiClient();
             mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
             mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
 
-            homeController = new HomeController(mockGeoLocationClient.Object, mockHttpContextAccessor.Object, mockWebHostEnvironment.Object);
+            homeController = new HomeController(fakeGeoLocationClient, mockHttpContextAccessor.Object, mockWebHostEnvironment.Object);
 
-            wellFormedGeoLocationDto = new GeoLocationDto()
-            {
-                AccuracyRadius = 200,
-                Address = "81.174.169.65",
-                CityName = "Chesterfield",
-                ContinentCode = "EU",
-                ContinentName = "Europe",
-                CountryCode = "GB",
-                CountryName = "United Kingdom",
-                IsEuropeanUnion = false,
-                Latitude = 53.2852,
-                Longitude = -1.2899,
-                PostalCode = "S43",
-                RegisteredCountry = "GB",
-                RepresentedCountry = null,
-                Timezone = "Europe/London",
-                Traits = new()
+            wellFormedGeoLocationDto = GeoLocationDtoFactory.CreateGeoLocation(
+                address: "81.174.169.65",
+                cityName: "Chesterfield",
+                continentCode: "EU",
+                continentName: "Europe",
+                countryCode: "GB",
+                countryName: "United Kingdom",
+                isEuropeanUnion: false,
+                latitude: 53.2852,
+                longitude: -1.2899,
+                postalCode: "S43",
+                registeredCountry: "GB",
+                accuracyRadius: 200,
+                timezone: "Europe/London",
+                traits: new()
                 {
                     { "AutonomousSystemNumber", "6871" },
                     { "ConnectionType", null },
                     { "Isp", "Plusnet" }
-                }
-            };
+                });
         }
 
         [Theory]
@@ -65,12 +59,21 @@ namespace MX.GeoLocation.Web.Tests.Controllers
         [InlineData(HttpStatusCode.InternalServerError)]
         public async Task IndexShouldRedirectToLookupAddressWhenGetGeoLocationFails(HttpStatusCode httpStatusCode)
         {
-            // Arrange
-            var mockGeoLookup = new Mock<IVersionedGeoLookupApi>();
-            var mockV1 = new Mock<IGeoLookupApi>();
-            mockV1.Setup(x => x.GetGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ApiResult<GeoLocationDto>(httpStatusCode));
-            mockGeoLookup.Setup(x => x.V1).Returns(mockV1.Object);
-            mockGeoLocationClient.Setup(x => x.GeoLookup).Returns(mockGeoLookup.Object);
+            // Arrange - configure the fake to return an error for any address
+            fakeGeoLocationClient.V1Lookup.AddErrorResponse("8.8.8.8", httpStatusCode, "ERROR", "Test error");
+
+            var mockConnection = new Mock<ConnectionInfo>();
+            mockConnection.Setup(c => c.RemoteIpAddress).Returns(System.Net.IPAddress.Parse("8.8.8.8"));
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.Setup(r => r.Headers).Returns(new HeaderDictionary());
+            byte[]? nullSessionData = null;
+            var mockSession = new Mock<ISession>();
+            mockSession.Setup(s => s.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
+            var mockHttpContext = new Mock<HttpContext>();
+            mockHttpContext.Setup(c => c.Session).Returns(mockSession.Object);
+            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+            mockHttpContext.Setup(c => c.Connection).Returns(mockConnection.Object);
+            mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
 
             // Act
             var result = await homeController.Index(CancellationToken.None);
@@ -119,6 +122,8 @@ namespace MX.GeoLocation.Web.Tests.Controllers
         public async Task IndexShouldGetGeoLocationAndStoreInSessionIfSessionDataIsNull()
         {
             // Arrange
+            fakeGeoLocationClient.V1Lookup.AddResponse("8.8.8.8", wellFormedGeoLocationDto);
+
             byte[]? nullSessionData = null;
             var mockSession = new Mock<ISession>();
             mockSession.Setup(s => s.TryGetValue("UserGeoLocationDto", out nullSessionData)).Returns(false);
@@ -131,12 +136,6 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
             mockHttpContext.Setup(c => c.Connection).Returns(mockConnection.Object);
             mockHttpContextAccessor.Setup(a => a.HttpContext).Returns(mockHttpContext.Object);
-
-            var mockGeoLookup = new Mock<IVersionedGeoLookupApi>();
-            var mockV1 = new Mock<IGeoLookupApi>();
-            mockV1.Setup(x => x.GetGeoLocation(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(new ApiResult<GeoLocationDto>(HttpStatusCode.OK, new ApiResponse<GeoLocationDto>(wellFormedGeoLocationDto)));
-            mockGeoLookup.Setup(x => x.V1).Returns(mockV1.Object);
-            mockGeoLocationClient.Setup(x => x.GeoLookup).Returns(mockGeoLookup.Object);
 
             // Act
             var result = await homeController.Index(CancellationToken.None);
@@ -175,11 +174,6 @@ namespace MX.GeoLocation.Web.Tests.Controllers
             Assert.Equal(expected.RepresentedCountry, actual.RepresentedCountry);
             Assert.Equal(expected.Timezone, actual.Timezone);
             Assert.Equal(expected.Traits, actual.Traits);
-        }
-
-        public void Dispose()
-        {
-            homeController?.Dispose();
         }
     }
 }

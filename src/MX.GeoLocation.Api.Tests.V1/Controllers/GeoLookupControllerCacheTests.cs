@@ -9,24 +9,32 @@ using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.LookupWebApi.Controllers.V1;
 using MX.GeoLocation.LookupWebApi.Repositories;
+using MX.GeoLocation.LookupWebApi.Services;
 
 namespace MX.GeoLocation.LookupWebApi.Tests.Controllers;
 
-public class GeoLookupControllerCacheTests : IDisposable
+public class GeoLookupControllerCacheTests
 {
     private readonly Mock<ITableStorageGeoLocationRepository> _mockTableStorage;
     private readonly Mock<IMaxMindGeoLocationRepository> _mockMaxMind;
+    private readonly Mock<IHostnameResolver> _mockHostnameResolver;
     private readonly GeoLookupController _controller;
 
     public GeoLookupControllerCacheTests()
     {
         _mockTableStorage = new Mock<ITableStorageGeoLocationRepository>();
         _mockMaxMind = new Mock<IMaxMindGeoLocationRepository>();
+        _mockHostnameResolver = new Mock<IHostnameResolver>();
+
+        _mockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
+        _mockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns<string, CancellationToken>((addr, _) => Task.FromResult<(bool, string?)>((true, addr)));
 
         _controller = new GeoLookupController(
             Mock.Of<ILogger<GeoLookupController>>(),
             _mockTableStorage.Object,
-            _mockMaxMind.Object);
+            _mockMaxMind.Object,
+            _mockHostnameResolver.Object);
     }
 
     [Fact]
@@ -151,8 +159,4 @@ public class GeoLookupControllerCacheTests : IDisposable
         Assert.Equal(500, objectResult.StatusCode);
     }
 
-    public void Dispose()
-    {
-        _controller?.Dispose();
-    }
 }

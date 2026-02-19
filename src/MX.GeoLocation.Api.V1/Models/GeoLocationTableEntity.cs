@@ -18,12 +18,6 @@ namespace MX.GeoLocation.LookupWebApi.Models
 
         }
 
-        public GeoLocationTableEntity(string partitionKey, string rowKey)
-        {
-            PartitionKey = partitionKey;
-            RowKey = rowKey;
-        }
-
         public GeoLocationTableEntity(GeoLocationDto geoLocationDto)
         {
             PartitionKey = "addresses";

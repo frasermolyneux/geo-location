@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MX.GeoLocation.Web\MX.GeoLocation.Web.csproj" />
+    <ProjectReference Include="..\MX.GeoLocation.Api.Client.Testing\MX.GeoLocation.Api.Client.Testing.csproj" />
   </ItemGroup>
 
 </Project>

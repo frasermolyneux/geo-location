@@ -14,15 +14,14 @@ namespace MX.GeoLocation.LookupWebApi.HealthChecks;
 /// </summary>
 public class MaxMindAvailabilityHealthCheck : IHealthCheck
 {
-    // Well-known public IP (Cloudflare DNS) used for the probe
     private const string ProbeAddress = "1.1.1.1";
 
-    private readonly IConfiguration _configuration;
+    private readonly WebServiceClient _webServiceClient;
     private readonly TelemetryClient _telemetryClient;
 
-    public MaxMindAvailabilityHealthCheck(IConfiguration configuration, TelemetryClient telemetryClient)
+    public MaxMindAvailabilityHealthCheck(WebServiceClient webServiceClient, TelemetryClient telemetryClient)
     {
-        _configuration = configuration;
+        _webServiceClient = webServiceClient;
         _telemetryClient = telemetryClient;
     }
 
@@ -38,24 +37,7 @@ public class MaxMindAvailabilityHealthCheck : IHealthCheck
 
         try
         {
-            var userIdString = _configuration["maxmind_userid"];
-            if (!int.TryParse(userIdString, out var userId))
-            {
-                availability.Success = false;
-                availability.Message = "MaxMind user ID is not configured or invalid.";
-                return HealthCheckResult.Unhealthy(availability.Message);
-            }
-
-            var apiKey = _configuration["maxmind_apikey"];
-            if (string.IsNullOrWhiteSpace(apiKey))
-            {
-                availability.Success = false;
-                availability.Message = "MaxMind API key is not configured.";
-                return HealthCheckResult.Unhealthy(availability.Message);
-            }
-
-            using var client = new WebServiceClient(userId, apiKey);
-            var result = await client.CityAsync(ProbeAddress);
+            var result = await _webServiceClient.CityAsync(ProbeAddress);
 
             availability.Success = true;
             availability.Message = $"Lookup succeeded for {ProbeAddress} — {result.Country?.Name ?? "unknown"}";

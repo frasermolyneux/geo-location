@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using MX.GeoLocation.LookupWebApi.Repositories;
+using MX.GeoLocation.LookupWebApi.Services;
 
 namespace MX.GeoLocation.Api.IntegrationTests;
 
@@ -22,6 +23,27 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     public Mock<IMaxMindGeoLocationRepository> MockMaxMind { get; } = new();
     public Mock<ITableStorageGeoLocationRepository> MockTableStorage { get; } = new();
+    public Mock<IHostnameResolver> MockHostnameResolver { get; } = new();
+
+    public CustomWebApplicationFactory()
+    {
+        // Default: IP addresses resolve to themselves
+        MockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns<string, CancellationToken>((addr, _) =>
+            {
+                if (System.Net.IPAddress.TryParse(addr, out var ip))
+                    return Task.FromResult<(bool, string?)>((true, ip.ToString()));
+                return Task.FromResult<(bool, string?)>((false, null));
+            });
+
+        MockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
+        MockHostnameResolver.Setup(x => x.IsLocalAddress("localhost")).Returns(true);
+        MockHostnameResolver.Setup(x => x.IsLocalAddress("127.0.0.1")).Returns(true);
+        MockHostnameResolver.Setup(x => x.ResolveHostname("localhost", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "127.0.0.1"));
+        MockHostnameResolver.Setup(x => x.ResolveHostname("127.0.0.1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "127.0.0.1"));
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -45,6 +67,14 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<ITableStorageGeoLocationRepository>();
             services.AddSingleton(MockTableStorage.Object);
+
+            // Replace hostname resolver with mock
+            services.RemoveAll<IHostnameResolver>();
+            services.AddSingleton(MockHostnameResolver.Object);
+
+            // Replace WebServiceClient with a real instance using fake credentials (it won't be called)
+            services.RemoveAll<MaxMind.GeoIP2.WebServiceClient>();
+            services.AddSingleton(new MaxMind.GeoIP2.WebServiceClient(12345, "fake-key"));
 
             // Replace TableServiceClient with a mock to avoid Azure connection
             services.RemoveAll<TableServiceClient>();
