@@ -1,7 +1,5 @@
 ﻿using System.Net;
 
-using MaxMind.GeoIP2.Exceptions;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
@@ -93,38 +91,26 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1
                 new ParallelOptions { MaxDegreeOfParallelism = 5, CancellationToken = cancellationToken },
                 async (hostname, ct) =>
             {
-                try
+                var lookupResult = await _geoLookupService.ExecuteLookup<GeoLocationDto>(hostname, ct, async address =>
                 {
-                    var (success, address) = await _hostnameResolver.ResolveHostname(hostname, ct);
-                    if (!success || address is null)
-                    {
-                        lock (errors) errors.Add(new ApiError(ErrorCodes.INVALID_HOSTNAME, $"The hostname provided '{hostname}' is invalid"));
-                        return;
-                    }
-
-                    if (_hostnameResolver.IsLocalAddress(hostname) || _hostnameResolver.IsPrivateOrReservedAddress(address))
-                    {
-                        lock (errors) errors.Add(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS_BATCH));
-                        return;
-                    }
-
                     var dto = await _tableStorage.GetGeoLocation(address, ct);
-                    if (dto is null)
-                    {
-                        dto = await _maxMind.GetGeoLocation(address, ct);
-                        dto.Address = hostname;
-                        await _tableStorage.StoreGeoLocation(dto, ct);
-                    }
+                    if (dto is not null)
+                        return new ApiResponse<GeoLocationDto>(dto).ToApiResult();
 
-                    lock (entries) entries.Add(dto);
-                }
-                catch (AddressNotFoundException ex)
+                    dto = await _maxMind.GetGeoLocation(address, ct);
+                    dto.Address = hostname;
+                    await _tableStorage.StoreGeoLocation(dto, ct);
+
+                    return new ApiResponse<GeoLocationDto>(dto).ToApiResult();
+                });
+
+                if (lookupResult.StatusCode == HttpStatusCode.OK && lookupResult.Result?.Data is not null)
                 {
-                    lock (errors) errors.Add(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ex.Message));
+                    lock (entries) entries.Add(lookupResult.Result.Data);
                 }
-                catch (GeoIP2Exception ex)
+                else if (lookupResult.Result?.Errors is not null)
                 {
-                    lock (errors) errors.Add(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message));
+                    lock (errors) errors.AddRange(lookupResult.Result.Errors);
                 }
             });
 

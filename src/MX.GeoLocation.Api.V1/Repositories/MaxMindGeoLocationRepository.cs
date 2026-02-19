@@ -31,7 +31,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
             try
             {
-                var lookupResult = await webServiceClient.CityAsync(address);
+                var lookupResult = await webServiceClient.CityAsync(address).WaitAsync(cancellationToken);
 
 #pragma warning disable CS0618 // Deprecated Traits properties — v1 API uses string dictionary for backward compatibility
                 var traits = new Dictionary<string, string?>
@@ -97,7 +97,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
             try
             {
-                var lookupResult = await webServiceClient.CityAsync(address);
+                var lookupResult = await webServiceClient.CityAsync(address).WaitAsync(cancellationToken);
                 var result = MapToCityDto(address, lookupResult);
                 MarkSuccess(operation);
                 return result;
@@ -121,7 +121,7 @@ namespace MX.GeoLocation.LookupWebApi.Repositories
 
             try
             {
-                var lookupResult = await webServiceClient.InsightsAsync(address);
+                var lookupResult = await webServiceClient.InsightsAsync(address).WaitAsync(cancellationToken);
                 var anonymizer = lookupResult.Anonymizer;
 
                 var dto = MapToInsightsDto(address, lookupResult);

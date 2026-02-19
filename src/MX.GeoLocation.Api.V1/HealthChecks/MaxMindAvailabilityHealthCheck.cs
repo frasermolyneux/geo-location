@@ -49,7 +49,7 @@ public class MaxMindAvailabilityHealthCheck : IHealthCheck
 
         try
         {
-            var result = await _webServiceClient.CityAsync(ProbeAddress);
+            var result = await _webServiceClient.CityAsync(ProbeAddress).WaitAsync(cancellationToken);
 
             availability.Success = true;
             availability.Message = $"Lookup succeeded for {ProbeAddress} — {result.Country?.Name ?? "unknown"}";

@@ -1,0 +1,198 @@
+using System.Net;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+using MX.Api.Abstractions;
+using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.LookupWebApi.Controllers.V1;
+using MX.GeoLocation.LookupWebApi.Repositories;
+using MX.GeoLocation.LookupWebApi.Services;
+
+namespace MX.GeoLocation.Api.Tests.V1.Controllers;
+
+[Trait("Category", "Unit")]
+public class GeoLookupControllerBatchTests
+{
+    private readonly Mock<ITableStorageGeoLocationRepository> _mockTableStorage;
+    private readonly Mock<IMaxMindGeoLocationRepository> _mockMaxMind;
+    private readonly Mock<IHostnameResolver> _mockHostnameResolver;
+    private readonly GeoLookupController _controller;
+
+    public GeoLookupControllerBatchTests()
+    {
+        _mockTableStorage = new Mock<ITableStorageGeoLocationRepository>();
+        _mockMaxMind = new Mock<IMaxMindGeoLocationRepository>();
+        _mockHostnameResolver = new Mock<IHostnameResolver>();
+
+        _mockHostnameResolver.Setup(x => x.IsLocalAddress(It.IsAny<string>())).Returns(false);
+        _mockHostnameResolver.Setup(x => x.IsPrivateOrReservedAddress(It.IsAny<string>())).Returns(false);
+        _mockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns<string, CancellationToken>((addr, _) => Task.FromResult<(bool, string?)>((true, addr)));
+
+        var geoLookupService = new GeoLookupService(
+            Mock.Of<ILogger<GeoLookupService>>(),
+            _mockHostnameResolver.Object);
+
+        _controller = new GeoLookupController(
+            Mock.Of<ILogger<GeoLookupController>>(),
+            _mockTableStorage.Object,
+            _mockMaxMind.Object,
+            _mockHostnameResolver.Object,
+            geoLookupService);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_NullBody_ReturnsBadRequest()
+    {
+        var result = await _controller.GetGeoLocations(null, CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(400, objectResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_EmptyList_ReturnsBadRequest()
+    {
+        var result = await _controller.GetGeoLocations([], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(400, objectResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_ExceedsMaxBatchSize_ReturnsBadRequest()
+    {
+        var hostnames = Enumerable.Range(1, 21).Select(i => $"host{i}.example.com").ToList();
+
+        var result = await _controller.GetGeoLocations(hostnames, CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(400, objectResult.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_ValidHostnames_ReturnsResults()
+    {
+        var dto = new GeoLocationDto
+        {
+            Address = "8.8.8.8",
+            TranslatedAddress = "8.8.8.8",
+            CountryName = "United States"
+        };
+
+        _mockTableStorage
+            .Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(dto);
+
+        var result = await _controller.GetGeoLocations(["8.8.8.8"], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        var response = objectResult.Value as ApiResponse<CollectionModel<GeoLocationDto>>;
+        Assert.NotNull(response?.Data);
+        Assert.Single(response.Data.Items);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_CacheMiss_QueriesMaxMindAndStores()
+    {
+        _mockTableStorage
+            .Setup(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((GeoLocationDto?)null);
+
+        var maxMindDto = new GeoLocationDto
+        {
+            Address = "1.1.1.1",
+            TranslatedAddress = "1.1.1.1",
+            CountryName = "Australia"
+        };
+
+        _mockMaxMind
+            .Setup(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(maxMindDto);
+
+        var result = await _controller.GetGeoLocations(["1.1.1.1"], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        _mockMaxMind.Verify(x => x.GetGeoLocation("1.1.1.1", It.IsAny<CancellationToken>()), Times.Once);
+        _mockTableStorage.Verify(x => x.StoreGeoLocation(It.IsAny<GeoLocationDto>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_InvalidHostname_ReturnsErrorInCollection()
+    {
+        _mockHostnameResolver.Setup(x => x.ResolveHostname("invalid.host", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((false, (string?)null));
+
+        var result = await _controller.GetGeoLocations(["invalid.host"], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        var response = objectResult.Value as ApiResponse<CollectionModel<GeoLocationDto>>;
+        Assert.NotNull(response);
+        Assert.Empty(response.Data!.Items);
+        Assert.NotNull(response.Errors);
+        Assert.NotEmpty(response.Errors);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_LocalAddress_ReturnsErrorInCollection()
+    {
+        _mockHostnameResolver.Setup(x => x.ResolveHostname("localhost", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "127.0.0.1"));
+        _mockHostnameResolver.Setup(x => x.IsLocalAddress("localhost")).Returns(true);
+
+        var result = await _controller.GetGeoLocations(["localhost"], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        var response = objectResult.Value as ApiResponse<CollectionModel<GeoLocationDto>>;
+        Assert.NotNull(response);
+        Assert.Empty(response.Data!.Items);
+        Assert.NotNull(response.Errors);
+        Assert.NotEmpty(response.Errors);
+    }
+
+    [Fact]
+    public async Task GetGeoLocations_MixedValidAndInvalid_ReturnsBothResultsAndErrors()
+    {
+        var validDto = new GeoLocationDto
+        {
+            Address = "8.8.8.8",
+            TranslatedAddress = "8.8.8.8",
+            CountryName = "United States"
+        };
+
+        _mockTableStorage
+            .Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(validDto);
+
+        _mockHostnameResolver.Setup(x => x.ResolveHostname("invalid.host", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((false, (string?)null));
+
+        var result = await _controller.GetGeoLocations(["8.8.8.8", "invalid.host"], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        var response = objectResult.Value as ApiResponse<CollectionModel<GeoLocationDto>>;
+        Assert.NotNull(response);
+        Assert.Single(response.Data!.Items);
+        Assert.NotNull(response.Errors);
+        Assert.NotEmpty(response.Errors);
+    }
+}
