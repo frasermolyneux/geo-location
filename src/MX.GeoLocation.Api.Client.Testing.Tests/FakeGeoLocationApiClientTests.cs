@@ -38,7 +38,7 @@ public class FakeGeoLocationApiClientTests
         var client = new FakeGeoLocationApiClient();
         client.InfoApi.WithInfo(GeoLocationDtoFactory.CreateApiInfo(buildVersion: "2.0.0.1"));
 
-        var result = await client.ApiInfo.GetApiInfo();
+        var result = await client.ApiInfo.V1.GetApiInfo();
 
         Assert.Equal("2.0.0.1", result.Result!.Data!.BuildVersion);
     }
@@ -49,7 +49,7 @@ public class FakeGeoLocationApiClientTests
         var client = new FakeGeoLocationApiClient();
         client.HealthApi.WithStatusCode(System.Net.HttpStatusCode.ServiceUnavailable);
 
-        var result = await client.ApiHealth.CheckHealth();
+        var result = await client.ApiHealth.V1.CheckHealth();
 
         Assert.Equal(System.Net.HttpStatusCode.ServiceUnavailable, result.StatusCode);
     }

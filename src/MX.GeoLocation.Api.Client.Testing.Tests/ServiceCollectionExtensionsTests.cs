@@ -26,6 +26,8 @@ public class ServiceCollectionExtensionsTests
 
         Assert.NotNull(provider.GetRequiredService<IGeoLocationApiClient>());
         Assert.NotNull(provider.GetRequiredService<IVersionedGeoLookupApi>());
+        Assert.NotNull(provider.GetRequiredService<IVersionedApiHealthApi>());
+        Assert.NotNull(provider.GetRequiredService<IVersionedApiInfoApi>());
         Assert.NotNull(provider.GetRequiredService<IGeoLookupApi>());
         Assert.NotNull(provider.GetRequiredService<V1_1.IGeoLookupApi>());
         Assert.NotNull(provider.GetRequiredService<IApiInfoApi>());

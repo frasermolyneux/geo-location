@@ -1,6 +1,4 @@
-﻿using MX.GeoLocation.Abstractions.Interfaces;
-
-namespace MX.GeoLocation.Api.Client.V1
+﻿namespace MX.GeoLocation.Api.Client.V1
 {
     /// <summary>
     /// Implementation of the GeoLocation API client that provides access to versioned API endpoints
@@ -11,9 +9,9 @@ namespace MX.GeoLocation.Api.Client.V1
         /// Initializes a new instance of the <see cref="GeoLocationApiClient"/> class
         /// </summary>
         /// <param name="versionedGeoLookupApi">The versioned GeoLookup API</param>
-        /// <param name="apiInfoApi">The API info endpoint</param>
-        /// <param name="apiHealthApi">The API health endpoint</param>
-        public GeoLocationApiClient(IVersionedGeoLookupApi versionedGeoLookupApi, IApiInfoApi apiInfoApi, IApiHealthApi apiHealthApi)
+        /// <param name="apiInfoApi">The versioned API info endpoint</param>
+        /// <param name="apiHealthApi">The versioned API health endpoint</param>
+        public GeoLocationApiClient(IVersionedGeoLookupApi versionedGeoLookupApi, IVersionedApiInfoApi apiInfoApi, IVersionedApiHealthApi apiHealthApi)
         {
             GeoLookup = versionedGeoLookupApi;
             ApiInfo = apiInfoApi;
@@ -26,13 +24,13 @@ namespace MX.GeoLocation.Api.Client.V1
         public IVersionedGeoLookupApi GeoLookup { get; }
 
         /// <summary>
-        /// Gets the API info endpoint
+        /// Gets the versioned API info endpoint
         /// </summary>
-        public IApiInfoApi ApiInfo { get; }
+        public IVersionedApiInfoApi ApiInfo { get; }
 
         /// <summary>
-        /// Gets the API health endpoint
+        /// Gets the versioned API health endpoint
         /// </summary>
-        public IApiHealthApi ApiHealth { get; }
+        public IVersionedApiHealthApi ApiHealth { get; }
     }
 }

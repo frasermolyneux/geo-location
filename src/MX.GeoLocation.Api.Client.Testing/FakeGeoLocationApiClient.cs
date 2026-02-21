@@ -7,6 +7,32 @@ using V1_1 = MX.GeoLocation.Abstractions.Interfaces.V1_1;
 namespace MX.GeoLocation.Api.Client.Testing;
 
 /// <summary>
+/// In-memory fake of <see cref="IVersionedApiHealthApi"/> for tests.
+/// </summary>
+public class FakeVersionedApiHealthApi : IVersionedApiHealthApi
+{
+    public FakeVersionedApiHealthApi(FakeApiHealthApi v1)
+    {
+        V1 = v1;
+    }
+
+    public IApiHealthApi V1 { get; }
+}
+
+/// <summary>
+/// In-memory fake of <see cref="IVersionedApiInfoApi"/> for tests.
+/// </summary>
+public class FakeVersionedApiInfoApi : IVersionedApiInfoApi
+{
+    public FakeVersionedApiInfoApi(FakeApiInfoApi v1)
+    {
+        V1 = v1;
+    }
+
+    public IApiInfoApi V1 { get; }
+}
+
+/// <summary>
 /// In-memory fake of <see cref="IVersionedGeoLookupApi"/> composing the V1 and V1.1 fakes.
 /// </summary>
 public class FakeVersionedGeoLookupApi : IVersionedGeoLookupApi
@@ -61,15 +87,19 @@ public class FakeGeoLocationApiClient : IGeoLocationApiClient
     public FakeApiHealthApi HealthApi { get; } = new();
 
     private readonly Lazy<FakeVersionedGeoLookupApi> _geoLookup;
+    private readonly Lazy<FakeVersionedApiHealthApi> _apiHealth;
+    private readonly Lazy<FakeVersionedApiInfoApi> _apiInfo;
 
     public FakeGeoLocationApiClient()
     {
         _geoLookup = new Lazy<FakeVersionedGeoLookupApi>(() => new FakeVersionedGeoLookupApi(V1Lookup, V1_1Lookup));
+        _apiHealth = new Lazy<FakeVersionedApiHealthApi>(() => new FakeVersionedApiHealthApi(HealthApi));
+        _apiInfo = new Lazy<FakeVersionedApiInfoApi>(() => new FakeVersionedApiInfoApi(InfoApi));
     }
 
     public IVersionedGeoLookupApi GeoLookup => _geoLookup.Value;
-    public IApiInfoApi ApiInfo => InfoApi;
-    public IApiHealthApi ApiHealth => HealthApi;
+    public IVersionedApiInfoApi ApiInfo => _apiInfo.Value;
+    public IVersionedApiHealthApi ApiHealth => _apiHealth.Value;
 
     /// <summary>
     /// Resets all fakes to their initial state, clearing configured responses,
