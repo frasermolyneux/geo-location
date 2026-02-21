@@ -38,6 +38,8 @@ public static class ServiceCollectionExtensions
 
         services.RemoveAll<IGeoLocationApiClient>();
         services.RemoveAll<IVersionedGeoLookupApi>();
+        services.RemoveAll<IVersionedApiHealthApi>();
+        services.RemoveAll<IVersionedApiInfoApi>();
         services.RemoveAll<IGeoLookupApi>();
         services.RemoveAll<V1_1.IGeoLookupApi>();
         services.RemoveAll<IApiInfoApi>();
@@ -45,6 +47,8 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IGeoLocationApiClient>(fakeClient);
         services.AddSingleton<IVersionedGeoLookupApi>(fakeClient.GeoLookup);
+        services.AddSingleton<IVersionedApiHealthApi>(fakeClient.ApiHealth);
+        services.AddSingleton<IVersionedApiInfoApi>(fakeClient.ApiInfo);
         services.AddSingleton<IGeoLookupApi>(fakeClient.V1Lookup);
         services.AddSingleton<V1_1.IGeoLookupApi>(fakeClient.V1_1Lookup);
         services.AddSingleton<IApiInfoApi>(fakeClient.InfoApi);

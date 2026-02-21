@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Abstractions.Interfaces;
 using MX.GeoLocation.Abstractions.Interfaces.V1;
 
@@ -35,10 +34,12 @@ namespace MX.GeoLocation.Api.Client.V1
             // Register API health endpoint
             serviceCollection.AddTypedApiClient<IApiHealthApi, ApiHealthApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
-            // Register versioned API wrapper
+            // Register version selectors as scoped
             serviceCollection.AddScoped<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
+            serviceCollection.AddScoped<IVersionedApiHealthApi, VersionedApiHealthApi>();
+            serviceCollection.AddScoped<IVersionedApiInfoApi, VersionedApiInfoApi>();
 
-            // Register main client
+            // Register the unified client as scoped
             serviceCollection.AddScoped<IGeoLocationApiClient, GeoLocationApiClient>();
 
             return serviceCollection;

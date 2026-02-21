@@ -134,6 +134,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.MapGet("/", () => Results.Ok()).ExcludeFromDescription();
+
 app.Run();
 
 // Make Program accessible for WebApplicationFactory in integration tests

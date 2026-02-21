@@ -19,8 +19,10 @@ IGeoLocationApiClient
 ├── .GeoLookup (IVersionedGeoLookupApi)
 │   ├── .V1 (IGeoLookupApi)          → GetGeoLocation, GetGeoLocations, DeleteMetadata
 │   └── .V1_1 (IGeoLookupApi)        → GetCityGeoLocation, GetInsightsGeoLocation
-├── .ApiInfo (IApiInfoApi)            → GetApiInfo
-└── .ApiHealth (IApiHealthApi)        → CheckHealth
+├── .ApiInfo (IVersionedApiInfoApi)
+│   └── .V1 (IApiInfoApi)            → GetApiInfo
+└── .ApiHealth (IVersionedApiHealthApi)
+    └── .V1 (IApiHealthApi)          → CheckHealth
 ```
 
 Without the testing package, each test needs 3+ levels of nested mocks just to call a single method. Additionally, all DTO properties use `internal set`, so external consumers cannot construct DTOs with custom values.

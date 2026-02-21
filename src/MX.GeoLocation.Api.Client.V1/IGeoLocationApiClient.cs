@@ -1,6 +1,4 @@
-﻿using MX.GeoLocation.Abstractions.Interfaces;
-
-namespace MX.GeoLocation.Api.Client.V1
+﻿namespace MX.GeoLocation.Api.Client.V1
 {
     /// <summary>
     /// Interface for the GeoLocation API client
@@ -13,13 +11,13 @@ namespace MX.GeoLocation.Api.Client.V1
         IVersionedGeoLookupApi GeoLookup { get; }
 
         /// <summary>
-        /// Gets the API info endpoint
+        /// Gets the versioned API info endpoint
         /// </summary>
-        IApiInfoApi ApiInfo { get; }
+        IVersionedApiInfoApi ApiInfo { get; }
 
         /// <summary>
-        /// Gets the API health endpoint
+        /// Gets the versioned API health endpoint
         /// </summary>
-        IApiHealthApi ApiHealth { get; }
+        IVersionedApiHealthApi ApiHealth { get; }
     }
 }

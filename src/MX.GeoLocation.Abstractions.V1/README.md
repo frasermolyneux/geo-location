@@ -35,15 +35,7 @@ public interface IGeoLookupApi
 
 ### IVersionedGeoLookupApi
 
-Wraps both API versions for version-aware consumers:
-
-```csharp
-public interface IVersionedGeoLookupApi
-{
-    V1.IGeoLookupApi V1 { get; }
-    V1_1.IGeoLookupApi V1_1 { get; }
-}
-```
+> **Note:** Version selector interfaces (`IVersionedGeoLookupApi`, `IVersionedApiHealthApi`, `IVersionedApiInfoApi`) are defined in the `MX.GeoLocation.Api.Client.V1` package, not in this abstractions package.
 
 ## Data Models
 
