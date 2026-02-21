@@ -14,7 +14,25 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
+  detect-changes:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.changes.outputs.src }}
+      terraform: ${{ steps.changes.outputs.terraform }}
+    steps:
+      - id: changes
+        uses: frasermolyneux/actions/detect-changes@main
+        with:
+          filters: |
+            src:src/**
+            terraform:terraform/**
+
   build-and-test:
+    needs:
+      - detect-changes
+    if: needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
@@ -51,12 +69,24 @@ jobs:
       contents: read
       id-token: write
     environment: Development
-    needs: build-and-test
+    needs:
+      - detect-changes
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+      - if: needs.detect-changes.outputs.terraform == 'true'
+        uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+        with:
+          terraform-folder: "terraform"
+          terraform-var-file: "tfvars/dev.tfvars"
+          terraform-backend-file: "backends/dev.backend.hcl"
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - if: needs.detect-changes.outputs.terraform != 'true'
+        uses: frasermolyneux/actions/terraform-output@terraform-output/v1.0
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"
@@ -95,11 +125,16 @@ jobs:
       api_version_set_id: ${{ steps.terraform-output-dev.outputs.api_version_set_id }}
 
   app-service-deploy-api-dev:
+    if: |
+      !failure() && !cancelled() && needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
     environment: Development
-    needs: [build-and-test, terraform-plan-and-apply-dev]
+    needs:
+      - detect-changes
+      - build-and-test
+      - terraform-plan-and-apply-dev
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-dev
@@ -114,11 +149,17 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
   app-service-deploy-web-dev:
+    if: |
+      !failure() && !cancelled() && needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
     environment: Development
-    needs: [build-and-test, terraform-plan-and-apply-dev, app-service-deploy-api-dev]
+    needs:
+      - detect-changes
+      - build-and-test
+      - terraform-plan-and-apply-dev
+      - app-service-deploy-api-dev
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-dev
@@ -133,11 +174,17 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
   apim-api-import-dev:
+    if: |
+      !failure() && !cancelled() && needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
     environment: Development
-    needs: [build-and-test, terraform-plan-and-apply-dev, app-service-deploy-api-dev]
+    needs:
+      - detect-changes
+      - build-and-test
+      - terraform-plan-and-apply-dev
+      - app-service-deploy-api-dev
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-dev
@@ -221,16 +268,34 @@ jobs:
             --api-id geolocation-api-v1-1 || true
 
   terraform-plan-and-apply-prd:
+    if: |
+      !failure() && !cancelled() && needs.terraform-plan-and-apply-dev.result == 'success'
     permissions:
       contents: read
       id-token: write
     environment: Production
-    needs: [app-service-deploy-web-dev, apim-api-import-dev]
+    needs:
+      - detect-changes
+      - terraform-plan-and-apply-dev
+      - app-service-deploy-api-dev
+      - app-service-deploy-web-dev
+      - apim-api-import-dev
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
     steps:
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+      - if: needs.detect-changes.outputs.terraform == 'true'
+        uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v1.4
+        with:
+          terraform-folder: "terraform"
+          terraform-var-file: "tfvars/prd.tfvars"
+          terraform-backend-file: "backends/prd.backend.hcl"
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - if: needs.detect-changes.outputs.terraform != 'true'
+        uses: frasermolyneux/actions/terraform-output@terraform-output/v1.0
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/prd.tfvars"
@@ -269,11 +334,16 @@ jobs:
       api_version_set_id: ${{ steps.terraform-output-prd.outputs.api_version_set_id }}
 
   app-service-deploy-api-prd:
+    if: |
+      !failure() && !cancelled() && needs.terraform-plan-and-apply-prd.result == 'success' && needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
     environment: Production
-    needs: [build-and-test, terraform-plan-and-apply-prd]
+    needs:
+      - detect-changes
+      - build-and-test
+      - terraform-plan-and-apply-prd
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
@@ -288,11 +358,17 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
   app-service-deploy-web-prd:
+    if: |
+      !failure() && !cancelled() && needs.terraform-plan-and-apply-prd.result == 'success' && needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
     environment: Production
-    needs: [build-and-test, terraform-plan-and-apply-prd, app-service-deploy-api-prd]
+    needs:
+      - detect-changes
+      - build-and-test
+      - terraform-plan-and-apply-prd
+      - app-service-deploy-api-prd
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
@@ -307,11 +383,17 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
   apim-api-import-prd:
+    if: |
+      !failure() && !cancelled() && needs.terraform-plan-and-apply-prd.result == 'success' && needs.detect-changes.outputs.src == 'true'
     permissions:
       contents: read
       id-token: write
     environment: Production
-    needs: [build-and-test, terraform-plan-and-apply-prd, app-service-deploy-api-prd]
+    needs:
+      - detect-changes
+      - build-and-test
+      - terraform-plan-and-apply-prd
+      - app-service-deploy-api-prd
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.repository }}-prd
