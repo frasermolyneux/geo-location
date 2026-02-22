@@ -6,7 +6,7 @@ on:
       - main
   workflow_dispatch:
   schedule:
-    - cron: "0 3 * * 4"
+    - cron: "0 2 * * 4"
 
 permissions: {}
 
@@ -30,6 +30,7 @@ jobs:
             terraform:terraform/**
 
   terraform-state-check-dev:
+    if: github.event_name != 'schedule'
     permissions:
       contents: read
       id-token: write
@@ -52,7 +53,8 @@ jobs:
     needs:
       - detect-changes
       - terraform-state-check-dev
-    if: needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true'
+    if: |
+      !failure() && !cancelled() && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
     permissions:
       contents: read
       id-token: write
@@ -85,6 +87,7 @@ jobs:
       build_version: ${{ steps.api-ci.outputs.build_version }}
 
   terraform-plan-and-apply-dev:
+    if: github.event_name != 'schedule'
     permissions:
       contents: read
       id-token: write
@@ -147,7 +150,7 @@ jobs:
 
   app-service-deploy-api-dev:
     if: |
-      !failure() && !cancelled() && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
+      !failure() && !cancelled() && github.event_name != 'schedule' && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
     permissions:
       contents: read
       id-token: write
@@ -172,7 +175,7 @@ jobs:
 
   app-service-deploy-web-dev:
     if: |
-      !failure() && !cancelled() && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
+      !failure() && !cancelled() && github.event_name != 'schedule' && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
     permissions:
       contents: read
       id-token: write
@@ -198,7 +201,7 @@ jobs:
 
   apim-api-import-dev:
     if: |
-      !failure() && !cancelled() && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
+      !failure() && !cancelled() && github.event_name != 'schedule' && (needs.detect-changes.outputs.src == 'true' || needs.terraform-state-check-dev.outputs.has_resources != 'true')
     permissions:
       contents: read
       id-token: write
@@ -293,7 +296,7 @@ jobs:
 
   terraform-plan-and-apply-prd:
     if: |
-      !failure() && !cancelled() && needs.terraform-plan-and-apply-dev.result == 'success'
+      !failure() && !cancelled() && (needs.terraform-plan-and-apply-dev.result == 'success' || github.event_name == 'schedule')
     permissions:
       contents: read
       id-token: write
