@@ -16,13 +16,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Identity" Version="1.17.1" />
+		<PackageReference Include="Azure.Identity" Version="1.18.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Options" Version="10.0.3" />
-		<PackageReference Include="MX.Api.Client" Version="2.3.25" />
-		<PackageReference Include="MX.Api.Abstractions" Version="2.3.25" />
+		<PackageReference Include="MX.Api.Client" Version="2.3.31" />
+		<PackageReference Include="MX.Api.Abstractions" Version="2.3.31" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Include="RestSharp" Version="113.1.0" />
 	</ItemGroup>
