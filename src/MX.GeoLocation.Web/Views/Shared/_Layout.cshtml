@@ -163,6 +163,12 @@
     </main>
 
     <!-- Footer -->
+    @{
+        var entryAssembly = System.Reflection.Assembly.GetEntryAssembly();
+        var informationalVersion = entryAssembly?.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown";
+        var buildVersion = informationalVersion.Split('+')[0];
+        var assemblyVersion = entryAssembly?.GetName().Version?.ToString() ?? "unknown";
+    }
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -210,6 +216,7 @@
                     Location data provided by <a href="https://www.maxmind.com/" target="_blank"
                         rel="noopener">MaxMind</a>
                 </p>
+                <span class="float-end small" title="Full: @informationalVersion&#10;Assembly: @assemblyVersion">v@(buildVersion)</span>
             </div>
         </div>
     </footer>

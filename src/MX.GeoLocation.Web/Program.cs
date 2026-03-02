@@ -94,6 +94,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapHealthChecks("/api/health").AllowAnonymous();
+app.MapInfoEndpoint();
 
 app.Run();
 
