@@ -40,6 +40,8 @@ resource "azuread_application_password" "api" {
   rotate_when_changed = {
     rotation = time_rotating.thirty_days.id
   }
+
+  depends_on = [azuread_service_principal.api]
 }
 
 resource "azurerm_key_vault_secret" "api_client_id" {
@@ -102,6 +104,8 @@ resource "azuread_application_password" "web" {
   rotate_when_changed = {
     rotation = time_rotating.thirty_days.id
   }
+
+  depends_on = [azuread_service_principal.web]
 }
 
 # App role assignments for Web App managed identity to access API
