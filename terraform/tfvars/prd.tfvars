@@ -55,3 +55,5 @@ tags = {
   DeployedBy  = "GitHub-Terraform"
   Git         = "https://github.com/frasermolyneux/geo-location"
 }
+
+gcp_project_id = "gcp-mx-io-geo-location"

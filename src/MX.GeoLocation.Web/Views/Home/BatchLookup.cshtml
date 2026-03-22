@@ -1,5 +1,6 @@
 ﻿@using MX.GeoLocation.Web.Models
 @using MX.GeoLocation.Abstractions.Models.V1
+@inject IConfiguration Configuration
 @model BatchLookupViewModel
 
 @{
@@ -150,8 +151,12 @@
             }
         </script>
 
-        <script async defer
-            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQPUe4GXdBSQe-VFwBpkJta5oDbQbihTk&signed_in=false&callback=initMap"></script>
+        @{ var mapsApiKey = Configuration["GoogleMaps:ApiKey"]; }
+        @if (!string.IsNullOrWhiteSpace(mapsApiKey))
+        {
+            <script async defer
+                src="https://maps.googleapis.com/maps/api/js?key=@mapsApiKey&signed_in=false&callback=initMap"></script>
+        }
     }
 
 }

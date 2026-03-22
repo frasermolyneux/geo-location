@@ -33,6 +33,7 @@ resource "azurerm_linux_web_app" "web" {
     "GeoLocationApi__ApplicationAudience"        = local.entra_api_identifier_uri
     "APPINSIGHTS_PROFILERFEATURE_VERSION"        = "1.0.0"
     "DiagnosticServices_EXTENSION_VERSION"       = "~3"
+    "GoogleMaps__ApiKey"                         = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.google_maps_api_key.versionless_id})"
   }
 }
 

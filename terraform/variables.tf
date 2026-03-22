@@ -58,3 +58,8 @@ variable "api_consumers" {
 variable "tags" {
   default = {}
 }
+
+variable "gcp_project_id" {
+  description = "GCP project ID for Google Maps API key management"
+  type        = string
+}
