@@ -32,20 +32,20 @@ dns = {
 
 api_consumers = [
   {
-    workload     = "portal-repository-func-dev"
-    principal_id = "2a7e32e1-0471-4dae-aca6-faae1fa71ec4"
+    workload      = "portal-repository-func-dev"
+    identity_name = "id-portal-repository-func-dev"
   },
   {
-    workload     = "portal-repository-func-prd"
-    principal_id = "737442a4-9953-45fb-8fdb-425b63c7963d"
+    workload      = "portal-repository-func-prd"
+    identity_name = "id-portal-repository-func-prd"
   },
   {
-    workload     = "portal-web-dev"
-    principal_id = "175a74ea-6b88-4ef5-a0d4-e6ab9eaf4faa"
+    workload      = "portal-web-dev"
+    identity_name = "id-portal-web-dev"
   },
   {
-    workload     = "portal-web-prd"
-    principal_id = "37bbe97d-def7-4cdd-9ea4-31bce4f23d5f"
+    workload      = "portal-web-prd"
+    identity_name = "id-portal-web-prd"
   }
 ]
 

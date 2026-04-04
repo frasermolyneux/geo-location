@@ -47,10 +47,10 @@ variable "dns" {
 }
 
 variable "api_consumers" {
-  description = "External API consumers that need APIM subscriptions."
+  description = "External API consumers that need APIM subscriptions. identity_name is the display name of the consumer's managed identity."
   type = list(object({
-    workload     = string
-    principal_id = string
+    workload      = string
+    identity_name = string
   }))
   default = []
 }

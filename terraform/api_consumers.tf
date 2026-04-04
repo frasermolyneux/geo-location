@@ -1,3 +1,8 @@
+data "azuread_service_principal" "api_consumer" {
+  for_each     = { for c in var.api_consumers : c.workload => c }
+  display_name = each.value.identity_name
+}
+
 resource "azurerm_api_management_subscription" "consumers" {
   for_each = { for c in var.api_consumers : c.workload => c }
 
@@ -29,8 +34,8 @@ resource "azurerm_key_vault" "consumer" {
   rbac_authorization_enabled = true
 
   tags = merge(var.tags, {
-    consumerWorkload    = each.value.workload
-    consumerPrincipalId = each.value.principal_id
+    consumerWorkload     = each.value.workload
+    consumerIdentityName = each.value.identity_name
   })
 }
 
@@ -39,7 +44,7 @@ resource "azurerm_role_assignment" "consumer_kv_secrets_user" {
 
   scope                = azurerm_key_vault.consumer[each.key].id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = each.value.principal_id
+  principal_id         = data.azuread_service_principal.api_consumer[each.key].object_id
 }
 
 resource "azurerm_role_assignment" "consumer_kv_deploy_secrets_officer" {
@@ -75,6 +80,6 @@ resource "azuread_app_role_assignment" "consumer_to_api" {
   for_each = { for c in var.api_consumers : c.workload => c }
 
   app_role_id         = local.lookup_api_user_role_id
-  principal_object_id = each.value.principal_id
+  principal_object_id = data.azuread_service_principal.api_consumer[each.key].object_id
   resource_object_id  = azuread_service_principal.api.object_id
 }
