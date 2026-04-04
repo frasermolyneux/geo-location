@@ -1,3 +1,8 @@
+import {
+  to = google_apikeys_key.maps
+  id = "projects/${var.gcp_project_id}/locations/global/keys/maps-${var.environment}"
+}
+
 resource "google_apikeys_key" "maps" {
   name         = format("maps-%s", var.environment)
   display_name = format("Geo Location Maps API Key - %s", var.environment)
