@@ -1,5 +1,6 @@
 ﻿@using MX.GeoLocation.Web.Models
-@using MX.GeoLocation.Abstractions.Models.V1
+@using MX.GeoLocation.Web.Extensions
+@using MX.GeoLocation.Abstractions.Models.V1_1
 @inject IConfiguration Configuration
 @model BatchLookupViewModel
 
@@ -7,7 +8,7 @@
     ViewData["Title"] = "Batch Lookup";
 }
 
-@if (Model.GeoLocationCollectionDto != null)
+@if (Model.IntelligenceCollectionDto != null)
 {
     <row>
         <div class="text-center">
@@ -30,25 +31,46 @@
                                     <th scope="col">Lat, Long</th>
                                     <th scope="col">Postal Code</th>
                                     <th scope="col">Timezone</th>
+                                    <th scope="col">Risk Score</th>
+                                    <th scope="col">Proxy / VPN</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model.GeoLocationCollectionDto?.Items != null)
+                                @if (Model.IntelligenceCollectionDto?.Items != null)
                                 {
-                                    @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Items)
+                                    @foreach (var item in Model.IntelligenceCollectionDto.Items)
                                     {
                                         <tr>
                                             <td class="fw-medium">
                                                 <div class="d-flex align-items-center gap-2">
-                                                    <img src="~/images/flags/@(geoLocationDto.CountryCode?.ToLower()).png"
-                                                        alt="@geoLocationDto.CountryCode" class="result-flag" />
-                                                    @geoLocationDto.TranslatedAddress
+                                                    <img src="~/images/flags/@(item.CountryCode?.ToLower()).png"
+                                                        alt="@item.CountryCode" class="result-flag" />
+                                                    @item.TranslatedAddress
                                                 </div>
                                             </td>
-                                            <td class="fw-medium">@geoLocationDto.AccuracyRadius</td>
-                                            <td class="fw-medium">@geoLocationDto.Latitude, @geoLocationDto.Longitude</td>
-                                            <td class="fw-medium">@(geoLocationDto.PostalCode ?? "unknown")</td>
-                                            <td class="fw-medium">@geoLocationDto.Timezone</td>
+                                            <td class="fw-medium">@item.AccuracyRadius</td>
+                                            <td class="fw-medium">@item.Latitude, @item.Longitude</td>
+                                            <td class="fw-medium">@(item.PostalCode ?? "unknown")</td>
+                                            <td class="fw-medium">@item.Timezone</td>
+                                            <td class="fw-medium">
+                                                <span class="badge @item.ProxyCheck.RiskBadgeClass()">
+                                                    @(item.ProxyCheck?.RiskScore.ToString() ?? "N/A") - @item.ProxyCheck.RiskLabel()
+                                                </span>
+                                            </td>
+                                            <td class="fw-medium">
+                                                @if (item.ProxyCheck?.IsProxy == true)
+                                                {
+                                                    <span class="badge text-bg-danger me-1">Proxy</span>
+                                                }
+                                                @if (item.ProxyCheck?.IsVpn == true)
+                                                {
+                                                    <span class="badge text-bg-warning me-1">VPN</span>
+                                                }
+                                                @if (!string.IsNullOrWhiteSpace(item.ProxyCheck?.ProxyType))
+                                                {
+                                                    <span class="badge text-bg-secondary">@item.ProxyCheck.ProxyType</span>
+                                                }
+                                            </td>
                                         </tr>
                                     }
                                 }
@@ -113,7 +135,7 @@
     </p>
 </row>
 
-@if (Model.GeoLocationCollectionDto != null)
+@if (Model.IntelligenceCollectionDto != null)
 {
     @section Scripts {
         <script>
@@ -126,15 +148,15 @@
                     });
 
                 var locations = [
-                    @if (Model.GeoLocationCollectionDto?.Items != null)
+                    @if (Model.IntelligenceCollectionDto?.Items != null)
                     {
-                                    @foreach (var geoLocationDto in Model.GeoLocationCollectionDto.Items)
+                                    @foreach (var item in Model.IntelligenceCollectionDto.Items)
                         {
                             <text>
                                 [
-                                '@geoLocationDto.Address',
-                                                                                                                                @geoLocationDto.Latitude,
-                                @geoLocationDto.Longitude
+                                '@item.Address',
+                                                                                                                                @item.Latitude,
+                                @item.Longitude
                                 ],
                             </text>
                                     }

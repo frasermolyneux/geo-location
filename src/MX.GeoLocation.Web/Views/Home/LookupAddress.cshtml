@@ -82,16 +82,16 @@
     </div>
 </div>
 
-@if (Model.GeoLocationDto != null)
+@if (Model.CityGeoLocationDto != null)
 {
     <!-- Results Section -->
     <div class="result-card fade-in">
         <div class="result-header">
-            <img src="~/images/flags/@(Model.GeoLocationDto.CountryCode?.ToLower()).png"
-                alt="@Model.GeoLocationDto.CountryCode" class="result-flag" />
+            <img src="~/images/flags/@(Model.CityGeoLocationDto.CountryCode?.ToLower()).png"
+                alt="@Model.CityGeoLocationDto.CountryCode" class="result-flag" />
             <div>
                 <h2 class="mb-1">@Model.AddressData</h2>
-                <p class="text-muted mb-0">Located in @Model.GeoLocationDto.LocationSummary()</p>
+                <p class="text-muted mb-0">Located in @Model.CityGeoLocationDto.LocationSummary()</p>
             </div>
             <div class="status-indicator status-success ms-auto">
                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -152,7 +152,7 @@
                                                 Accuracy Radius
                                             </div>
                                         </td>
-                                        <td class="fw-medium">@Model.GeoLocationDto.AccuracyRadius KM</td>
+                                        <td class="fw-medium">@Model.CityGeoLocationDto.AccuracyRadius KM</td>
                                     </tr>
                                     <tr>
                                         <td class="text-muted">
@@ -165,8 +165,8 @@
                                                 Coordinates
                                             </div>
                                         </td>
-                                        <td class="fw-medium">@Model.GeoLocationDto.Latitude,
-                                            @Model.GeoLocationDto.Longitude</td>
+                                        <td class="fw-medium">@Model.CityGeoLocationDto.Latitude,
+                                            @Model.CityGeoLocationDto.Longitude</td>
                                     </tr>
                                     <tr>
                                         <td class="text-muted">
@@ -182,12 +182,12 @@
                                         </td>
                                         <td class="fw-medium">
                                             <div class="d-flex align-items-center gap-2">
-                                                @Model.GeoLocationDto.FlagImage()
-                                                @Model.GeoLocationDto.TranslatedAddress
+                                                @Model.CityGeoLocationDto.FlagImage()
+                                                @Model.CityGeoLocationDto.TranslatedAddress
                                             </div>
                                         </td>
                                     </tr>
-                                    @if (!string.IsNullOrEmpty(Model.GeoLocationDto.PostalCode))
+                                    @if (!string.IsNullOrEmpty(Model.CityGeoLocationDto.PostalCode))
                                     {
                                         <tr>
                                             <td class="text-muted">
@@ -200,7 +200,7 @@
                                                     Postal Code
                                                 </div>
                                             </td>
-                                            <td class="fw-medium">@Model.GeoLocationDto.PostalCode</td>
+                                            <td class="fw-medium">@Model.CityGeoLocationDto.PostalCode</td>
                                         </tr>
                                     }
                                     <tr>
@@ -214,7 +214,7 @@
                                                 Timezone
                                             </div>
                                         </td>
-                                        <td class="fw-medium">@Model.GeoLocationDto.Timezone</td>
+                                        <td class="fw-medium">@Model.CityGeoLocationDto.Timezone</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -227,7 +227,7 @@
                                     stroke-width="2">
                                     <polyline points="6,9 12,15 18,9" />
                                 </svg>
-                                View All Traits
+                                View Network Traits
                             </button>
                         </div>
                     </div>
@@ -236,7 +236,31 @@
         </div>
     </div>
 
-    <!-- Additional Traits Section -->
+    <!-- Subdivisions Section -->
+    @if (Model.CityGeoLocationDto.Subdivisions.Count > 0)
+    {
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0 d-flex align-items-center gap-2">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    Subdivisions
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var subdivision in Model.CityGeoLocationDto.Subdivisions)
+                    {
+                        <span class="badge text-bg-secondary">@subdivision</span>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Network Traits Section -->
     <div class="collapse" id="traits">
         <div class="card">
             <div class="card-header">
@@ -245,7 +269,7 @@
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                         <path d="M9 9h6v6H9z" />
                     </svg>
-                    Additional Location Traits
+                    Network Traits
                 </h3>
             </div>
             <div class="card-body">
@@ -271,12 +295,81 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var trait in Model.GeoLocationDto.Traits.Where(trait =>
-                                                    !string.IsNullOrWhiteSpace(trait.Value)))
+                            @if (Model.CityGeoLocationDto.NetworkTraits.AutonomousSystemNumber.HasValue)
                             {
                                 <tr>
-                                    <td class="text-muted">@trait.Key</td>
-                                    <td class="fw-medium">@trait.Value</td>
+                                    <td class="text-muted">Autonomous System Number</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.AutonomousSystemNumber</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.AutonomousSystemOrganization))
+                            {
+                                <tr>
+                                    <td class="text-muted">AS Organization</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.AutonomousSystemOrganization</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.Isp))
+                            {
+                                <tr>
+                                    <td class="text-muted">ISP</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.Isp</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.Organization))
+                            {
+                                <tr>
+                                    <td class="text-muted">Organization</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.Organization</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.ConnectionType))
+                            {
+                                <tr>
+                                    <td class="text-muted">Connection Type</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.ConnectionType</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.Domain))
+                            {
+                                <tr>
+                                    <td class="text-muted">Domain</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.Domain</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.UserType))
+                            {
+                                <tr>
+                                    <td class="text-muted">User Type</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.UserType</td>
+                                </tr>
+                            }
+                            @if (!string.IsNullOrWhiteSpace(Model.CityGeoLocationDto.NetworkTraits.Network))
+                            {
+                                <tr>
+                                    <td class="text-muted">Network</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.Network</td>
+                                </tr>
+                            }
+                            @if (Model.CityGeoLocationDto.NetworkTraits.IsAnycast)
+                            {
+                                <tr>
+                                    <td class="text-muted">Anycast</td>
+                                    <td class="fw-medium">Yes</td>
+                                </tr>
+                            }
+                            @if (Model.CityGeoLocationDto.NetworkTraits.StaticIPScore.HasValue)
+                            {
+                                <tr>
+                                    <td class="text-muted">Static IP Score</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.StaticIPScore</td>
+                                </tr>
+                            }
+                            @if (Model.CityGeoLocationDto.NetworkTraits.UserCount.HasValue)
+                            {
+                                <tr>
+                                    <td class="text-muted">User Count</td>
+                                    <td class="fw-medium">@Model.CityGeoLocationDto.NetworkTraits.UserCount</td>
                                 </tr>
                             }
                         </tbody>
@@ -290,8 +383,8 @@
         <script>
             function initMap() {
                 var myLatLng = {
-                    lat: @Model.GeoLocationDto.Latitude,
-                    lng: @Model.GeoLocationDto.Longitude
+                    lat: @Model.CityGeoLocationDto.Latitude,
+                    lng: @Model.CityGeoLocationDto.Longitude
                                                 };
 
                 var map = new google.maps.Map(document.getElementById('map'), {
@@ -487,9 +580,9 @@
                 var infoWindow = new google.maps.InfoWindow({
                     content: `
                                                         <div style="padding: 10px; font-family: 'Inter', sans-serif;">
-                                                            <h6 style="margin: 0 0 8px 0; color: #1e293b;">@Model.GeoLocationDto.LocationSummary()</h6>
+                                                            <h6 style="margin: 0 0 8px 0; color: #1e293b;">@Model.CityGeoLocationDto.LocationSummary()</h6>
                                                             <p style="margin: 0; color: #64748b; font-size: 14px;">@Model.AddressData</p>
-                                                            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 12px;">Accuracy: @Model.GeoLocationDto.AccuracyRadius KM</p>
+                                                            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 12px;">Accuracy: @Model.CityGeoLocationDto.AccuracyRadius KM</p>
                                                         </div>
                                                     `
                 });

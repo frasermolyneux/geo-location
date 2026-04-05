@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -6,7 +6,7 @@ using System.Net.Sockets;
 using Microsoft.AspNetCore.Mvc;
 
 using MX.GeoLocation.Api.Client.V1;
-using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Abstractions.Models.V1_1;
 using MX.GeoLocation.Web.Extensions;
 using MX.GeoLocation.Web.Models;
 
@@ -14,7 +14,7 @@ namespace MX.GeoLocation.Web.Controllers
 {
     public class HomeController : Controller
     {
-        private const string UserLocationSessionKey = "UserGeoLocationDto";
+        private const string UserLocationSessionKey = "UserCityGeoLocationDto";
         private const string BatchLookupSessionKey = "BatchLookupAddressData";
 
         private readonly IGeoLocationApiClient geoLocationApiClient;
@@ -33,24 +33,23 @@ namespace MX.GeoLocation.Web.Controllers
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var sessionGeoLocationDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<GeoLocationDto>(UserLocationSessionKey);
+            var sessionDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<CityGeoLocationDto>(UserLocationSessionKey);
 
-            if (sessionGeoLocationDto is not null)
-                return View(sessionGeoLocationDto);
+            if (sessionDto is not null)
+                return View(sessionDto);
 
             var address = GetUsersIpForLookup();
 
-            var lookupAddressResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocation(address.ToString(), cancellationToken);
+            var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(address.ToString(), cancellationToken);
 
-            if (!lookupAddressResponse.IsSuccess || lookupAddressResponse.IsNotFound || lookupAddressResponse.Result?.Data is null)
+            if (!lookupResponse.IsSuccess || lookupResponse.IsNotFound || lookupResponse.Result?.Data is null)
             {
                 return RedirectToAction("LookupAddress");
             }
             else
             {
-                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupAddressResponse.Result.Data);
-
-                return View(lookupAddressResponse.Result.Data);
+                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupResponse.Result.Data);
+                return View(lookupResponse.Result.Data);
             }
         }
 
@@ -63,9 +62,7 @@ namespace MX.GeoLocation.Web.Controllers
         public IActionResult Error(string? message)
         {
             if (!ModelState.IsValid)
-            {
                 return View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = "An error occurred while processing your request." });
-            }
 
             return View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = message });
         }
@@ -79,11 +76,7 @@ namespace MX.GeoLocation.Web.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return View(new LookupAddressViewModel());
 
-            var model = new LookupAddressViewModel
-            {
-                AddressData = id
-            };
-
+            var model = new LookupAddressViewModel { AddressData = id };
             return await LookupAddress(model, cancellationToken);
         }
 
@@ -96,8 +89,7 @@ namespace MX.GeoLocation.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(model.AddressData))
             {
-                ModelState.AddModelError(nameof(model.AddressData),
-                    "You must provide an address to query against. IP or DNS is acceptable.");
+                ModelState.AddModelError(nameof(model.AddressData), "You must provide an address to query against. IP or DNS is acceptable.");
                 return View(model);
             }
 
@@ -107,27 +99,68 @@ namespace MX.GeoLocation.Web.Controllers
                 return View(model);
             }
 
-            var lookupAddressResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocation(model.AddressData, cancellationToken);
+            var response = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(model.AddressData, cancellationToken);
 
-            if (!lookupAddressResponse.IsSuccess)
+            if (!response.IsSuccess)
             {
-                if (lookupAddressResponse.Result?.Errors is not null)
-                {
-                    foreach (var error in lookupAddressResponse.Result.Errors)
-                    {
+                if (response.Result?.Errors is not null)
+                    foreach (var error in response.Result.Errors)
                         ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-                    }
-                }
-
                 return View(model);
             }
-            else if (lookupAddressResponse.IsNotFound)
+            else if (response.IsNotFound)
             {
                 ModelState.AddModelError(nameof(model.AddressData), "Could not retrieve GeoLocation data for address");
             }
             else
             {
-                model.GeoLocationDto = lookupAddressResponse.Result?.Data;
+                model.CityGeoLocationDto = response.Result?.Data;
+            }
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult IntelligenceLookup()
+        {
+            return View(new IntelligenceLookupViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> IntelligenceLookup(IntelligenceLookupViewModel model, CancellationToken cancellationToken)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (string.IsNullOrWhiteSpace(model.AddressData))
+            {
+                ModelState.AddModelError(nameof(model.AddressData), "You must provide an address to query against. IP or DNS is acceptable.");
+                return View(model);
+            }
+
+            if (!await ValidateHostname(model.AddressData, cancellationToken))
+            {
+                ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
+                return View(model);
+            }
+
+            var response = await geoLocationApiClient.GeoLookup.V1_1.GetIpIntelligence(model.AddressData, cancellationToken);
+
+            if (!response.IsSuccess)
+            {
+                if (response.Result?.Errors is not null)
+                    foreach (var error in response.Result.Errors)
+                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                return View(model);
+            }
+            else if (response.IsNotFound)
+            {
+                ModelState.AddModelError(nameof(model.AddressData), "Could not retrieve intelligence data for address");
+            }
+            else
+            {
+                model.Intelligence = response.Result?.Data;
             }
 
             return View(model);
@@ -139,10 +172,7 @@ namespace MX.GeoLocation.Web.Controllers
             var addressData = httpContextAccessor.HttpContext?.Session.GetString(BatchLookupSessionKey);
 
             if (!string.IsNullOrWhiteSpace(addressData))
-                return View(new BatchLookupViewModel
-                {
-                    AddressData = addressData
-                });
+                return View(new BatchLookupViewModel { AddressData = addressData });
 
             return View(new BatchLookupViewModel());
         }
@@ -158,8 +188,7 @@ namespace MX.GeoLocation.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(model.AddressData))
             {
-                ModelState.AddModelError(nameof(model.AddressData),
-                    "You must provide a line separated list of addresses. IP or DNS is acceptable.");
+                ModelState.AddModelError(nameof(model.AddressData), "You must provide a line separated list of addresses. IP or DNS is acceptable.");
                 return View(model);
             }
 
@@ -174,35 +203,27 @@ namespace MX.GeoLocation.Web.Controllers
             }
             catch (FormatException)
             {
-                ModelState.AddModelError(nameof(model.AddressData),
-                    "Invalid data, you must provide a line separated list of addresses. IP or DNS is acceptable.");
+                ModelState.AddModelError(nameof(model.AddressData), "Invalid data, you must provide a line separated list of addresses. IP or DNS is acceptable.");
                 return View(model);
             }
 
             if (addresses.Count > 20)
             {
-                ModelState.AddModelError(nameof(model.AddressData),
-                    "You can only search for a maximum of 20 addresses in one request");
+                ModelState.AddModelError(nameof(model.AddressData), "You can only search for a maximum of 20 addresses in one request");
                 return View(model);
             }
 
-            var lookupAddressesResponse = await geoLocationApiClient.GeoLookup.V1.GetGeoLocations(addresses, cancellationToken);
+            var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetIpIntelligences(addresses, cancellationToken);
 
-            if (!lookupAddressesResponse.IsSuccess || (lookupAddressesResponse.Result?.Errors?.Any() ?? false))
+            if (!lookupResponse.IsSuccess || (lookupResponse.Result?.Errors?.Any() ?? false))
             {
-                if (lookupAddressesResponse.Result?.Errors is not null)
-                {
-                    foreach (var error in lookupAddressesResponse.Result.Errors)
-                    {
+                if (lookupResponse.Result?.Errors is not null)
+                    foreach (var error in lookupResponse.Result.Errors)
                         ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-                    }
-                }
             }
 
-            if (lookupAddressesResponse.IsSuccess)
-            {
-                model.GeoLocationCollectionDto = lookupAddressesResponse.Result?.Data;
-            }
+            if (lookupResponse.IsSuccess)
+                model.IntelligenceCollectionDto = lookupResponse.Result?.Data;
 
             return View(model);
         }
@@ -229,18 +250,13 @@ namespace MX.GeoLocation.Web.Controllers
                     return View(model);
                 }
 
-                var deleteMetaDataResponse = await geoLocationApiClient.GeoLookup.V1.DeleteMetadata(model.AddressData, cancellationToken);
+                var deleteResponse = await geoLocationApiClient.GeoLookup.V1_1.DeleteMetadata(model.AddressData, cancellationToken);
 
-                if (!deleteMetaDataResponse.IsSuccess)
+                if (!deleteResponse.IsSuccess)
                 {
-                    if (deleteMetaDataResponse.Result?.Errors is not null)
-                    {
-                        foreach (var error in deleteMetaDataResponse.Result.Errors)
-                        {
+                    if (deleteResponse.Result?.Errors is not null)
+                        foreach (var error in deleteResponse.Result.Errors)
                             ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-                        }
-                    }
-
                     return View(model);
                 }
 
@@ -263,13 +279,9 @@ namespace MX.GeoLocation.Web.Controllers
 
             IPAddress? address = null;
 
-            // CF-Connecting-IP is a Cloudflare-specific header; not handled by ForwardedHeaders middleware
             if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) ?? false)
-            {
                 IPAddress.TryParse(cfConnectingIp, out address);
-            }
 
-            // RemoteIpAddress is populated by the ForwardedHeaders middleware from X-Forwarded-For
             if (address is null)
                 address = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
 
@@ -278,26 +290,18 @@ namespace MX.GeoLocation.Web.Controllers
 
         private async Task<bool> ValidateHostname(string address, CancellationToken cancellationToken)
         {
-            if (IPAddress.TryParse(address, out var ipAddress))
-            {
+            if (IPAddress.TryParse(address, out _))
                 return true;
-            }
 
             try
             {
                 var hostEntry = await Dns.GetHostEntryAsync(address, cancellationToken);
-
-                if (hostEntry.AddressList.FirstOrDefault() is not null)
-                {
-                    return true;
-                }
+                return hostEntry.AddressList.FirstOrDefault() is not null;
             }
             catch (SocketException)
             {
                 return false;
             }
-
-            return false;
         }
     }
 }

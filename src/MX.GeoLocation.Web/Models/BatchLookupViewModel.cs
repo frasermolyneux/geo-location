@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Abstractions.Models.V1_1;
 using MX.Api.Abstractions;
 
 namespace MX.GeoLocation.Web.Models
@@ -11,6 +11,6 @@ namespace MX.GeoLocation.Web.Models
         [DataType(DataType.MultilineText)]
         public string? AddressData { get; set; }
 
-        public CollectionModel<GeoLocationDto>? GeoLocationCollectionDto { get; set; }
+        public CollectionModel<IpIntelligenceDto>? IntelligenceCollectionDto { get; set; }
     }
 }
