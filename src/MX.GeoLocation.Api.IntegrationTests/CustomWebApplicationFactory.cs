@@ -23,6 +23,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     public Mock<IMaxMindGeoLocationRepository> MockMaxMind { get; } = new();
     public Mock<ITableStorageGeoLocationRepository> MockTableStorage { get; } = new();
+    public Mock<IProxyCheckRepository> MockProxyCheck { get; } = new();
+    public Mock<IProxyCheckCacheRepository> MockProxyCheckCache { get; } = new();
     public Mock<IHostnameResolver> MockHostnameResolver { get; } = new();
 
     public CustomWebApplicationFactory()
@@ -38,6 +40,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         MockMaxMind.Reset();
         MockTableStorage.Reset();
+        MockProxyCheck.Reset();
+        MockProxyCheckCache.Reset();
         MockHostnameResolver.Reset();
         SetupDefaultHostnameResolver();
     }
@@ -73,6 +77,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 ["Storage:TableEndpoint"] = "https://fake.table.core.windows.net",
                 ["maxmind_userid"] = "12345",
                 ["maxmind_apikey"] = "fake-api-key",
+                ["ProxyCheck:ApiKey"] = "fake-proxycheck-key",
                 ["ApplicationInsights:ConnectionString"] = "InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://localhost",
             });
         });
@@ -85,6 +90,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<ITableStorageGeoLocationRepository>();
             services.AddSingleton(MockTableStorage.Object);
+
+            services.RemoveAll<IProxyCheckRepository>();
+            services.AddSingleton(MockProxyCheck.Object);
+
+            services.RemoveAll<IProxyCheckCacheRepository>();
+            services.AddSingleton(MockProxyCheckCache.Object);
 
             // Replace hostname resolver with mock
             services.RemoveAll<IHostnameResolver>();
