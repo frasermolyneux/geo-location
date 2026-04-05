@@ -51,3 +51,15 @@ resource "azurerm_key_vault_secret" "maxmind_userid" {
 
   depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
 }
+
+resource "azurerm_key_vault_secret" "proxycheck_apikey" {
+  name         = "proxycheck-apikey"
+  value        = "placeholder"
+  key_vault_id = azurerm_key_vault.kv.id
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+
+  depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
+}
