@@ -15,10 +15,17 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
 {
     private readonly ConcurrentDictionary<string, CityGeoLocationDto> _cityResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, InsightsGeoLocationDto> _insightsResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, ProxyCheckDto> _proxyCheckResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, IpIntelligenceDto> _intelligenceResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _cityErrorResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _insightsErrorResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _proxyCheckErrorResponses = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, (HttpStatusCode StatusCode, ApiError Error)> _intelligenceErrorResponses = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentBag<string> _cityLookedUpAddresses = [];
     private readonly ConcurrentBag<string> _insightsLookedUpAddresses = [];
+    private readonly ConcurrentBag<string> _proxyCheckLookedUpAddresses = [];
+    private readonly ConcurrentBag<string> _intelligenceLookedUpAddresses = [];
+    private readonly ConcurrentBag<string> _deletedAddresses = [];
     private DefaultLookupBehavior _defaultBehavior = DefaultLookupBehavior.ReturnGenericSuccess;
     private HttpStatusCode _defaultErrorStatusCode = HttpStatusCode.NotFound;
     private string _defaultErrorCode = "NOT_FOUND";
@@ -61,6 +68,42 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
     }
 
     /// <summary>
+    /// Registers a canned proxycheck response for a specific address.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 AddProxyCheckResponse(string address, ProxyCheckDto dto)
+    {
+        _proxyCheckResponses[address] = dto;
+        return this;
+    }
+
+    /// <summary>
+    /// Registers a canned error response for proxycheck lookups of a specific address.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 AddProxyCheckErrorResponse(string address, HttpStatusCode statusCode, string errorCode, string errorMessage)
+    {
+        _proxyCheckErrorResponses[address] = (statusCode, new ApiError(errorCode, errorMessage));
+        return this;
+    }
+
+    /// <summary>
+    /// Registers a canned intelligence response for a specific address.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 AddIntelligenceResponse(string address, IpIntelligenceDto dto)
+    {
+        _intelligenceResponses[address] = dto;
+        return this;
+    }
+
+    /// <summary>
+    /// Registers a canned error response for intelligence lookups of a specific address.
+    /// </summary>
+    public FakeGeoLookupApiV1_1 AddIntelligenceErrorResponse(string address, HttpStatusCode statusCode, string errorCode, string errorMessage)
+    {
+        _intelligenceErrorResponses[address] = (statusCode, new ApiError(errorCode, errorMessage));
+        return this;
+    }
+
+    /// <summary>
     /// Configures how unconfigured addresses are handled.
     /// When set to <see cref="DefaultLookupBehavior.ReturnError"/>, lookups for addresses
     /// without a canned response will return an error instead of a generic success.
@@ -86,10 +129,17 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
     {
         _cityResponses.Clear();
         _insightsResponses.Clear();
+        _proxyCheckResponses.Clear();
+        _intelligenceResponses.Clear();
         _cityErrorResponses.Clear();
         _insightsErrorResponses.Clear();
+        _proxyCheckErrorResponses.Clear();
+        _intelligenceErrorResponses.Clear();
         while (_cityLookedUpAddresses.TryTake(out _)) { }
         while (_insightsLookedUpAddresses.TryTake(out _)) { }
+        while (_proxyCheckLookedUpAddresses.TryTake(out _)) { }
+        while (_intelligenceLookedUpAddresses.TryTake(out _)) { }
+        while (_deletedAddresses.TryTake(out _)) { }
         _defaultBehavior = DefaultLookupBehavior.ReturnGenericSuccess;
         _defaultErrorStatusCode = HttpStatusCode.NotFound;
         _defaultErrorCode = "NOT_FOUND";
@@ -97,15 +147,20 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
         return this;
     }
 
-    /// <summary>
-    /// Returns the set of addresses looked up via <see cref="GetCityGeoLocation"/>.
-    /// </summary>
+    /// <summary>Returns the set of addresses looked up via <see cref="GetCityGeoLocation"/>.</summary>
     public IReadOnlyCollection<string> CityLookedUpAddresses => _cityLookedUpAddresses.ToArray();
 
-    /// <summary>
-    /// Returns the set of addresses looked up via <see cref="GetInsightsGeoLocation"/>.
-    /// </summary>
+    /// <summary>Returns the set of addresses looked up via <see cref="GetInsightsGeoLocation"/>.</summary>
     public IReadOnlyCollection<string> InsightsLookedUpAddresses => _insightsLookedUpAddresses.ToArray();
+
+    /// <summary>Returns the set of addresses looked up via <see cref="GetProxyCheck"/>.</summary>
+    public IReadOnlyCollection<string> ProxyCheckLookedUpAddresses => _proxyCheckLookedUpAddresses.ToArray();
+
+    /// <summary>Returns the set of addresses looked up via <see cref="GetIpIntelligence"/>.</summary>
+    public IReadOnlyCollection<string> IntelligenceLookedUpAddresses => _intelligenceLookedUpAddresses.ToArray();
+
+    /// <summary>Returns the set of addresses deleted via <see cref="DeleteMetadata"/>.</summary>
+    public IReadOnlyCollection<string> DeletedAddresses => _deletedAddresses.ToArray();
 
     public Task<ApiResult<CityGeoLocationDto>> GetCityGeoLocation(string hostname, CancellationToken cancellationToken = default)
     {
@@ -155,5 +210,60 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
 
         dto = GeoLocationDtoFactory.CreateInsightsGeoLocation(address: hostname, cityName: "Test City", countryName: "Test Country");
         return Task.FromResult(new ApiResult<InsightsGeoLocationDto>(HttpStatusCode.OK, new ApiResponse<InsightsGeoLocationDto>(dto)));
+    }
+
+    public Task<ApiResult<ProxyCheckDto>> GetProxyCheck(string hostname, CancellationToken cancellationToken = default)
+    {
+        _proxyCheckLookedUpAddresses.Add(hostname);
+
+        if (_proxyCheckErrorResponses.TryGetValue(hostname, out var error))
+            return Task.FromResult(new ApiResult<ProxyCheckDto>(error.StatusCode, new ApiResponse<ProxyCheckDto>(error.Error)));
+
+        if (_proxyCheckResponses.TryGetValue(hostname, out var dto))
+            return Task.FromResult(new ApiResult<ProxyCheckDto>(HttpStatusCode.OK, new ApiResponse<ProxyCheckDto>(dto)));
+
+        if (_defaultBehavior == DefaultLookupBehavior.ReturnError)
+            return Task.FromResult(new ApiResult<ProxyCheckDto>(_defaultErrorStatusCode, new ApiResponse<ProxyCheckDto>(new ApiError(_defaultErrorCode, _defaultErrorMessage))));
+
+        dto = GeoLocationDtoFactory.CreateProxyCheck(address: hostname);
+        return Task.FromResult(new ApiResult<ProxyCheckDto>(HttpStatusCode.OK, new ApiResponse<ProxyCheckDto>(dto)));
+    }
+
+    public Task<ApiResult<IpIntelligenceDto>> GetIpIntelligence(string hostname, CancellationToken cancellationToken = default)
+    {
+        _intelligenceLookedUpAddresses.Add(hostname);
+
+        if (_intelligenceErrorResponses.TryGetValue(hostname, out var error))
+            return Task.FromResult(new ApiResult<IpIntelligenceDto>(error.StatusCode, new ApiResponse<IpIntelligenceDto>(error.Error)));
+
+        if (_intelligenceResponses.TryGetValue(hostname, out var dto))
+            return Task.FromResult(new ApiResult<IpIntelligenceDto>(HttpStatusCode.OK, new ApiResponse<IpIntelligenceDto>(dto)));
+
+        if (_defaultBehavior == DefaultLookupBehavior.ReturnError)
+            return Task.FromResult(new ApiResult<IpIntelligenceDto>(_defaultErrorStatusCode, new ApiResponse<IpIntelligenceDto>(new ApiError(_defaultErrorCode, _defaultErrorMessage))));
+
+        dto = GeoLocationDtoFactory.CreateIpIntelligence(address: hostname);
+        return Task.FromResult(new ApiResult<IpIntelligenceDto>(HttpStatusCode.OK, new ApiResponse<IpIntelligenceDto>(dto)));
+    }
+
+    public async Task<ApiResult<CollectionModel<IpIntelligenceDto>>> GetIpIntelligences(List<string> hostnames, CancellationToken cancellationToken = default)
+    {
+        var results = new List<IpIntelligenceDto>();
+        foreach (var hostname in hostnames)
+        {
+            var result = await GetIpIntelligence(hostname, cancellationToken);
+            if (result.IsSuccess && result.Result?.Data is not null)
+                results.Add(result.Result.Data);
+        }
+
+        var response = new ApiResponse<CollectionModel<IpIntelligenceDto>>(
+            new CollectionModel<IpIntelligenceDto> { Items = results });
+        return new ApiResult<CollectionModel<IpIntelligenceDto>>(HttpStatusCode.OK, response);
+    }
+
+    public Task<ApiResult> DeleteMetadata(string hostname, CancellationToken cancellationToken = default)
+    {
+        _deletedAddresses.Add(hostname);
+        return Task.FromResult(new ApiResult(HttpStatusCode.OK, new ApiResponse()));
     }
 }

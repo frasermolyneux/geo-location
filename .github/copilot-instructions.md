@@ -3,12 +3,19 @@
 ## Architecture
 - .NET 9 solution in `src/MX.GeoLocation.sln` with API (`MX.GeoLocation.Api.V1`) and MVC web (`MX.GeoLocation.Web`) projects plus abstractions, a generated API client, and a testing package.
 - Three NuGet packages are published: `MX.GeoLocation.Abstractions.V1` (interfaces/models), `MX.GeoLocation.Api.Client.V1` (typed HTTP client), and `MX.GeoLocation.Api.Client.Testing` (in-memory fakes and DTO factories for consumer test projects).
-- API uses MaxMind GeoIP2 and caches responses in Azure Table Storage:
+- API uses MaxMind GeoIP2 and ProxyCheck.io, caching responses in Azure Table Storage:
   - **v1.0**: `geolocations` table with `GeoLocationTableEntity` (permanent cache)
   - **v1.1**: `geolocationsv11` table with `CityGeoLocationTableEntity` (city: permanent, insights: configurable TTL via `Caching:InsightsCacheDays`, default 7 days)
+  - **proxycheck**: `proxycheck` table with `ProxyCheckTableEntity` (configurable TTL via `Caching:ProxyCheckCacheMinutes`, default 60 minutes)
 - API exposes two versioned endpoint groups:
   - **v1.0**: Single/batch lookup, metadata deletion, and API info (`/v1.0/lookup/...`, `/v1.0/info`)
-  - **v1.1**: City and Insights lookups with typed DTOs (`/v1.1/lookup/city/...`, `/v1.1/lookup/insights/...`)
+  - **v1.1**: City, Insights, ProxyCheck, and IP Intelligence lookups with typed DTOs:
+    - `/v1.1/lookup/city/{hostname}` — MaxMind city-level geolocation
+    - `/v1.1/lookup/insights/{hostname}` — MaxMind Insights detailed geolocation
+    - `/v1.1/lookup/proxycheck/{hostname}` — ProxyCheck.io risk assessment (`ProxyCheckDto`)
+    - `/v1.1/lookup/intelligence/{hostname}` — merged MaxMind Insights + ProxyCheck (`IpIntelligenceDto`)
+    - `POST /v1.1/lookup/intelligence` — batch IP intelligence (max 20, `CollectionModel<IpIntelligenceDto>`)
+    - `DELETE /v1.1/lookup/{hostname}` — deletes from all cache tables (v1.0 + v1.1 + proxycheck)
 - Controllers are differentiated by namespace (`Controllers.V1`, `Controllers.V1_1`), both named `GeoLookupController`. Both inject `IHostnameResolver` for shared hostname validation and resolution.
 - API security is Entra ID via `Microsoft.Identity.Web`; the `LookupApiUser` role is required for controller access. The `/v1.0/info` and `/v1.0/health` endpoints are `[AllowAnonymous]`.
 - OpenAPI specs are served at runtime at `/openapi/v1.0.json` and `/openapi/v1.1.json`. Scalar provides interactive API docs at `/scalar`.
@@ -28,8 +35,9 @@
 
 ## Configuration
 - API needs `maxmind_userid`, `maxmind_apikey`, and `appdata_storage_connectionstring`; MaxMind secrets belong in Key Vault (see `docs/manual-steps.md`).
+- ProxyCheck integration needs `ProxyCheck:ApiKey` (stored in Key Vault) and `ProxyCheck:BaseUrl` (defaults to `https://proxycheck.io/v2/`). Cache TTL is controlled by `Caching:ProxyCheckCacheMinutes` (default 60).
 - Web needs `GeoLocationApi:BaseUrl`, `GeoLocationApi:ApiKey`, and `GeoLocationApi:ApplicationAudience`; user secrets are wired in `Program.cs` for development.
-- Batch lookup caps at 20 entries (enforced by `MaxBatchSize` constant in the V1 controller); `localhost` and `127.0.0.1` are rejected to avoid local lookups.
+- Batch lookup caps at 20 entries (enforced by `MaxBatchSize` constant in the V1 and V1.1 controllers); `localhost` and `127.0.0.1` are rejected to avoid local lookups.
 
 ## Key Files
 - `MX.GeoLocation.Api.V1/Program.cs` sets API versioning (GroupNameFormat `'v'VV`), OpenAPI documents (`v1.0`, `v1.1`), auth, table storage, and health checks.
@@ -38,16 +46,20 @@
 - `Controllers/V1/GeoLookupController.cs` implements GET/POST lookups and DELETE metadata with cache-first flow then MaxMind fallback. Uses `IHostnameResolver` for hostname validation and DNS resolution. Input validation returns `BadRequest` for null/empty hostnames. Batch endpoint uses `[FromBody]` model binding with a configurable `MaxBatchSize` (20) limit.
 - `Controllers/V1/ApiInfoController.cs` implements the `/v1.0/info` endpoint returning build version information (anonymous access).
 - `Controllers/V1/HealthController.cs` implements the `/v1.0/health` endpoint wrapping the ASP.NET health check service (anonymous access).
-- `Controllers/V1_1/GeoLookupController.cs` implements city and insights lookups with cache-first flow and configurable insights TTL. Uses `IHostnameResolver` for hostname validation and DNS resolution. Input validation returns `BadRequest` for null/empty hostnames.
+- `Controllers/V1_1/GeoLookupController.cs` implements city, insights, proxycheck, intelligence (single + batch), and delete endpoints with cache-first flow. Uses `IHostnameResolver` for hostname validation and DNS resolution. Input validation returns `BadRequest` for null/empty hostnames. Intelligence endpoints use `IIpIntelligenceService` for parallel fan-out. Delete removes from all cache tables (v1.0, v1.1, proxycheck).
 - `Services/HostnameResolver.cs` provides shared hostname resolution (DNS lookup or IP parsing) and local address detection. Injected into both V1 and V1.1 controllers.
 - `Repositories/TableStorageGeoLocationRepository.cs` handles Azure Table persistence for both v1.0 (`geolocations`) and v1.1 (`geolocationsv11`) tables. All async methods accept `CancellationToken` and validate `address` input with `ArgumentException.ThrowIfNullOrWhiteSpace`.
 - `Repositories/MaxMindGeoLocationRepository.cs` wraps `MaxMind.GeoIP2.WebServiceClient` (injected as singleton) with dependency telemetry; provides `GetGeoLocation` (v1), `GetCityGeoLocation` and `GetInsightsGeoLocation` (v1.1). Catches `GeoIP2Exception` specifically (not broad `Exception`). All async methods accept `CancellationToken`.
+- `Repositories/ProxyCheckRepository.cs` calls the ProxyCheck.io API (`IProxyCheckRepository`) with Application Insights dependency telemetry. Uses a named `HttpClient` with configurable base URL (`ProxyCheck:BaseUrl`) and API key (`ProxyCheck:ApiKey`). Returns `ProxyCheckDto` with risk score, proxy/VPN flags, and ASN data.
+- `Repositories/ProxyCheckCacheRepository.cs` provides Azure Table Storage caching (`IProxyCheckCacheRepository`) for ProxyCheck results in the `proxycheck` table. Supports `GetProxyCheckData` (with `maxAge` TTL), `StoreProxyCheckData`, and `DeleteProxyCheckData`.
+- `Services/IpIntelligenceService.cs` orchestrates parallel MaxMind Insights + ProxyCheck lookups (`IIpIntelligenceService`). Implements graceful degradation — returns partial results with `SourceStatus` metadata when one source fails, and null only when both fail. See [docs/ip-intelligence.md](../docs/ip-intelligence.md).
 - `Models/CityGeoLocationTableEntity.cs` is the table entity for v1.1 DTOs, serializing complex fields (Subdivisions, NetworkTraits, Anonymizer) as JSON columns with safe deserialization (graceful fallback on malformed JSON).
+- `Models/ProxyCheckTableEntity.cs` is the table entity for ProxyCheck cache data in the `proxycheck` table. Maps `ProxyCheckDto` fields to table columns with a `ToDto()` conversion method.
 - `Models/GeoLocationTableEntity.cs` uses lazy-initialized backing field for the `Traits` property (deserialized once from JSON, cached).
 - `MX.GeoLocation.Web/Program.cs` wires the API client and sessions; `HomeController.cs` drives lookup, batch lookup, and data removal flows.
-- `MX.GeoLocation.Api.Client.Testing/` provides `FakeGeoLocationApiClient` (in-memory fake of `IGeoLocationApiClient`), `GeoLocationDtoFactory` (factory methods to create DTOs with internal setters), and `AddFakeGeoLocationApiClient()` DI extension for integration tests. Fakes support error simulation via `AddErrorResponse()` and call tracking via `LookedUpAddresses`. See [docs/testing.md](../docs/testing.md).
+- `MX.GeoLocation.Api.Client.Testing/` provides `FakeGeoLocationApiClient` (in-memory fake of `IGeoLocationApiClient`), `GeoLocationDtoFactory` (factory methods to create DTOs with internal setters), and `AddFakeGeoLocationApiClient()` DI extension for integration tests. Fakes support error simulation via `AddErrorResponse()` and call tracking via `LookedUpAddresses`. `FakeGeoLookupApiV1_1` supports ProxyCheck/Intelligence response registration, error simulation, and `DeleteMetadata`. See [docs/testing.md](../docs/testing.md).
 
 ## Infrastructure
-- Terraform under `terraform/` builds App Services (API + Web on shared platform-hosting plan), API Management (Consumption), Key Vault, Storage (including both `geolocations` and `geolocationsv11` tables), DNS, Entra ID apps, and Application Insights (per-environment tfvars/backends). GitHub Actions workflows cover build/test, codequality, PR verify, deploy-dev/prd, destroy-development/environment, dependabot-automerge, and copilot-setup-steps.
+- Terraform under `terraform/` builds App Services (API + Web on shared platform-hosting plan), API Management (Consumption), Key Vault, Storage (including `geolocations`, `geolocationsv11`, and `proxycheck` tables), DNS, Entra ID apps, and Application Insights (per-environment tfvars/backends). GitHub Actions workflows cover build/test, codequality, PR verify, deploy-dev/prd, destroy-development/environment, dependabot-automerge, and copilot-setup-steps.
 - APIM API definitions are imported from the live deployed App Service via `az apim api import` in the GitHub Actions deploy workflows (not managed by Terraform). Terraform manages the APIM instance, version set (`geolocation-api`, scheme `Segment`), product, product policy (JWT/caching), and diagnostics.
 - See [docs/api-versioning-and-apim.md](../docs/api-versioning-and-apim.md) for the full API versioning, APIM routing, and OpenAPI flow.

@@ -9,7 +9,7 @@ The API uses `Asp.Versioning` with URL segment versioning:
 - **Controller routes**: `[Route("v{version:apiVersion}")]` + action routes like `[Route("lookup/{hostname}")]`
 - **API versions**:
   - **v1.0**: Single/batch IP lookup and metadata deletion (`/v1.0/lookup/...`, `/v1.0/info`)
-  - **v1.1**: City and Insights lookups with typed DTOs (`/v1.1/lookup/city/...`, `/v1.1/lookup/insights/...`)
+  - **v1.1**: City, Insights, ProxyCheck, and IP Intelligence lookups with typed DTOs (`/v1.1/lookup/city/...`, `/v1.1/lookup/insights/...`, `/v1.1/lookup/proxycheck/...`, `/v1.1/lookup/intelligence/...`), batch intelligence (`POST /v1.1/lookup/intelligence`), and cross-table deletion (`DELETE /v1.1/lookup/{hostname}`)
 - **Version reader**: `UrlSegmentApiVersionReader` extracts the version from the URL path
 - **Group name format**: `'v'VV` — always includes the minor version (`v1.0`, `v1.1`) to ensure unambiguous OpenAPI document grouping
 - **Controllers**: Both versions use `GeoLookupController` differentiated by namespace (`Controllers.V1`, `Controllers.V1_1`)
@@ -19,7 +19,7 @@ The API uses `Asp.Versioning` with URL segment versioning:
 Two separate OpenAPI documents are served at runtime:
 
 - `/openapi/v1.0.json` — v1.0 endpoints (lookup, batch lookup, delete, info)
-- `/openapi/v1.1.json` — v1.1 endpoints (city lookup, insights lookup)
+- `/openapi/v1.1.json` — v1.1 endpoints (city lookup, insights lookup, proxycheck lookup, intelligence lookup/batch, delete)
 
 Two document transformers modify each spec:
 
@@ -59,7 +59,7 @@ The API definitions are imported via `az apim api import` after the App Service 
 | `--service-url` | `.../v1` | `.../v1.1` |
 | `--path` | `geolocation` | `geolocation` |
 
-Both APIs share the same `--path` and version set — APIM requires this for segment versioning to work.
+Both APIs share the same `--path` and version set — APIM requires this for segment versioning to work. The v1.1 spec import now includes the proxycheck and intelligence paths alongside the existing city and insights paths.
 
 Each API is then added to the product for subscription key access.
 
@@ -102,6 +102,10 @@ The same flow applies to v1.1 with `/v1.1/` in the version segment and service U
 - **v1.1**: Uses `geolocationsv11` table with `CityGeoLocationTableEntity`:
   - **City lookups**: Permanent cache (no TTL)
   - **Insights lookups**: Configurable TTL via `Caching:InsightsCacheDays` (default 7 days), checked against entity `Timestamp`
+- **proxycheck**: Uses `proxycheck` table with `ProxyCheckTableEntity`:
+  - Configurable TTL via `Caching:ProxyCheckCacheMinutes` (default 60 minutes), checked against entity `Timestamp`
+
+The IP Intelligence endpoints (`/v1.1/lookup/intelligence/...`) use both the v1.1 and proxycheck caches in parallel — see [IP Intelligence](ip-intelligence.md) for details.
 
 Both use `UpsertEntityAsync` with `TableUpdateMode.Replace` for idempotent writes.
 
@@ -110,7 +114,7 @@ Both use `UpsertEntityAsync` with `TableUpdateMode.Replace` for idempotent write
 The `MX.GeoLocation.Api.Client.V1` provides typed access via `IGeoLocationApiClient`:
 
 - `client.GeoLookup.V1` — v1.0 endpoints (`GetGeoLocation`, `GetGeoLocations`, `DeleteMetadata`)
-- `client.GeoLookup.V1_1` — v1.1 endpoints (`GetCityGeoLocation`, `GetInsightsGeoLocation`)
+- `client.GeoLookup.V1_1` — v1.1 endpoints (`GetCityGeoLocation`, `GetInsightsGeoLocation`, `GetProxyCheck`, `GetIpIntelligence`, `GetIpIntelligences`, `DeleteMetadata`)
 - `client.ApiInfo` — version info endpoint (`GetApiInfo`)
 
 Client paths include the version prefix (e.g. `v1/lookup/{hostname}`, `v1.1/lookup/city/{hostname}`, `v1/info`):

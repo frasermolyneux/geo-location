@@ -14,6 +14,9 @@ namespace MX.GeoLocation.Api.Tests.V1.Controllers.V1_1
     {
         private readonly Mock<IMaxMindGeoLocationRepository> mockMaxMind;
         private readonly Mock<ITableStorageGeoLocationRepository> mockTableStorage;
+        private readonly Mock<IProxyCheckRepository> mockProxyCheck;
+        private readonly Mock<IProxyCheckCacheRepository> mockProxyCheckCache;
+        private readonly Mock<IIpIntelligenceService> mockIntelligenceService;
         private readonly Mock<IHostnameResolver> mockHostnameResolver;
         private readonly GeoLookupController geoLookupController;
 
@@ -21,6 +24,9 @@ namespace MX.GeoLocation.Api.Tests.V1.Controllers.V1_1
         {
             mockMaxMind = new Mock<IMaxMindGeoLocationRepository>();
             mockTableStorage = new Mock<ITableStorageGeoLocationRepository>();
+            mockProxyCheck = new Mock<IProxyCheckRepository>();
+            mockProxyCheckCache = new Mock<IProxyCheckCacheRepository>();
+            mockIntelligenceService = new Mock<IIpIntelligenceService>();
             mockHostnameResolver = new Mock<IHostnameResolver>();
 
             mockHostnameResolver.Setup(x => x.ResolveHostname(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -40,7 +46,8 @@ namespace MX.GeoLocation.Api.Tests.V1.Controllers.V1_1
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
-                    { "Caching:InsightsCacheDays", "7" }
+                    { "Caching:InsightsCacheDays", "7" },
+                    { "Caching:ProxyCheckCacheMinutes", "60" }
                 })
                 .Build();
 
@@ -51,8 +58,13 @@ namespace MX.GeoLocation.Api.Tests.V1.Controllers.V1_1
             geoLookupController = new GeoLookupController(
                 mockMaxMind.Object,
                 mockTableStorage.Object,
+                mockProxyCheck.Object,
+                mockProxyCheckCache.Object,
                 geoLookupService,
-                config);
+                mockIntelligenceService.Object,
+                mockHostnameResolver.Object,
+                config,
+                Mock.Of<ILogger<GeoLookupController>>());
         }
 
         [Theory]

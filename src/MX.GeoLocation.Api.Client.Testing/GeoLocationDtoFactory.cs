@@ -224,4 +224,84 @@ public static class GeoLocationDtoFactory
             AssemblyVersion = assemblyVersion
         };
     }
+
+    /// <summary>
+    /// Creates a ProxyCheckDto with the specified values.
+    /// </summary>
+    public static ProxyCheckDto CreateProxyCheck(
+        string address = "8.8.8.8",
+        string? translatedAddress = null,
+        int riskScore = 0,
+        bool isProxy = false,
+        bool isVpn = false,
+        string proxyType = "",
+        string country = "United States",
+        string region = "California",
+        string asNumber = "AS15169",
+        string asOrganization = "Google LLC")
+    {
+        return new ProxyCheckDto
+        {
+            Address = address,
+            TranslatedAddress = translatedAddress ?? address,
+            RiskScore = riskScore,
+            IsProxy = isProxy,
+            IsVpn = isVpn,
+            ProxyType = proxyType,
+            Country = country,
+            Region = region,
+            AsNumber = asNumber,
+            AsOrganization = asOrganization
+        };
+    }
+
+    /// <summary>
+    /// Creates an IpIntelligenceDto with the specified values.
+    /// </summary>
+    public static IpIntelligenceDto CreateIpIntelligence(
+        string address = "8.8.8.8",
+        string? translatedAddress = null,
+        string? continentCode = "NA",
+        string? continentName = "North America",
+        string? countryCode = "US",
+        string? countryName = "United States",
+        bool isEuropeanUnion = false,
+        string? cityName = "Mountain View",
+        string? postalCode = "94035",
+        double? latitude = 37.386,
+        double? longitude = -122.0838,
+        int? accuracyRadius = 1000,
+        string? timezone = "America/Los_Angeles",
+        List<string>? subdivisions = null,
+        NetworkTraitsDto? networkTraits = null,
+        AnonymizerDto? anonymizer = null,
+        ProxyCheckDto? proxyCheck = null,
+        SourceStatus maxMindStatus = SourceStatus.Success,
+        SourceStatus proxyCheckStatus = SourceStatus.Success,
+        bool isPartial = false)
+    {
+        return new IpIntelligenceDto
+        {
+            Address = address,
+            TranslatedAddress = translatedAddress ?? address,
+            ContinentCode = continentCode,
+            ContinentName = continentName,
+            CountryCode = countryCode,
+            CountryName = countryName,
+            IsEuropeanUnion = isEuropeanUnion,
+            CityName = cityName,
+            PostalCode = postalCode,
+            Subdivisions = subdivisions ?? [],
+            Latitude = latitude,
+            Longitude = longitude,
+            AccuracyRadius = accuracyRadius,
+            Timezone = timezone,
+            NetworkTraits = networkTraits ?? CreateNetworkTraits(),
+            Anonymizer = anonymizer ?? CreateAnonymizer(),
+            ProxyCheck = proxyCheck ?? CreateProxyCheck(address: address, translatedAddress: translatedAddress ?? address),
+            MaxMindStatus = maxMindStatus,
+            ProxyCheckStatus = proxyCheckStatus,
+            IsPartial = isPartial
+        };
+    }
 }

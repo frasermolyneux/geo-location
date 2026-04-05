@@ -18,7 +18,9 @@ The `IGeoLocationApiClient` interface has a nested structure:
 IGeoLocationApiClient
 ├── .GeoLookup (IVersionedGeoLookupApi)
 │   ├── .V1 (IGeoLookupApi)          → GetGeoLocation, GetGeoLocations, DeleteMetadata
-│   └── .V1_1 (IGeoLookupApi)        → GetCityGeoLocation, GetInsightsGeoLocation
+│   └── .V1_1 (IGeoLookupApi)        → GetCityGeoLocation, GetInsightsGeoLocation,
+│                                       GetProxyCheck, GetIpIntelligence,
+│                                       GetIpIntelligences, DeleteMetadata
 ├── .ApiInfo (IVersionedApiInfoApi)
 │   └── .V1 (IApiInfoApi)            → GetApiInfo
 └── .ApiHealth (IVersionedApiHealthApi)
@@ -74,12 +76,54 @@ fakeClient.V1_1Lookup.AddInsightsResponse("10.0.0.1",
         anonymizer: GeoLocationDtoFactory.CreateAnonymizer(isAnonymousVpn: true)));
 ```
 
+### ProxyCheck and IP Intelligence endpoints
+
+```csharp
+fakeClient.V1_1Lookup.AddProxyCheckResponse("8.8.8.8",
+    GeoLocationDtoFactory.CreateProxyCheck(
+        riskScore: 65,
+        isVpn: true,
+        proxyType: "VPN",
+        country: "United States",
+        asOrganization: "Google LLC"));
+
+fakeClient.V1_1Lookup.AddIntelligenceResponse("8.8.8.8",
+    GeoLocationDtoFactory.CreateIpIntelligence(
+        cityName: "Mountain View",
+        countryName: "United States",
+        proxyCheck: GeoLocationDtoFactory.CreateProxyCheck(riskScore: 10),
+        maxMindStatus: SourceStatus.Success,
+        proxyCheckStatus: SourceStatus.Success));
+```
+
+### Simulating partial results (one source failed)
+
+```csharp
+fakeClient.V1_1Lookup.AddIntelligenceResponse("1.2.3.4",
+    GeoLocationDtoFactory.CreateIpIntelligence(
+        cityName: "Berlin",
+        proxyCheck: null,
+        maxMindStatus: SourceStatus.Success,
+        proxyCheckStatus: SourceStatus.Failed,
+        isPartial: true));
+```
+
 ### Verifying deletes
+
+V1 delete removes from the `geolocations` cache:
 
 ```csharp
 await fakeClient.V1Lookup.DeleteMetadata("8.8.8.8");
 
 Assert.Contains("8.8.8.8", fakeClient.V1Lookup.DeletedAddresses);
+```
+
+V1.1 delete removes from all cache tables (v1.0, v1.1, and proxycheck):
+
+```csharp
+await fakeClient.V1_1Lookup.DeleteMetadata("8.8.8.8");
+
+Assert.Contains("8.8.8.8", fakeClient.V1_1Lookup.DeletedAddresses);
 ```
 
 ## Integration Tests (WebApplicationFactory)
@@ -104,6 +148,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 client.V1_1Lookup.AddCityResponse("1.1.1.1",
                     GeoLocationDtoFactory.CreateCityGeoLocation(
                         cityName: "Los Angeles"));
+                client.V1_1Lookup.AddIntelligenceResponse("8.8.8.8",
+                    GeoLocationDtoFactory.CreateIpIntelligence(
+                        cityName: "Mountain View",
+                        countryName: "United States"));
             });
         });
     }
@@ -123,6 +171,8 @@ All factory methods use named parameters with sensible defaults — only specify
 | `CreateInsightsGeoLocation(...)` | `InsightsGeoLocationDto` | Same as city + `anonymizer` |
 | `CreateNetworkTraits(...)` | `NetworkTraitsDto` | `autonomousSystemNumber`, `isp`, `organization`, `domain`, `connectionType` |
 | `CreateAnonymizer(...)` | `AnonymizerDto` | `isAnonymous`, `isAnonymousVpn`, `isTorExitNode`, `isHostingProvider`, `isPublicProxy` |
+| `CreateProxyCheck(...)` | `ProxyCheckDto` | `address`, `translatedAddress`, `riskScore`, `isProxy`, `isVpn`, `proxyType`, `country`, `region`, `asNumber`, `asOrganization` |
+| `CreateIpIntelligence(...)` | `IpIntelligenceDto` | Same as city + `anonymizer`, `proxyCheck`, `maxMindStatus`, `proxyCheckStatus`, `isPartial` |
 | `CreateApiInfo(...)` | `ApiInfoDto` | `version`, `buildVersion`, `assemblyVersion` |
 
 ## Fake Classes Reference
@@ -131,6 +181,6 @@ All factory methods use named parameters with sensible defaults — only specify
 |---|---|---|
 | `FakeGeoLocationApiClient` | `IGeoLocationApiClient` | `.V1Lookup`, `.V1_1Lookup`, `.InfoApi`, `.HealthApi` |
 | `FakeGeoLookupApi` | `IGeoLookupApi` (V1) | `.AddResponse()`, `.DeletedAddresses` |
-| `FakeGeoLookupApiV1_1` | `IGeoLookupApi` (V1.1) | `.AddCityResponse()`, `.AddInsightsResponse()` |
+| `FakeGeoLookupApiV1_1` | `IGeoLookupApi` (V1.1) | `.AddCityResponse()`, `.AddInsightsResponse()`, `.AddProxyCheckResponse()`, `.AddIntelligenceResponse()`, `.AddProxyCheckErrorResponse()`, `.AddIntelligenceErrorResponse()`, `.DeleteMetadata()`, `.ProxyCheckLookedUpAddresses`, `.IntelligenceLookedUpAddresses`, `.DeletedAddresses`, `.SetDefaultBehavior()`, `.Reset()` |
 | `FakeApiInfoApi` | `IApiInfoApi` | `.WithInfo()` |
 | `FakeApiHealthApi` | `IApiHealthApi` | `.WithStatusCode()` |

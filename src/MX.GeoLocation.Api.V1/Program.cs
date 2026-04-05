@@ -96,6 +96,15 @@ builder.Services.AddSingleton<IMaxMindGeoLocationRepository, MaxMindGeoLocationR
 builder.Services.AddSingleton<IHostnameResolver, HostnameResolver>();
 builder.Services.AddSingleton<IGeoLookupService, GeoLookupService>();
 
+// ProxyCheck integration
+builder.Services.AddHttpClient("ProxyCheck", client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+builder.Services.AddSingleton<IProxyCheckRepository, ProxyCheckRepository>();
+builder.Services.AddSingleton<IProxyCheckCacheRepository, ProxyCheckCacheRepository>();
+builder.Services.AddSingleton<IIpIntelligenceService, IpIntelligenceService>();
+
 builder.Services.AddSingleton<WebServiceClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();

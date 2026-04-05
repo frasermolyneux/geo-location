@@ -56,5 +56,74 @@ namespace MX.GeoLocation.Api.Client.V1
                 return new ApiResult<InsightsGeoLocationDto>(System.Net.HttpStatusCode.InternalServerError, errorResponse);
             }
         }
+
+        public async Task<ApiResult<ProxyCheckDto>> GetProxyCheck(string hostname, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var request = await CreateRequestAsync($"v1.1/lookup/proxycheck/{Uri.EscapeDataString(hostname)}", Method.Get, cancellationToken);
+                var response = await ExecuteAsync(request, cancellationToken);
+
+                return response.ToApiResult<ProxyCheckDto>();
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse<ProxyCheckDto>(
+                    new ApiError("CLIENT_ERROR", "Failed to retrieve proxycheck data"));
+                return new ApiResult<ProxyCheckDto>(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
+        }
+
+        public async Task<ApiResult<IpIntelligenceDto>> GetIpIntelligence(string hostname, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var request = await CreateRequestAsync($"v1.1/lookup/intelligence/{Uri.EscapeDataString(hostname)}", Method.Get, cancellationToken);
+                var response = await ExecuteAsync(request, cancellationToken);
+
+                return response.ToApiResult<IpIntelligenceDto>();
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse<IpIntelligenceDto>(
+                    new ApiError("CLIENT_ERROR", "Failed to retrieve IP intelligence"));
+                return new ApiResult<IpIntelligenceDto>(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
+        }
+
+        public async Task<ApiResult<CollectionModel<IpIntelligenceDto>>> GetIpIntelligences(List<string> hostnames, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var request = await CreateRequestAsync("v1.1/lookup/intelligence", Method.Post, cancellationToken);
+                request.AddJsonBody(hostnames);
+                var response = await ExecuteAsync(request, cancellationToken);
+
+                return response.ToApiResult<CollectionModel<IpIntelligenceDto>>();
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse<CollectionModel<IpIntelligenceDto>>(
+                    new ApiError("CLIENT_ERROR", "Failed to retrieve batch IP intelligence"));
+                return new ApiResult<CollectionModel<IpIntelligenceDto>>(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
+        }
+
+        public async Task<ApiResult> DeleteMetadata(string hostname, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var request = await CreateRequestAsync($"v1.1/lookup/{Uri.EscapeDataString(hostname)}", Method.Delete, cancellationToken);
+                var response = await ExecuteAsync(request, cancellationToken);
+
+                return response.ToApiResult();
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                var errorResponse = new ApiResponse(
+                    new ApiError("CLIENT_ERROR", "Failed to delete metadata"));
+                return new ApiResult(System.Net.HttpStatusCode.InternalServerError, errorResponse);
+            }
+        }
     }
 }
