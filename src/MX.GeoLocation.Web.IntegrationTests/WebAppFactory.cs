@@ -128,6 +128,7 @@ public class WebAppFactory : IAsyncDisposable
 
     private void ConfigureFakeApiClient()
     {
+        // V1 responses (kept for backward compatibility)
         FakeApiClient.V1Lookup
             .AddResponse("8.8.8.8", GeoLocationDtoFactory.CreateGeoLocation(
                 address: "8.8.8.8",
@@ -138,6 +139,44 @@ public class WebAppFactory : IAsyncDisposable
                 latitude: 37.386,
                 longitude: -122.0838))
             .AddResponse("1.1.1.1", GeoLocationDtoFactory.CreateGeoLocation(
+                address: "1.1.1.1",
+                cityName: "Los Angeles",
+                countryName: "United States",
+                countryCode: "US",
+                continentName: "North America",
+                latitude: 34.0522,
+                longitude: -118.2437));
+
+        // V1.1 City responses (used by Index and LookupAddress)
+        FakeApiClient.V1_1Lookup
+            .AddCityResponse("8.8.8.8", GeoLocationDtoFactory.CreateCityGeoLocation(
+                address: "8.8.8.8",
+                cityName: "Mountain View",
+                countryName: "United States",
+                countryCode: "US",
+                continentName: "North America",
+                latitude: 37.386,
+                longitude: -122.0838))
+            .AddCityResponse("1.1.1.1", GeoLocationDtoFactory.CreateCityGeoLocation(
+                address: "1.1.1.1",
+                cityName: "Los Angeles",
+                countryName: "United States",
+                countryCode: "US",
+                continentName: "North America",
+                latitude: 34.0522,
+                longitude: -118.2437));
+
+        // V1.1 Intelligence responses (used by IntelligenceLookup and BatchLookup)
+        FakeApiClient.V1_1Lookup
+            .AddIntelligenceResponse("8.8.8.8", GeoLocationDtoFactory.CreateIpIntelligence(
+                address: "8.8.8.8",
+                cityName: "Mountain View",
+                countryName: "United States",
+                countryCode: "US",
+                continentName: "North America",
+                latitude: 37.386,
+                longitude: -122.0838))
+            .AddIntelligenceResponse("1.1.1.1", GeoLocationDtoFactory.CreateIpIntelligence(
                 address: "1.1.1.1",
                 cityName: "Los Angeles",
                 countryName: "United States",
