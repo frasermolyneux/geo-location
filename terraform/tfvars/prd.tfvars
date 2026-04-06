@@ -46,6 +46,14 @@ api_consumers = [
   {
     workload      = "portal-web-prd"
     identity_name = "id-portal-web-prd"
+  },
+  {
+    workload      = "portal-server-events-dev"
+    identity_name = "id-portal-server-events-dev"
+  },
+  {
+    workload      = "portal-server-events-prd"
+    identity_name = "id-portal-server-events-prd"
   }
 ]
 
