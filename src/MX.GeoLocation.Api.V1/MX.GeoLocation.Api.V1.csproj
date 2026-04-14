@@ -29,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="9.0.15" />
     <ProjectReference Include="..\MX.GeoLocation.Abstractions.V1\MX.GeoLocation.Abstractions.V1.csproj" />
   </ItemGroup>
 
