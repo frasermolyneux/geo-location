@@ -1,8 +1,13 @@
 # Copilot Instructions
 
+> Shared conventions:
+> - [`.github-copilot/.github/instructions/terraform.instructions.md`](../../.github-copilot/.github/instructions/terraform.instructions.md) — standard Terraform layout, providers, remote-state, validation, CI/CD.
+> - [`.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md`](../../.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md) — .NET NuGet library standards.
+> - [`.github-copilot/.github/instructions/dotnet-api-client-libraries.instructions.md`](../../.github-copilot/.github/instructions/dotnet-api-client-libraries.instructions.md) — typed API client patterns (three-package layout, fluent DI builder, `ApiResult<T>` envelope, authentication options, testing-package conventions).
+
 ## Architecture
 - .NET 9 solution in `src/MX.GeoLocation.sln` with API (`MX.GeoLocation.Api.V1`) and MVC web (`MX.GeoLocation.Web`) projects plus abstractions, a generated API client, and a testing package.
-- Three NuGet packages are published: `MX.GeoLocation.Abstractions.V1` (interfaces/models), `MX.GeoLocation.Api.Client.V1` (typed HTTP client), and `MX.GeoLocation.Api.Client.Testing` (in-memory fakes and DTO factories for consumer test projects).
+- Library packages: `MX.GeoLocation.Abstractions.V1`, `MX.GeoLocation.Api.Client.V1`, `MX.GeoLocation.Api.Client.Testing` (follow the standard three-package pattern).
 - API uses MaxMind GeoIP2 and ProxyCheck.io, caching responses in Azure Table Storage:
   - **v1.0**: `geolocations` table with `GeoLocationTableEntity` (permanent cache)
   - **v1.1**: `geolocationsv11` table with `CityGeoLocationTableEntity` (city: permanent, insights: configurable TTL via `Caching:InsightsCacheDays`, default 7 days)
