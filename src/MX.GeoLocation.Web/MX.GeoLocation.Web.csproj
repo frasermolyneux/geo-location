@@ -54,13 +54,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
-    <PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" Version="3.0.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.Profiler.AspNetCore" Version="3.0.2" />
     <PackageReference Include="Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel" Version="2.23.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3" />
-    <PackageReference Include="MX.Api.Web.Extensions" Version="2.3.25" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
+  <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.7" />
+  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.7" />
+    <PackageReference Include="MX.Api.Web.Extensions" Version="2.3.31" />
     <PackageReference Include="MX.Observability.ApplicationInsights.AspNetCore" Version="1.1.1" />
   </ItemGroup>
 
