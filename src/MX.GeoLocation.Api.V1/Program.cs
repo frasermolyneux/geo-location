@@ -14,6 +14,7 @@ using MX.GeoLocation.LookupWebApi.Services;
 using MX.GeoLocation.LookupWebApi.HealthChecks;
 using Asp.Versioning;
 using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
+using MX.Observability.ApplicationInsights.AspNetCore;
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
 
@@ -42,6 +43,7 @@ builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceO
 {
     EnableAdaptiveSampling = false,
 });
+builder.Services.AddObservability();
 
 builder.Services.AddServiceProfiler();
 

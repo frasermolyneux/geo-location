@@ -6,6 +6,7 @@ using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
 using MX.GeoLocation.Web.HealthChecks;
+using MX.Observability.ApplicationInsights.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,7 @@ builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceO
 {
     EnableAdaptiveSampling = false,
 });
+builder.Services.AddObservability();
 
 builder.Services.AddServiceProfiler();
 
