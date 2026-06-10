@@ -40,3 +40,7 @@ Please read the [contributing](CONTRIBUTING.md) guidance; this is a learning and
 ## Security
 
 Please read the [security](SECURITY.md) guidance; I am always open to security feedback through email or opening an issue.
+
+## Local dev: MCP wire-up
+
+This repo wires the `frasermolyneux-copilot` MCP server so AI coding agents can query the shared `frasermolyneux/.github-copilot` catalog (instructions, prompts, agents) at runtime. The Copilot coding-agent config lives at [`.github/copilot/mcp_config.json`](.github/copilot/mcp_config.json) and the setup workflow at [`.github/workflows/copilot-setup-steps.yml`](.github/workflows/copilot-setup-steps.yml) checks out `.github-copilot` (pinned to tag `v0.1.0`) and builds the server before the agent runs. For tool surface, content-root resolution, and per-client wire-up snippets (VS Code, Claude Desktop, Copilot CLI), see [`.github-copilot/mcp-server/README.md`](https://github.com/frasermolyneux/.github-copilot/blob/v0.1.0/mcp-server/README.md).

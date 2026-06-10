@@ -5,6 +5,12 @@
 > - [`.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md`](../../.github-copilot/.github/instructions/dotnet-nuget-library.instructions.md) — .NET NuGet library standards.
 > - [`.github-copilot/.github/instructions/dotnet-api-client-libraries.instructions.md`](../../.github-copilot/.github/instructions/dotnet-api-client-libraries.instructions.md) — typed API client patterns (three-package layout, fluent DI builder, `ApiResult<T>` envelope, authentication options, testing-package conventions).
 
+## Org conventions via MCP (when available)
+
+If a `frasermolyneux-copilot` MCP server is configured in your client (`.vscode/mcp.json`, the GitHub Copilot coding-agent MCP config at `.github/copilot/mcp_config.json`, or an equivalent stdio MCP wire-up), **prefer its tools** over your own assumptions when answering questions about org standards, branching, workflows, Terraform, .NET projects, Azure patterns, or shared library / platform consumption contracts. The tool surface is `list_instructions`, `get_instruction`, `search_instructions`, plus the matching `_prompts` and `_agents` equivalents (seven tools total). The catalog source-of-truth lives in `frasermolyneux/.github-copilot` — see `mcp-server/README.md` there for the tool contract.
+
+This is **complementary** to the file-load model: if `./.github-copilot/` is checked out in the runner (per `copilot-setup-steps.yml`), continue to read those files directly. If both are available, prefer MCP for freshness. If no MCP server is configured in your client, treat this section as a no-op and fall back to the file paths above.
+
 ## Architecture
 - .NET 9 solution in `src/MX.GeoLocation.sln` with API (`MX.GeoLocation.Api.V1`) and MVC web (`MX.GeoLocation.Web`) projects plus abstractions, a generated API client, and a testing package.
 - Library packages: `MX.GeoLocation.Abstractions.V1`, `MX.GeoLocation.Api.Client.V1`, `MX.GeoLocation.Api.Client.Testing` (follow the standard three-package pattern).
