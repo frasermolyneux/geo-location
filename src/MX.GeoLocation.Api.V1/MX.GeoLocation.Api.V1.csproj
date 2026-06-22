@@ -19,14 +19,14 @@
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.9" />
 	<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.9" />
 	<PackageReference Include="Microsoft.Identity.Web" Version="4.10.0" />
-	<PackageReference Include="MX.Api.Abstractions" Version="2.3.53" />
-	<PackageReference Include="MX.Api.Web.Extensions" Version="2.3.53" />
-	<PackageReference Include="MX.Observability.ApplicationInsights.AspNetCore" Version="1.1.1" />
+	<PackageReference Include="MX.Api.Abstractions" Version="2.3.60" />
+	<PackageReference Include="MX.Api.Web.Extensions" Version="2.3.60" />
+	<PackageReference Include="MX.Observability.ApplicationInsights.AspNetCore" Version="1.1.15" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
 	<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.1" />
 	<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.17" />
-	<PackageReference Include="Scalar.AspNetCore" Version="2.16.4" />
+	<PackageReference Include="Scalar.AspNetCore" Version="2.16.5" />
   </ItemGroup>
 
   <ItemGroup>
