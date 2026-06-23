@@ -65,3 +65,7 @@ tags = {
 }
 
 gcp_project_id = "gcp-mx-io-geo-location"
+
+google_maps_allowed_referrers = [
+  "https://www.geo-location.net/*"
+]

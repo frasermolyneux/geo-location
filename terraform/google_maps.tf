@@ -10,9 +10,7 @@ resource "google_apikeys_key" "maps" {
     }
 
     browser_key_restrictions {
-      allowed_referrers = [
-        "https://${var.dns.web_subdomain}.${var.dns.domain}/*",
-      ]
+      allowed_referrers = var.google_maps_allowed_referrers
     }
   }
 }
@@ -21,6 +19,8 @@ resource "azurerm_key_vault_secret" "google_maps_api_key" {
   name         = "google-maps-api-key"
   value        = google_apikeys_key.maps.key_string
   key_vault_id = azurerm_key_vault.kv.id
+
+  content_type = "text/plain"
 
   depends_on = [azurerm_role_assignment.deploy_kv_secrets_officer]
 }
