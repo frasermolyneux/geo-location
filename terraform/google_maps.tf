@@ -1,5 +1,6 @@
 resource "google_apikeys_key" "maps" {
-  name         = format("maps-%s", var.environment)
+  # Include environment random suffix to avoid collisions with legacy manually-created keys.
+  name         = format("maps-%s-%s", var.environment, random_id.environment_id.hex)
   display_name = format("Geo Location Maps API Key - %s", var.environment)
   project      = var.gcp_project_id
 
