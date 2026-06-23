@@ -1,9 +1,11 @@
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 using MX.GeoLocation.Api.Client.Testing;
 using MX.GeoLocation.Api.Client.V1;
@@ -61,7 +63,8 @@ public class WebAppFactory : IAsyncDisposable
             .AddApplicationPart(typeof(Program).Assembly);
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddSession();
-        builder.Services.AddHealthChecks();
+        builder.Services.AddHealthChecks()
+            .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
 
         // Replace the API client with the testing package fake (dogfooding)
         builder.Services.AddFakeGeoLocationApiClient(_ =>
@@ -96,7 +99,11 @@ public class WebAppFactory : IAsyncDisposable
         _app.UseRouting();
         _app.UseAuthorization();
         _app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
-        _app.MapHealthChecks("/api/health").AllowAnonymous();
+        _app.MapHealthChecks("/api/health/live", new HealthCheckOptions
+        {
+            Predicate = check => check.Tags.Contains("live"),
+        }).AllowAnonymous();
+        _app.MapHealthChecks("/api/health/ready").AllowAnonymous();
 
         await _app.StartAsync();
 

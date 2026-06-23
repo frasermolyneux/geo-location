@@ -1,12 +1,14 @@
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
 using MX.GeoLocation.Web.HealthChecks;
 using MX.Observability.ApplicationInsights.AspNetCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +66,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"])
     .AddCheck<GeoLocationApiHealthCheck>(
         name: "geolocation-api",
         tags: ["dependency"]);
@@ -95,7 +98,11 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapHealthChecks("/api/health").AllowAnonymous();
+app.MapHealthChecks("/api/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live"),
+}).AllowAnonymous();
+app.MapHealthChecks("/api/health/ready").AllowAnonymous();
 app.MapInfoEndpoint();
 
 app.Run();

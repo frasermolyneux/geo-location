@@ -22,7 +22,7 @@
     - `POST /v1.1/lookup/intelligence` — batch IP intelligence (max 20, `CollectionModel<IpIntelligenceDto>`)
     - `DELETE /v1.1/lookup/{hostname}` — deletes from all cache tables (v1.0 + v1.1 + proxycheck)
 - Controllers are differentiated by namespace (`Controllers.V1`, `Controllers.V1_1`), both named `GeoLookupController`. Both inject `IHostnameResolver` for shared hostname validation and resolution.
-- API security is Entra ID via `Microsoft.Identity.Web`; the `LookupApiUser` role is required for controller access. The `/v1.0/info` and `/v1.0/health` endpoints are `[AllowAnonymous]`.
+- API security is Entra ID via `Microsoft.Identity.Web`; the `LookupApiUser` role is required for controller access. The `/v1.0/info`, `/v1.0/health/live`, and `/v1.0/health/ready` endpoints are `[AllowAnonymous]`.
 - OpenAPI specs are served at runtime at `/openapi/v1.0.json` and `/openapi/v1.1.json`. Scalar provides interactive API docs at `/scalar`.
 - Web front end uses `MX.GeoLocation.Api.Client.V1` with API-key + Entra authentication, stores the last lookup in session, and resolves client IPs via ASP.NET Core `ForwardedHeaders` middleware for `X-Forwarded-For` with a `CF-Connecting-IP` fallback for Cloudflare (defaults to `8.8.8.8` in development). In production, `KnownProxies`/`KnownNetworks` should be configured on `ForwardedHeadersOptions`.
 - Application Insights telemetry is enabled with custom adaptive sampling (exceptions excluded) and Service Profiler in both API and Web.
@@ -50,7 +50,7 @@
 - `MX.GeoLocation.Api.V1/OpenApi/BearerSecuritySchemeTransformer.cs` adds Bearer JWT security scheme to the OpenAPI document.
 - `Controllers/V1/GeoLookupController.cs` implements GET/POST lookups and DELETE metadata with cache-first flow then MaxMind fallback. Uses `IHostnameResolver` for hostname validation and DNS resolution. Input validation returns `BadRequest` for null/empty hostnames. Batch endpoint uses `[FromBody]` model binding with a configurable `MaxBatchSize` (20) limit.
 - `Controllers/V1/ApiInfoController.cs` implements the `/v1.0/info` endpoint returning build version information (anonymous access).
-- `Controllers/V1/HealthController.cs` implements the `/v1.0/health` endpoint wrapping the ASP.NET health check service (anonymous access).
+- `Controllers/V1/HealthController.cs` implements `/v1.0/health/live` and `/v1.0/health/ready` endpoints wrapping the ASP.NET health check service (anonymous access).
 - `Controllers/V1_1/GeoLookupController.cs` implements city, insights, proxycheck, intelligence (single + batch), and delete endpoints with cache-first flow. Uses `IHostnameResolver` for hostname validation and DNS resolution. Input validation returns `BadRequest` for null/empty hostnames. Intelligence endpoints use `IIpIntelligenceService` for parallel fan-out. Delete removes from all cache tables (v1.0, v1.1, proxycheck).
 - `Services/HostnameResolver.cs` provides shared hostname resolution (DNS lookup or IP parsing) and local address detection. Injected into both V1 and V1.1 controllers.
 - `Repositories/TableStorageGeoLocationRepository.cs` handles Azure Table persistence for both v1.0 (`geolocations`) and v1.1 (`geolocationsv11`) tables. All async methods accept `CancellationToken` and validate `address` input with `ArgumentException.ThrowIfNullOrWhiteSpace`.

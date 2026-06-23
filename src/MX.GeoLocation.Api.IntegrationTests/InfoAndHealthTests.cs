@@ -42,14 +42,24 @@ public class InfoAndHealthTests : IClassFixture<CustomWebApplicationFactory>, IA
     }
 
     [Fact]
-    public async Task GetHealth_ReturnsResponse()
+    public async Task GetHealthReady_ReturnsResponse()
     {
         // Act
-        var response = await _client.GetAsync("/v1.0/health");
+        var response = await _client.GetAsync("/v1.0/health/ready");
 
-        // Assert - health endpoint returns a response (may be degraded due to stubbed dependencies)
+        // Assert
         Assert.True(
             response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.ServiceUnavailable,
             $"Expected OK or ServiceUnavailable but got {response.StatusCode}");
+    }
+
+    [Fact]
+    public async Task GetHealthLive_ReturnsOk()
+    {
+        // Act
+        var response = await _client.GetAsync("/v1.0/health/live");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 }

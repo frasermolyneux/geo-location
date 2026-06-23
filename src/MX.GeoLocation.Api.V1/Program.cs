@@ -17,6 +17,7 @@ using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
 using MX.Observability.ApplicationInsights.AspNetCore;
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,6 +123,7 @@ builder.Services.AddSingleton<WebServiceClient>(sp =>
 });
 
 builder.Services.AddHealthChecks()
+    .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"])
     .AddAzureTable(
         name: "azure-table-storage",
         tags: ["dependency"])
