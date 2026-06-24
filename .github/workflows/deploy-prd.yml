@@ -175,14 +175,21 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
         with:
           web-artifact-name: "MX.GeoLocation.Api.V1"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}
           resource-group-name: ${{ needs.terraform-plan-and-apply-dev.outputs.api_app_resource_group_name }}
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+        with:
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
 
   app-service-deploy-web-dev:
     name: Deploy Web v${{ needs.build-and-test.outputs.build_version }}
@@ -202,11 +209,13 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
         with:
           web-artifact-name: "MX.GeoLocation.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}
           resource-group-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_resource_group_name }}
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}.azurewebsites.net/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
@@ -362,14 +371,21 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-prd
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
         with:
           web-artifact-name: "MX.GeoLocation.Api.V1"
           web-app-name: ${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}
           resource-group-name: ${{ needs.terraform-plan-and-apply-prd.outputs.api_app_resource_group_name }}
+          info-url: "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+        with:
+          info-url: "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
 
   app-service-deploy-web-prd:
     name: Deploy Web v${{ needs.build-and-test.outputs.build_version }}
@@ -388,11 +404,13 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-prd
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
         with:
           web-artifact-name: "MX.GeoLocation.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-prd.outputs.web_app_name }}
           resource-group-name: ${{ needs.terraform-plan-and-apply-prd.outputs.web_app_resource_group_name }}
+          info-url: "https://${{ needs.terraform-plan-and-apply-prd.outputs.web_app_name }}.azurewebsites.net/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}

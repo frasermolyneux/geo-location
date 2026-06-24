@@ -20,7 +20,8 @@ jobs:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v1.4
+      - id: api-ci
+        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v1.4
         with:
           dotnet-project: "MX.GeoLocation.Api.V1"
           dotnet-version: |
@@ -41,6 +42,9 @@ jobs:
         with:
           test-project: "MX.GeoLocation.Web.IntegrationTests"
           src-folder: "src"
+
+    outputs:
+      build_version: ${{ steps.api-ci.outputs.build_version }}
 
   terraform-plan-dev:
     permissions:
@@ -139,14 +143,21 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
         with:
           web-artifact-name: "MX.GeoLocation.Api.V1"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}
           resource-group-name: ${{ needs.terraform-plan-and-apply-dev.outputs.api_app_resource_group_name }}
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+        with:
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
 
   app-service-deploy-web-dev:
     permissions:
@@ -160,14 +171,21 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.2
+      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
         with:
           web-artifact-name: "MX.GeoLocation.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}
           resource-group-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_resource_group_name }}
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}.azurewebsites.net/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
           AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+        with:
+          info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}.azurewebsites.net/info"
+          expected-version: ${{ needs.build-and-test.outputs.build_version }}
 
   terraform-plan-prd:
     permissions:
