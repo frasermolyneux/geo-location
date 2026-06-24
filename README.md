@@ -1,18 +1,20 @@
 # GeoLocation Service
-
 [![Build and Test](https://github.com/frasermolyneux/geo-location/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/build-and-test.yml)
 [![Code Quality](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/codequality.yml)
 [![Copilot Setup Steps](https://github.com/frasermolyneux/geo-location/actions/workflows/copilot-setup-steps.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/copilot-setup-steps.yml)
-[![Dependabot Automerge](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml)
+[![Dependabot Auto-Merge](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/dependabot-automerge.yml)
 [![Deploy Dev](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-dev.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-dev.yml)
 [![Deploy Prd](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-prd.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/deploy-prd.yml)
 [![Destroy Development](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-development.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-development.yml)
 [![Destroy Environment](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-environment.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/destroy-environment.yml)
 [![PR Verify](https://github.com/frasermolyneux/geo-location/actions/workflows/pr-verify.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/pr-verify.yml)
+[![Release - Publish NuGet](https://github.com/frasermolyneux/geo-location/actions/workflows/release-publish-nuget.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/release-publish-nuget.yml)
+[![Release - Version and Tag](https://github.com/frasermolyneux/geo-location/actions/workflows/release-version-and-tag.yml/badge.svg)](https://github.com/frasermolyneux/geo-location/actions/workflows/release-version-and-tag.yml)
 
 ## Documentation
 
 * [API Versioning, APIM Routing & OpenAPI](docs/api-versioning-and-apim.md)
+* [IP Intelligence](docs/ip-intelligence.md)
 * [Testing with the GeoLocation API Client](docs/testing.md)
 * [Manual Steps](docs/manual-steps.md)
 
@@ -27,11 +29,11 @@ Both versions enforce the `LookupApiUser` Entra role. An MVC web front end calls
 
 ## NuGet Packages
 
-| Package | Description |
-|---|---|
-| `MX.GeoLocation.Abstractions.V1` | Interfaces and models for the GeoLocation API |
-| `MX.GeoLocation.Api.Client.V1` | Typed HTTP client with DI registration via `AddGeoLocationApiClient()` |
-| `MX.GeoLocation.Api.Client.Testing` | In-memory fakes and DTO factory helpers for consumer test projects — see [testing docs](docs/testing.md) |
+| Package                                                                                                 | Latest                                                                                                                                              | Description                                                                                             |
+| ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`MX.GeoLocation.Abstractions.V1`](https://www.nuget.org/packages/MX.GeoLocation.Abstractions.V1)       | [![NuGet](https://img.shields.io/nuget/v/MX.GeoLocation.Abstractions.V1.svg)](https://www.nuget.org/packages/MX.GeoLocation.Abstractions.V1/)       | Interfaces and models for the GeoLocation API                                                           |
+| [`MX.GeoLocation.Api.Client.V1`](https://www.nuget.org/packages/MX.GeoLocation.Api.Client.V1)           | [![NuGet](https://img.shields.io/nuget/v/MX.GeoLocation.Api.Client.V1.svg)](https://www.nuget.org/packages/MX.GeoLocation.Api.Client.V1/)           | Typed HTTP client with DI registration via AddGeoLocationApiClient()                                    |
+| [`MX.GeoLocation.Api.Client.Testing`](https://www.nuget.org/packages/MX.GeoLocation.Api.Client.Testing) | [![NuGet](https://img.shields.io/nuget/v/MX.GeoLocation.Api.Client.Testing.svg)](https://www.nuget.org/packages/MX.GeoLocation.Api.Client.Testing/) | In-memory fakes and DTO factory helpers for consumer test projects; see [testing docs](docs/testing.md) |
 
 ## Contributing
 
