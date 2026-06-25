@@ -32,7 +32,12 @@ dotnet_style_collection_initializer = true:warning
 dotnet_style_prefer_auto_properties = true:warning
 dotnet_style_null_propagation = true:warning
 dotnet_style_namespace_match_folder = true:warning
-dotnet_diagnostic.CA1707.severity = none
+
+# Legacy API version namespaces intentionally use underscores (for example V1_1).
+dotnet_diagnostic.CA1707.severity = suggestion
+
+# Avoid IDE0005 build coupling to GenerateDocumentationFile during standards rollout.
+dotnet_diagnostic.IDE0005.severity = none
 
 # Keep build strict, but avoid API/behavioral churn from analyzer-only refactors.
 dotnet_diagnostic.IDE0130.severity = suggestion

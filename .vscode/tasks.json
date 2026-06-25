@@ -141,6 +141,17 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "dotnet: run-web",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "run",
+                "--project",
+                "${workspaceFolder}/src/MX.GeoLocation.Web/MX.GeoLocation.Web.csproj"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "playwright-install",
             "command": "pwsh",
             "type": "process",
