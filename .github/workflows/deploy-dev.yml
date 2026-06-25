@@ -30,6 +30,9 @@ jobs:
           src-folder: "src"
           skip-nuget-artifact-upload: "true"
 
+      - name: Verify .NET formatting
+        run: dotnet format src/MX.GeoLocation.sln --verify-no-changes
+
       - uses: frasermolyneux/actions/dotnet-playwright-tests@main
         with:
           test-project: "MX.GeoLocation.Web.IntegrationTests"
