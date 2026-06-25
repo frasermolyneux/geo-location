@@ -1,5 +1,3 @@
-using MX.GeoLocation.Api.Client.Testing;
-
 namespace MX.GeoLocation.Api.Client.Testing.Tests;
 
 [Trait("Category", "Unit")]

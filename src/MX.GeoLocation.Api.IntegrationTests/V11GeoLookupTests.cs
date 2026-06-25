@@ -22,7 +22,10 @@ public class V11GeoLookupTests : IClassFixture<CustomWebApplicationFactory>, IAs
         _client = _factory.CreateClient();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync()
     {

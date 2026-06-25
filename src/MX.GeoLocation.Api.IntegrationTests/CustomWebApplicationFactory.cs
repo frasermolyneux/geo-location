@@ -52,7 +52,10 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             .Returns<string, CancellationToken>((addr, _) =>
             {
                 if (System.Net.IPAddress.TryParse(addr, out var ip))
+                {
                     return Task.FromResult<(bool, string?)>((true, ip.ToString()));
+                }
+
                 return Task.FromResult<(bool, string?)>((false, null));
             });
 

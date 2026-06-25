@@ -21,7 +21,10 @@ public class V1BatchLookupTests : IClassFixture<CustomWebApplicationFactory>, IA
         _client = _factory.CreateClient();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync()
     {

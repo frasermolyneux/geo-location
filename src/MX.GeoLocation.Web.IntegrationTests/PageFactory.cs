@@ -1,69 +1,67 @@
 ﻿using MX.GeoLocation.Web.IntegrationTests.PageObject;
-using Microsoft.Playwright;
 using Microsoft.Extensions.Configuration;
 
-namespace MX.GeoLocation.Web.IntegrationTests
+namespace MX.GeoLocation.Web.IntegrationTests;
+
+public class PageFactory
 {
-    public class PageFactory
+    private readonly Microsoft.Playwright.IPage page;
+    private readonly IConfiguration configuration;
+
+    private HomePage? homePage;
+    private LookupAddressPage? lookupAddressPage;
+    private BatchLookupPage? batchLookupPage;
+    private PrivacyPage? privacyPage;
+    private RemoveDataPage? removeMyDataPage;
+
+    public PageFactory(Microsoft.Playwright.IPage page, IConfiguration configuration)
     {
-        private readonly Microsoft.Playwright.IPage page;
-        private readonly IConfiguration configuration;
+        this.page = page;
+        this.configuration = configuration;
+    }
 
-        private HomePage? homePage;
-        private LookupAddressPage? lookupAddressPage;
-        private BatchLookupPage? batchLookupPage;
-        private PrivacyPage? privacyPage;
-        private RemoveDataPage? removeMyDataPage;
-
-        public PageFactory(Microsoft.Playwright.IPage page, IConfiguration configuration)
+    public HomePage HomePage
+    {
+        get
         {
-            this.page = page;
-            this.configuration = configuration;
+            homePage ??= new HomePage(page, configuration);
+            return homePage;
         }
+    }
 
-        public HomePage HomePage
+    public LookupAddressPage LookupAddressPage
+    {
+        get
         {
-            get
-            {
-                homePage ??= new HomePage(page, configuration);
-                return homePage;
-            }
+            lookupAddressPage ??= new LookupAddressPage(page, configuration);
+            return lookupAddressPage;
         }
+    }
 
-        public LookupAddressPage LookupAddressPage
+    public BatchLookupPage BatchLookupPage
+    {
+        get
         {
-            get
-            {
-                lookupAddressPage ??= new LookupAddressPage(page, configuration);
-                return lookupAddressPage;
-            }
+            batchLookupPage ??= new BatchLookupPage(page, configuration);
+            return batchLookupPage;
         }
+    }
 
-        public BatchLookupPage BatchLookupPage
+    public PrivacyPage PrivacyPage
+    {
+        get
         {
-            get
-            {
-                batchLookupPage ??= new BatchLookupPage(page, configuration);
-                return batchLookupPage;
-            }
+            privacyPage ??= new PrivacyPage(page, configuration);
+            return privacyPage;
         }
+    }
 
-        public PrivacyPage PrivacyPage
+    public RemoveDataPage RemoveMyDataPage
+    {
+        get
         {
-            get
-            {
-                privacyPage ??= new PrivacyPage(page, configuration);
-                return privacyPage;
-            }
-        }
-
-        public RemoveDataPage RemoveMyDataPage
-        {
-            get
-            {
-                removeMyDataPage ??= new RemoveDataPage(page, configuration);
-                return removeMyDataPage;
-            }
+            removeMyDataPage ??= new RemoveDataPage(page, configuration);
+            return removeMyDataPage;
         }
     }
 }

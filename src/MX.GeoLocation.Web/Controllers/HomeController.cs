@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Net;
-using System.Net.Http;
 using System.Net.Sockets;
 
 using Microsoft.AspNetCore.Mvc;
@@ -10,298 +9,337 @@ using MX.GeoLocation.Abstractions.Models.V1_1;
 using MX.GeoLocation.Web.Extensions;
 using MX.GeoLocation.Web.Models;
 
-namespace MX.GeoLocation.Web.Controllers
+namespace MX.GeoLocation.Web.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private const string UserLocationSessionKey = "UserCityGeoLocationDto";
+    private const string BatchLookupSessionKey = "BatchLookupAddressData";
+
+    private readonly IGeoLocationApiClient geoLocationApiClient;
+    private readonly IHttpContextAccessor httpContextAccessor;
+    private readonly IWebHostEnvironment webHostEnvironment;
+
+    public HomeController(
+        IGeoLocationApiClient geoLocationClient,
+        IHttpContextAccessor httpContext,
+        IWebHostEnvironment environment)
     {
-        private const string UserLocationSessionKey = "UserCityGeoLocationDto";
-        private const string BatchLookupSessionKey = "BatchLookupAddressData";
+        geoLocationApiClient = geoLocationClient ?? throw new ArgumentNullException(nameof(geoLocationClient));
+        httpContextAccessor = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
+        webHostEnvironment = environment ?? throw new ArgumentNullException(nameof(environment));
+    }
 
-        private readonly IGeoLocationApiClient geoLocationApiClient;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly IWebHostEnvironment webHostEnvironment;
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    {
+        var sessionDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<CityGeoLocationDto>(UserLocationSessionKey);
 
-        public HomeController(
-            IGeoLocationApiClient geoLocationClient,
-            IHttpContextAccessor httpContext,
-            IWebHostEnvironment environment)
+        if (sessionDto is not null)
         {
-            geoLocationApiClient = geoLocationClient ?? throw new ArgumentNullException(nameof(geoLocationClient));
-            httpContextAccessor = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
-            webHostEnvironment = environment ?? throw new ArgumentNullException(nameof(environment));
+            return View(sessionDto);
         }
 
-        public async Task<IActionResult> Index(CancellationToken cancellationToken)
+        var address = GetUsersIpForLookup();
+
+        var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(address.ToString(), cancellationToken);
+
+        if (!lookupResponse.IsSuccess || lookupResponse.IsNotFound || lookupResponse.Result?.Data is null)
         {
-            var sessionDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<CityGeoLocationDto>(UserLocationSessionKey);
+            return RedirectToAction("LookupAddress");
+        }
+        else
+        {
+            httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupResponse.Result.Data);
+            return View(lookupResponse.Result.Data);
+        }
+    }
 
-            if (sessionDto is not null)
-                return View(sessionDto);
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-            var address = GetUsersIpForLookup();
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error(string? message)
+    {
+        return !ModelState.IsValid
+            ? View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = "An error occurred while processing your request." })
+            : View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = message });
+    }
 
-            var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(address.ToString(), cancellationToken);
+    [HttpGet]
+    public async Task<IActionResult> LookupAddress(string id, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(new LookupAddressViewModel());
+        }
 
-            if (!lookupResponse.IsSuccess || lookupResponse.IsNotFound || lookupResponse.Result?.Data is null)
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            return View(new LookupAddressViewModel());
+        }
+
+        var model = new LookupAddressViewModel { AddressData = id };
+        return await LookupAddress(model, cancellationToken);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> LookupAddress(LookupAddressViewModel model, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        if (string.IsNullOrWhiteSpace(model.AddressData))
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "You must provide an address to query against. IP or DNS is acceptable.");
+            return View(model);
+        }
+
+        if (!await ValidateHostname(model.AddressData, cancellationToken))
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
+            return View(model);
+        }
+
+        var response = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(model.AddressData, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            if (response.Result?.Errors is not null)
             {
-                return RedirectToAction("LookupAddress");
+                foreach (var error in response.Result.Errors)
+                {
+                    ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                }
             }
-            else
+
+            return View(model);
+        }
+        else if (response.IsNotFound)
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "Could not retrieve GeoLocation data for address");
+        }
+        else
+        {
+            model.CityGeoLocationDto = response.Result?.Data;
+        }
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult IntelligenceLookup()
+    {
+        return View(new IntelligenceLookupViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> IntelligenceLookup(IntelligenceLookupViewModel model, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        if (string.IsNullOrWhiteSpace(model.AddressData))
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "You must provide an address to query against. IP or DNS is acceptable.");
+            return View(model);
+        }
+
+        if (!await ValidateHostname(model.AddressData, cancellationToken))
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
+            return View(model);
+        }
+
+        var response = await geoLocationApiClient.GeoLookup.V1_1.GetIpIntelligence(model.AddressData, cancellationToken);
+
+        if (!response.IsSuccess)
+        {
+            if (response.Result?.Errors is not null)
             {
-                httpContextAccessor.HttpContext?.Session.SetObjectAsJson(UserLocationSessionKey, lookupResponse.Result.Data);
-                return View(lookupResponse.Result.Data);
+                foreach (var error in response.Result.Errors)
+                {
+                    ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                }
             }
+
+            return View(model);
+        }
+        else if (response.IsNotFound)
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "Could not retrieve intelligence data for address");
+        }
+        else
+        {
+            model.Intelligence = response.Result?.Data;
         }
 
-        public IActionResult Privacy()
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult BatchLookup()
+    {
+        var addressData = httpContextAccessor.HttpContext?.Session.GetString(BatchLookupSessionKey);
+
+        return !string.IsNullOrWhiteSpace(addressData)
+            ? View(new BatchLookupViewModel { AddressData = addressData })
+            : View(new BatchLookupViewModel());
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BatchLookup(BatchLookupViewModel model, CancellationToken cancellationToken)
+    {
+        if (model.AddressData is not null)
         {
-            return View();
+            httpContextAccessor.HttpContext?.Session.SetString(BatchLookupSessionKey, model.AddressData);
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(string? message)
+        if (!ModelState.IsValid)
         {
-            if (!ModelState.IsValid)
-                return View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = "An error occurred while processing your request." });
-
-            return View("Error", new ErrorViewModel(Activity.Current?.Id ?? HttpContext.TraceIdentifier) { Message = message });
+            return View(model);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> LookupAddress(string id, CancellationToken cancellationToken)
+        if (string.IsNullOrWhiteSpace(model.AddressData))
         {
-            if (!ModelState.IsValid)
-                return View(new LookupAddressViewModel());
-
-            if (string.IsNullOrWhiteSpace(id))
-                return View(new LookupAddressViewModel());
-
-            var model = new LookupAddressViewModel { AddressData = id };
-            return await LookupAddress(model, cancellationToken);
+            ModelState.AddModelError(nameof(model.AddressData), "You must provide a line separated list of addresses. IP or DNS is acceptable.");
+            return View(model);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> LookupAddress(LookupAddressViewModel model, CancellationToken cancellationToken)
+        List<string> addresses;
+        try
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            addresses = [.. model.AddressData
+                .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
+                .Where(address => !string.IsNullOrWhiteSpace(address))
+                .Select(address => address.Trim())];
+        }
+        catch (FormatException)
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "Invalid data, you must provide a line separated list of addresses. IP or DNS is acceptable.");
+            return View(model);
+        }
 
-            if (string.IsNullOrWhiteSpace(model.AddressData))
+        if (addresses.Count > 20)
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "You can only search for a maximum of 20 addresses in one request");
+            return View(model);
+        }
+
+        var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetIpIntelligences(addresses, cancellationToken);
+
+        if (!lookupResponse.IsSuccess || (lookupResponse.Result?.Errors?.Any() ?? false))
+        {
+            if (lookupResponse.Result?.Errors is not null)
             {
-                ModelState.AddModelError(nameof(model.AddressData), "You must provide an address to query against. IP or DNS is acceptable.");
-                return View(model);
+                foreach (var error in lookupResponse.Result.Errors)
+                {
+                    ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                }
             }
+        }
 
+        if (lookupResponse.IsSuccess)
+        {
+            model.IntelligenceCollectionDto = lookupResponse.Result?.Data;
+        }
+
+        return View(model);
+    }
+
+    [HttpGet]
+    public IActionResult RemoveData()
+    {
+        var model = new RemoveMyDataViewModel(GetUsersIpForLookup().ToString());
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveData(RemoveMyDataViewModel model, CancellationToken cancellationToken)
+    {
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        try
+        {
             if (!await ValidateHostname(model.AddressData, cancellationToken))
             {
                 ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
                 return View(model);
             }
 
-            var response = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(model.AddressData, cancellationToken);
+            var deleteResponse = await geoLocationApiClient.GeoLookup.V1_1.DeleteMetadata(model.AddressData, cancellationToken);
 
-            if (!response.IsSuccess)
+            if (!deleteResponse.IsSuccess)
             {
-                if (response.Result?.Errors is not null)
-                    foreach (var error in response.Result.Errors)
-                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-                return View(model);
-            }
-            else if (response.IsNotFound)
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "Could not retrieve GeoLocation data for address");
-            }
-            else
-            {
-                model.CityGeoLocationDto = response.Result?.Data;
-            }
-
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult IntelligenceLookup()
-        {
-            return View(new IntelligenceLookupViewModel());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> IntelligenceLookup(IntelligenceLookupViewModel model, CancellationToken cancellationToken)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            if (string.IsNullOrWhiteSpace(model.AddressData))
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "You must provide an address to query against. IP or DNS is acceptable.");
-                return View(model);
-            }
-
-            if (!await ValidateHostname(model.AddressData, cancellationToken))
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
-                return View(model);
-            }
-
-            var response = await geoLocationApiClient.GeoLookup.V1_1.GetIpIntelligence(model.AddressData, cancellationToken);
-
-            if (!response.IsSuccess)
-            {
-                if (response.Result?.Errors is not null)
-                    foreach (var error in response.Result.Errors)
-                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-                return View(model);
-            }
-            else if (response.IsNotFound)
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "Could not retrieve intelligence data for address");
-            }
-            else
-            {
-                model.Intelligence = response.Result?.Data;
-            }
-
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult BatchLookup()
-        {
-            var addressData = httpContextAccessor.HttpContext?.Session.GetString(BatchLookupSessionKey);
-
-            if (!string.IsNullOrWhiteSpace(addressData))
-                return View(new BatchLookupViewModel { AddressData = addressData });
-
-            return View(new BatchLookupViewModel());
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> BatchLookup(BatchLookupViewModel model, CancellationToken cancellationToken)
-        {
-            if (model.AddressData is not null)
-                httpContextAccessor.HttpContext?.Session.SetString(BatchLookupSessionKey, model.AddressData);
-
-            if (!ModelState.IsValid) return View(model);
-
-            if (string.IsNullOrWhiteSpace(model.AddressData))
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "You must provide a line separated list of addresses. IP or DNS is acceptable.");
-                return View(model);
-            }
-
-            List<string> addresses;
-            try
-            {
-                addresses = model.AddressData
-                    .Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)
-                    .Where(address => !string.IsNullOrWhiteSpace(address))
-                    .Select(address => address.Trim())
-                    .ToList();
-            }
-            catch (FormatException)
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "Invalid data, you must provide a line separated list of addresses. IP or DNS is acceptable.");
-                return View(model);
-            }
-
-            if (addresses.Count > 20)
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "You can only search for a maximum of 20 addresses in one request");
-                return View(model);
-            }
-
-            var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetIpIntelligences(addresses, cancellationToken);
-
-            if (!lookupResponse.IsSuccess || (lookupResponse.Result?.Errors?.Any() ?? false))
-            {
-                if (lookupResponse.Result?.Errors is not null)
-                    foreach (var error in lookupResponse.Result.Errors)
-                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-            }
-
-            if (lookupResponse.IsSuccess)
-                model.IntelligenceCollectionDto = lookupResponse.Result?.Data;
-
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult RemoveData()
-        {
-            var model = new RemoveMyDataViewModel(GetUsersIpForLookup().ToString());
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveData(RemoveMyDataViewModel model, CancellationToken cancellationToken)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            try
-            {
-                if (!await ValidateHostname(model.AddressData, cancellationToken))
+                if (deleteResponse.Result?.Errors is not null)
                 {
-                    ModelState.AddModelError(nameof(model.AddressData), "The address provided is invalid. IP or DNS is acceptable.");
-                    return View(model);
+                    foreach (var error in deleteResponse.Result.Errors)
+                    {
+                        ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
+                    }
                 }
 
-                var deleteResponse = await geoLocationApiClient.GeoLookup.V1_1.DeleteMetadata(model.AddressData, cancellationToken);
-
-                if (!deleteResponse.IsSuccess)
-                {
-                    if (deleteResponse.Result?.Errors is not null)
-                        foreach (var error in deleteResponse.Result.Errors)
-                            ModelState.AddModelError(nameof(model.AddressData), error.Message ?? "An error occurred");
-                    return View(model);
-                }
-
-                model.Removed = true;
                 return View(model);
             }
-            catch (HttpRequestException)
-            {
-                ModelState.AddModelError(nameof(model.AddressData), "An error occurred while trying to remove the data. Please try again.");
-                return View(model);
-            }
+
+            model.Removed = true;
+            return View(model);
+        }
+        catch (HttpRequestException)
+        {
+            ModelState.AddModelError(nameof(model.AddressData), "An error occurred while trying to remove the data. Please try again.");
+            return View(model);
+        }
+    }
+
+    private IPAddress GetUsersIpForLookup()
+    {
+        const string cfConnectingIpKey = "CF-Connecting-IP";
+
+        if (webHostEnvironment.IsDevelopment())
+        {
+            return IPAddress.Parse("8.8.8.8");
         }
 
-        private IPAddress GetUsersIpForLookup()
+        IPAddress? address = null;
+
+        if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) ?? false)
         {
-            const string cfConnectingIpKey = "CF-Connecting-IP";
-
-            if (webHostEnvironment.IsDevelopment())
-                return IPAddress.Parse("8.8.8.8");
-
-            IPAddress? address = null;
-
-            if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) ?? false)
-                IPAddress.TryParse(cfConnectingIp, out address);
-
-            if (address is null)
-                address = httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
-
-            return address ?? IPAddress.Parse("8.8.8.8");
+            IPAddress.TryParse(cfConnectingIp, out address);
         }
 
-        private async Task<bool> ValidateHostname(string address, CancellationToken cancellationToken)
-        {
-            if (IPAddress.TryParse(address, out _))
-                return true;
+        address ??= httpContextAccessor.HttpContext?.Connection.RemoteIpAddress;
 
-            try
-            {
-                var hostEntry = await Dns.GetHostEntryAsync(address, cancellationToken);
-                return hostEntry.AddressList.FirstOrDefault() is not null;
-            }
-            catch (SocketException)
-            {
-                return false;
-            }
+        return address ?? IPAddress.Parse("8.8.8.8");
+    }
+
+    private async Task<bool> ValidateHostname(string address, CancellationToken cancellationToken)
+    {
+        if (IPAddress.TryParse(address, out _))
+        {
+            return true;
+        }
+
+        try
+        {
+            var hostEntry = await Dns.GetHostEntryAsync(address, cancellationToken);
+            return hostEntry.AddressList.FirstOrDefault() is not null;
+        }
+        catch (SocketException)
+        {
+            return false;
         }
     }
 }

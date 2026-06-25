@@ -21,12 +21,7 @@ public class GeoLocationApiHealthCheck : IHealthCheck
         {
             var result = await _apiHealthApi.CheckHealth(cancellationToken);
 
-            if (result.IsSuccess)
-            {
-                return HealthCheckResult.Healthy();
-            }
-
-            return HealthCheckResult.Unhealthy($"GeoLocation API returned {result.StatusCode}.");
+            return result.IsSuccess ? HealthCheckResult.Healthy() : HealthCheckResult.Unhealthy($"GeoLocation API returned {result.StatusCode}.");
         }
         catch (Exception ex)
         {

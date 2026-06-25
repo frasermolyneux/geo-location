@@ -17,7 +17,10 @@ public class InfoAndHealthTests : IClassFixture<CustomWebApplicationFactory>, IA
         _client = _factory.CreateClient();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync()
     {
@@ -49,7 +52,7 @@ public class InfoAndHealthTests : IClassFixture<CustomWebApplicationFactory>, IA
 
         // Assert
         Assert.True(
-            response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.ServiceUnavailable,
+            response.StatusCode is HttpStatusCode.OK or HttpStatusCode.ServiceUnavailable,
             $"Expected OK or ServiceUnavailable but got {response.StatusCode}");
     }
 

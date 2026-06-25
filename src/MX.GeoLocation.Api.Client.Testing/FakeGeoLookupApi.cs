@@ -95,12 +95,12 @@ public class FakeGeoLookupApi : IGeoLookupApi
     /// <summary>
     /// Returns the set of addresses that had <see cref="DeleteMetadata"/> called on them.
     /// </summary>
-    public IReadOnlyCollection<string> DeletedAddresses => _deletedAddresses.ToArray();
+    public IReadOnlyCollection<string> DeletedAddresses => [.. _deletedAddresses];
 
     /// <summary>
     /// Returns the set of addresses that were looked up via <see cref="GetGeoLocation"/> or <see cref="GetGeoLocations"/>.
     /// </summary>
-    public IReadOnlyCollection<string> LookedUpAddresses => _lookedUpAddresses.ToArray();
+    public IReadOnlyCollection<string> LookedUpAddresses => [.. _lookedUpAddresses];
 
     public Task<ApiResult<GeoLocationDto>> GetGeoLocation(string hostname, CancellationToken cancellationToken = default)
     {
@@ -129,7 +129,10 @@ public class FakeGeoLookupApi : IGeoLookupApi
 
     public Task<ApiResult<CollectionModel<GeoLocationDto>>> GetGeoLocations(List<string> hostnames, CancellationToken cancellationToken = default)
     {
-        foreach (var h in hostnames) _lookedUpAddresses.Add(h);
+        foreach (var h in hostnames)
+        {
+            _lookedUpAddresses.Add(h);
+        }
 
         List<GeoLocationDto> items = [];
         List<ApiError> errors = [];

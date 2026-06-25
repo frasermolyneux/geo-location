@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using MX.Api.Client;
 using MX.Api.Client.Auth;
 using MX.GeoLocation.Abstractions.Models.V1;
-using MX.GeoLocation.Abstractions.Models.V1_1;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Api.IntegrationTests;
 
@@ -33,7 +32,10 @@ public class ClientV1LookupTests : IClassFixture<CustomWebApplicationFactory>, I
             options);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     [Fact]
     public async Task GetGeoLocation_CacheHit_ReturnsData()

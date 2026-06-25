@@ -36,7 +36,9 @@ public class MaxMindAvailabilityHealthCheck : IHealthCheck
         lock (_cacheLock)
         {
             if (_cachedResult.HasValue && DateTime.UtcNow < _cacheExpiry)
+            {
                 return _cachedResult.Value;
+            }
         }
 
         var availability = new AvailabilityTelemetry

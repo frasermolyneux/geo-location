@@ -1,10 +1,5 @@
 using System.Net;
 
-using MX.Api.Abstractions;
-using MX.GeoLocation.Abstractions.Models.V1;
-
-using Newtonsoft.Json;
-
 namespace MX.GeoLocation.Api.IntegrationTests;
 
 [Trait("Category", "Integration")]
@@ -20,7 +15,10 @@ public class V1DeleteTests : IClassFixture<CustomWebApplicationFactory>, IAsyncL
         _client = _factory.CreateClient();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync()
     {

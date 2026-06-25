@@ -120,12 +120,16 @@ public class WebAppFactory : IAsyncDisposable
         {
             var candidate = Path.Combine(dir.FullName, "MX.GeoLocation.Web");
             if (Directory.Exists(candidate) && File.Exists(Path.Combine(candidate, "MX.GeoLocation.Web.csproj")))
+            {
                 return candidate;
+            }
 
             // Also check src subdirectory
             candidate = Path.Combine(dir.FullName, "src", "MX.GeoLocation.Web");
             if (Directory.Exists(candidate) && File.Exists(Path.Combine(candidate, "MX.GeoLocation.Web.csproj")))
+            {
                 return candidate;
+            }
 
             dir = dir.Parent;
         }

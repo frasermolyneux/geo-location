@@ -1,54 +1,52 @@
 ﻿using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
-using Microsoft.Playwright;
 using Microsoft.Extensions.Configuration;
 
-namespace MX.GeoLocation.Web.IntegrationTests.PageObject
+namespace MX.GeoLocation.Web.IntegrationTests.PageObject;
+
+public class BatchLookupPage : IPageObject
 {
-    public class BatchLookupPage : IPageObject
+    private readonly Microsoft.Playwright.IPage page;
+    private readonly IConfiguration configuration;
+
+    public BatchLookupPage(Microsoft.Playwright.IPage page, IConfiguration configuration)
     {
-        private readonly Microsoft.Playwright.IPage page;
-        private readonly IConfiguration configuration;
+        this.page = page;
+        this.configuration = configuration;
+        Navigation = new NavigationBar(page);
+    }
 
-        public BatchLookupPage(Microsoft.Playwright.IPage page, IConfiguration configuration)
+    public NavigationBar Navigation { get; private set; }
+
+    public async Task<bool> IsOnPageAsync()
+    {
+        try
         {
-            this.page = page;
-            this.configuration = configuration;
-            Navigation = new NavigationBar(page);
+            var title = await page.TitleAsync();
+            return title?.Contains("Batch Lookup") ?? false;
         }
-
-        public NavigationBar Navigation { get; private set; }
-
-        public async Task<bool> IsOnPageAsync()
+        catch
         {
-            try
-            {
-                var title = await page.TitleAsync();
-                return title?.Contains("Batch Lookup") ?? false;
-            }
-            catch
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        public async Task GoToPageAsync(bool useNavigation = false)
+    public async Task GoToPageAsync(bool useNavigation = false)
+    {
+        if (useNavigation)
         {
-            if (useNavigation)
-            {
-                await Navigation.ClickNavBarLookupDropdownAsync();
-                await Navigation.ClickNavBarLookupBatchAsync();
-            }
-            else
-            {
-                var baseUrl = GetBaseUrl();
-                await page.GotoAsync($"{baseUrl}/Home/BatchLookup");
-            }
+            await Navigation.ClickNavBarLookupDropdownAsync();
+            await Navigation.ClickNavBarLookupBatchAsync();
         }
+        else
+        {
+            var baseUrl = GetBaseUrl();
+            await page.GotoAsync($"{baseUrl}/Home/BatchLookup");
+        }
+    }
 
-        private string GetBaseUrl()
-        {
-            var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
-            return url.EndsWith("/") ? url[..^1] : url;
-        }
+    private string GetBaseUrl()
+    {
+        var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
+        return url.EndsWith("/") ? url[..^1] : url;
     }
 }

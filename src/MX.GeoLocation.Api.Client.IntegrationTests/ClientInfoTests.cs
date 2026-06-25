@@ -31,7 +31,10 @@ public class ClientInfoTests : IClassFixture<CustomWebApplicationFactory>, IAsyn
             options);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync()
     {

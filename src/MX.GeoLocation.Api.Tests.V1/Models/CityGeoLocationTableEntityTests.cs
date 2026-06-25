@@ -171,30 +171,33 @@ public class CityGeoLocationTableEntityTests
         Assert.Throws<ArgumentNullException>(() => new CityGeoLocationTableEntity(dto));
     }
 
-    private static CityGeoLocationDto CreateFullCityDto() => new()
+    private static CityGeoLocationDto CreateFullCityDto()
     {
-        Address = "google.co.uk",
-        TranslatedAddress = "142.250.187.195",
-        ContinentCode = "NA",
-        ContinentName = "North America",
-        CountryCode = "US",
-        CountryName = "United States",
-        IsEuropeanUnion = false,
-        CityName = "Mountain View",
-        PostalCode = "94035",
-        RegisteredCountry = "US",
-        RepresentedCountry = "",
-        Latitude = 37.386,
-        Longitude = -122.0838,
-        AccuracyRadius = 1000,
-        Timezone = "America/Los_Angeles",
-        Subdivisions = ["California", "Santa Clara County"],
-        NetworkTraits = new NetworkTraitsDto
+        return new()
         {
-            Isp = "Google LLC",
-            Organization = "Google LLC",
-            AutonomousSystemNumber = 15169,
-            Domain = "google.com"
-        }
-    };
+            Address = "google.co.uk",
+            TranslatedAddress = "142.250.187.195",
+            ContinentCode = "NA",
+            ContinentName = "North America",
+            CountryCode = "US",
+            CountryName = "United States",
+            IsEuropeanUnion = false,
+            CityName = "Mountain View",
+            PostalCode = "94035",
+            RegisteredCountry = "US",
+            RepresentedCountry = "",
+            Latitude = 37.386,
+            Longitude = -122.0838,
+            AccuracyRadius = 1000,
+            Timezone = "America/Los_Angeles",
+            Subdivisions = ["California", "Santa Clara County"],
+            NetworkTraits = new NetworkTraitsDto
+            {
+                Isp = "Google LLC",
+                Organization = "Google LLC",
+                AutonomousSystemNumber = 15169,
+                Domain = "google.com"
+            }
+        };
+    }
 }

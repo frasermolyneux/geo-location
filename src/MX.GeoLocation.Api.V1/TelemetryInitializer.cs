@@ -1,13 +1,12 @@
 ﻿using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.Extensibility;
 
-namespace MX.GeoLocation.LookupWebApi
+namespace MX.GeoLocation.LookupWebApi;
+
+public class TelemetryInitializer : ITelemetryInitializer
 {
-    public class TelemetryInitializer : ITelemetryInitializer
+    public void Initialize(ITelemetry telemetry)
     {
-        public void Initialize(ITelemetry telemetry)
-        {
-            telemetry.Context.Cloud.RoleName = "Lookup WebApi";
-        }
+        telemetry.Context.Cloud.RoleName = "Lookup WebApi";
     }
 }

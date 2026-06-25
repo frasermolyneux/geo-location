@@ -3,7 +3,6 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.WindowsServer.Channel.Implementation;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
-using MX.Api.Client.Extensions;
 using MX.GeoLocation.Api.Client.V1;
 using MX.GeoLocation.Web;
 using MX.GeoLocation.Web.HealthChecks;

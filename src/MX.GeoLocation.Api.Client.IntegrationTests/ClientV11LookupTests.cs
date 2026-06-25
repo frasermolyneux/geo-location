@@ -32,7 +32,10 @@ public class ClientV11LookupTests : IClassFixture<CustomWebApplicationFactory>, 
             options);
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     [Fact]
     public async Task GetCityGeoLocation_CacheHit_ReturnsData()

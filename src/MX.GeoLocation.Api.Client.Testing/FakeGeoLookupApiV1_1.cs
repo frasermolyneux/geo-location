@@ -148,19 +148,19 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
     }
 
     /// <summary>Returns the set of addresses looked up via <see cref="GetCityGeoLocation"/>.</summary>
-    public IReadOnlyCollection<string> CityLookedUpAddresses => _cityLookedUpAddresses.ToArray();
+    public IReadOnlyCollection<string> CityLookedUpAddresses => [.. _cityLookedUpAddresses];
 
     /// <summary>Returns the set of addresses looked up via <see cref="GetInsightsGeoLocation"/>.</summary>
-    public IReadOnlyCollection<string> InsightsLookedUpAddresses => _insightsLookedUpAddresses.ToArray();
+    public IReadOnlyCollection<string> InsightsLookedUpAddresses => [.. _insightsLookedUpAddresses];
 
     /// <summary>Returns the set of addresses looked up via <see cref="GetProxyCheck"/>.</summary>
-    public IReadOnlyCollection<string> ProxyCheckLookedUpAddresses => _proxyCheckLookedUpAddresses.ToArray();
+    public IReadOnlyCollection<string> ProxyCheckLookedUpAddresses => [.. _proxyCheckLookedUpAddresses];
 
     /// <summary>Returns the set of addresses looked up via <see cref="GetIpIntelligence"/>.</summary>
-    public IReadOnlyCollection<string> IntelligenceLookedUpAddresses => _intelligenceLookedUpAddresses.ToArray();
+    public IReadOnlyCollection<string> IntelligenceLookedUpAddresses => [.. _intelligenceLookedUpAddresses];
 
     /// <summary>Returns the set of addresses deleted via <see cref="DeleteMetadata"/>.</summary>
-    public IReadOnlyCollection<string> DeletedAddresses => _deletedAddresses.ToArray();
+    public IReadOnlyCollection<string> DeletedAddresses => [.. _deletedAddresses];
 
     public Task<ApiResult<CityGeoLocationDto>> GetCityGeoLocation(string hostname, CancellationToken cancellationToken = default)
     {
@@ -217,13 +217,19 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
         _proxyCheckLookedUpAddresses.Add(hostname);
 
         if (_proxyCheckErrorResponses.TryGetValue(hostname, out var error))
+        {
             return Task.FromResult(new ApiResult<ProxyCheckDto>(error.StatusCode, new ApiResponse<ProxyCheckDto>(error.Error)));
+        }
 
         if (_proxyCheckResponses.TryGetValue(hostname, out var dto))
+        {
             return Task.FromResult(new ApiResult<ProxyCheckDto>(HttpStatusCode.OK, new ApiResponse<ProxyCheckDto>(dto)));
+        }
 
         if (_defaultBehavior == DefaultLookupBehavior.ReturnError)
+        {
             return Task.FromResult(new ApiResult<ProxyCheckDto>(_defaultErrorStatusCode, new ApiResponse<ProxyCheckDto>(new ApiError(_defaultErrorCode, _defaultErrorMessage))));
+        }
 
         dto = GeoLocationDtoFactory.CreateProxyCheck(address: hostname);
         return Task.FromResult(new ApiResult<ProxyCheckDto>(HttpStatusCode.OK, new ApiResponse<ProxyCheckDto>(dto)));
@@ -234,13 +240,19 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
         _intelligenceLookedUpAddresses.Add(hostname);
 
         if (_intelligenceErrorResponses.TryGetValue(hostname, out var error))
+        {
             return Task.FromResult(new ApiResult<IpIntelligenceDto>(error.StatusCode, new ApiResponse<IpIntelligenceDto>(error.Error)));
+        }
 
         if (_intelligenceResponses.TryGetValue(hostname, out var dto))
+        {
             return Task.FromResult(new ApiResult<IpIntelligenceDto>(HttpStatusCode.OK, new ApiResponse<IpIntelligenceDto>(dto)));
+        }
 
         if (_defaultBehavior == DefaultLookupBehavior.ReturnError)
+        {
             return Task.FromResult(new ApiResult<IpIntelligenceDto>(_defaultErrorStatusCode, new ApiResponse<IpIntelligenceDto>(new ApiError(_defaultErrorCode, _defaultErrorMessage))));
+        }
 
         dto = GeoLocationDtoFactory.CreateIpIntelligence(address: hostname);
         return Task.FromResult(new ApiResult<IpIntelligenceDto>(HttpStatusCode.OK, new ApiResponse<IpIntelligenceDto>(dto)));
@@ -253,7 +265,9 @@ public class FakeGeoLookupApiV1_1 : V1_1.IGeoLookupApi
         {
             var result = await GetIpIntelligence(hostname, cancellationToken);
             if (result.IsSuccess && result.Result?.Data is not null)
+            {
                 results.Add(result.Result.Data);
+            }
         }
 
         var response = new ApiResponse<CollectionModel<IpIntelligenceDto>>(

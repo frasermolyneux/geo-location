@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 
 using MaxMind.GeoIP2.Exceptions;
 
@@ -23,7 +22,10 @@ public class V1GeoLookupTests : IClassFixture<CustomWebApplicationFactory>, IAsy
         _client = _factory.CreateClient();
     }
 
-    public Task InitializeAsync() => Task.CompletedTask;
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public Task DisposeAsync()
     {

@@ -1,24 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MX.GeoLocation.Web.Models
+namespace MX.GeoLocation.Web.Models;
+
+public class RemoveMyDataViewModel
 {
-    public class RemoveMyDataViewModel
+    public RemoveMyDataViewModel()
     {
-        public RemoveMyDataViewModel()
-        {
-            AddressData = string.Empty;
-        }
-
-        public RemoveMyDataViewModel(string addressData)
-        {
-            AddressData = addressData;
-        }
-
-        [Required(ErrorMessage = "You must provide an address to query against. IP or DNS is acceptable.")]
-        [MaxLength(256, ErrorMessage = "The inputted address data is greater than the maximum length")]
-        [DataType(DataType.Text)]
-        public string AddressData { get; set; }
-
-        public bool Removed { get; set; }
+        AddressData = string.Empty;
     }
+
+    public RemoveMyDataViewModel(string addressData)
+    {
+        AddressData = addressData;
+    }
+
+    [Required(ErrorMessage = "You must provide an address to query against. IP or DNS is acceptable.")]
+    [MaxLength(256, ErrorMessage = "The inputted address data is greater than the maximum length")]
+    [DataType(DataType.Text)]
+    public string AddressData { get; set; }
+
+    public bool Removed { get; set; }
 }

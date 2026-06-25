@@ -2,58 +2,57 @@
 using Microsoft.Playwright;
 using Microsoft.Extensions.Configuration;
 
-namespace MX.GeoLocation.Web.IntegrationTests.PageObject
+namespace MX.GeoLocation.Web.IntegrationTests.PageObject;
+
+public class HomePage : IPageObject
 {
-    public class HomePage : IPageObject
+    private readonly Microsoft.Playwright.IPage page;
+    private readonly IConfiguration configuration;
+
+    public HomePage(Microsoft.Playwright.IPage page, IConfiguration configuration)
     {
-        private readonly Microsoft.Playwright.IPage page;
-        private readonly IConfiguration configuration;
+        this.page = page;
+        this.configuration = configuration;
 
-        public HomePage(Microsoft.Playwright.IPage page, IConfiguration configuration)
+        Navigation = new NavigationBar(page);
+    }
+
+    public NavigationBar Navigation { get; private set; }
+
+    public async Task<bool> IsOnPageAsync()
+    {
+        try
         {
-            this.page = page;
-            this.configuration = configuration;
-
-            Navigation = new NavigationBar(page);
+            // Check the page title instead of looking for a pageTitle element
+            var title = await page.TitleAsync();
+            return title?.Contains("Home Page") ?? false;
         }
-
-        public NavigationBar Navigation { get; private set; }
-
-        public async Task<bool> IsOnPageAsync()
+        catch
         {
-            try
-            {
-                // Check the page title instead of looking for a pageTitle element
-                var title = await page.TitleAsync();
-                return title?.Contains("Home Page") ?? false;
-            }
-            catch
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        public async Task GoToPageAsync(bool useNavigation = false)
+    public async Task GoToPageAsync(bool useNavigation = false)
+    {
+        if (useNavigation)
         {
-            if (useNavigation)
-            {
-                await Navigation.ClickNavBarHomeAsync();
-            }
-            else
-            {
-                var baseUrl = GetBaseUrl();
-                await page.GotoAsync(baseUrl, new PageGotoOptions
-                {
-                    Timeout = 60000,
-                    WaitUntil = WaitUntilState.NetworkIdle
-                });
-            }
+            await Navigation.ClickNavBarHomeAsync();
         }
+        else
+        {
+            var baseUrl = GetBaseUrl();
+            await page.GotoAsync(baseUrl, new PageGotoOptions
+            {
+                Timeout = 60000,
+                WaitUntil = WaitUntilState.NetworkIdle
+            });
+        }
+    }
 
-        private string GetBaseUrl()
-        {
-            var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
-            return url.EndsWith("/") ? url[..^1] : url;
-        }
+    private string GetBaseUrl()
+    {
+        var url = configuration["SiteUrl"] ?? "https://dev.geo-location.net";
+        return url.EndsWith("/") ? url[..^1] : url;
     }
 }

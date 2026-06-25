@@ -8,226 +8,225 @@ using Microsoft.ApplicationInsights.Extensibility;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Abstractions.Models.V1_1;
 
-namespace MX.GeoLocation.LookupWebApi.Repositories
+namespace MX.GeoLocation.LookupWebApi.Repositories;
+
+public class MaxMindGeoLocationRepository : IMaxMindGeoLocationRepository
 {
-    public class MaxMindGeoLocationRepository : IMaxMindGeoLocationRepository
+    private readonly WebServiceClient webServiceClient;
+    private readonly TelemetryClient telemetryClient;
+
+    public MaxMindGeoLocationRepository(
+        WebServiceClient webServiceClient,
+        TelemetryClient telemetryClient)
     {
-        private readonly WebServiceClient webServiceClient;
-        private readonly TelemetryClient telemetryClient;
+        this.webServiceClient = webServiceClient ?? throw new ArgumentNullException(nameof(webServiceClient));
+        this.telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
+    }
 
-        public MaxMindGeoLocationRepository(
-            WebServiceClient webServiceClient,
-            TelemetryClient telemetryClient)
+    public async Task<GeoLocationDto> GetGeoLocation(string address, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
+        var operation = StartOperation("MaxMindCityQuery", address);
+
+        try
         {
-            this.webServiceClient = webServiceClient ?? throw new ArgumentNullException(nameof(webServiceClient));
-            this.telemetryClient = telemetryClient ?? throw new ArgumentNullException(nameof(telemetryClient));
-        }
-
-        public async Task<GeoLocationDto> GetGeoLocation(string address, CancellationToken cancellationToken = default)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(address);
-
-            var operation = StartOperation("MaxMindCityQuery", address);
-
-            try
-            {
-                var lookupResult = await webServiceClient.CityAsync(address).WaitAsync(cancellationToken);
+            var lookupResult = await webServiceClient.CityAsync(address).WaitAsync(cancellationToken);
 
 #pragma warning disable CS0618 // Deprecated Traits properties — v1 API uses string dictionary for backward compatibility
-                var traits = new Dictionary<string, string?>
-                {
-                    {"AutonomousSystemNumber", lookupResult.Traits.AutonomousSystemNumber?.ToString()},
-                    {"AutonomousSystemOrganization", lookupResult.Traits?.AutonomousSystemOrganization},
-                    {"ConnectionType", lookupResult.Traits?.ConnectionType},
-                    {"Domain", lookupResult.Traits?.Domain},
-                    {"IPAddress", lookupResult.Traits?.IPAddress},
-                    {"IsAnonymous", lookupResult.Traits?.IsAnonymous.ToString()},
-                    {"IsAnonymousVpn", lookupResult.Traits?.IsAnonymousVpn.ToString()},
-                    {"IsHostingProvider", lookupResult.Traits?.IsHostingProvider.ToString()},
-                    {"IsLegitimateProxy", lookupResult.Traits?.IsLegitimateProxy.ToString()},
-                    {"IsPublicProxy", lookupResult.Traits?.IsPublicProxy.ToString()},
-                    {"IsTorExitNode", lookupResult.Traits?.IsTorExitNode.ToString()},
-                    {"Isp", lookupResult.Traits?.Isp},
-                    {"Organization", lookupResult.Traits?.Organization},
-                    {"StaticIPScore", lookupResult.Traits?.StaticIPScore.ToString()},
-                    {"UserCount", lookupResult.Traits?.UserCount.ToString()},
-                    {"UserType", lookupResult.Traits?.UserType}
-                };
+            var traits = new Dictionary<string, string?>
+            {
+                {"AutonomousSystemNumber", lookupResult.Traits.AutonomousSystemNumber?.ToString()},
+                {"AutonomousSystemOrganization", lookupResult.Traits?.AutonomousSystemOrganization},
+                {"ConnectionType", lookupResult.Traits?.ConnectionType},
+                {"Domain", lookupResult.Traits?.Domain},
+                {"IPAddress", lookupResult.Traits?.IPAddress},
+                {"IsAnonymous", lookupResult.Traits?.IsAnonymous.ToString()},
+                {"IsAnonymousVpn", lookupResult.Traits?.IsAnonymousVpn.ToString()},
+                {"IsHostingProvider", lookupResult.Traits?.IsHostingProvider.ToString()},
+                {"IsLegitimateProxy", lookupResult.Traits?.IsLegitimateProxy.ToString()},
+                {"IsPublicProxy", lookupResult.Traits?.IsPublicProxy.ToString()},
+                {"IsTorExitNode", lookupResult.Traits?.IsTorExitNode.ToString()},
+                {"Isp", lookupResult.Traits?.Isp},
+                {"Organization", lookupResult.Traits?.Organization},
+                {"StaticIPScore", lookupResult.Traits?.StaticIPScore.ToString()},
+                {"UserCount", lookupResult.Traits?.UserCount.ToString()},
+                {"UserType", lookupResult.Traits?.UserType}
+            };
 #pragma warning restore CS0618
 
-                var result = new GeoLocationDto()
-                {
-                    Address = address,
-                    TranslatedAddress = address,
-                    ContinentCode = lookupResult.Continent?.Code ?? string.Empty,
-                    ContinentName = lookupResult.Continent?.Name ?? string.Empty,
-                    CountryCode = lookupResult.Country?.IsoCode ?? string.Empty,
-                    CountryName = lookupResult.Country?.Name ?? string.Empty,
-                    IsEuropeanUnion = lookupResult.Country?.IsInEuropeanUnion ?? false,
-                    CityName = lookupResult.City?.Name ?? string.Empty,
-                    PostalCode = lookupResult.Postal?.Code ?? string.Empty,
-                    RegisteredCountry = lookupResult.RegisteredCountry?.IsoCode ?? string.Empty,
-                    RepresentedCountry = lookupResult.RepresentedCountry?.IsoCode ?? string.Empty,
-                    Latitude = lookupResult.Location?.Latitude ?? 0.0,
-                    Longitude = lookupResult.Location?.Longitude ?? 0.0,
-                    AccuracyRadius = lookupResult.Location?.AccuracyRadius ?? 0,
-                    Timezone = lookupResult.Location?.TimeZone ?? string.Empty,
-                    Traits = traits
-                };
+            var result = new GeoLocationDto()
+            {
+                Address = address,
+                TranslatedAddress = address,
+                ContinentCode = lookupResult.Continent?.Code ?? string.Empty,
+                ContinentName = lookupResult.Continent?.Name ?? string.Empty,
+                CountryCode = lookupResult.Country?.IsoCode ?? string.Empty,
+                CountryName = lookupResult.Country?.Name ?? string.Empty,
+                IsEuropeanUnion = lookupResult.Country?.IsInEuropeanUnion ?? false,
+                CityName = lookupResult.City?.Name ?? string.Empty,
+                PostalCode = lookupResult.Postal?.Code ?? string.Empty,
+                RegisteredCountry = lookupResult.RegisteredCountry?.IsoCode ?? string.Empty,
+                RepresentedCountry = lookupResult.RepresentedCountry?.IsoCode ?? string.Empty,
+                Latitude = lookupResult.Location?.Latitude ?? 0.0,
+                Longitude = lookupResult.Location?.Longitude ?? 0.0,
+                AccuracyRadius = lookupResult.Location?.AccuracyRadius ?? 0,
+                Timezone = lookupResult.Location?.TimeZone ?? string.Empty,
+                Traits = traits
+            };
 
-                MarkSuccess(operation);
-                return result;
-            }
-            catch (GeoIP2Exception ex)
-            {
-                HandleException(operation, ex);
-                throw;
-            }
-            finally
-            {
-                telemetryClient.StopOperation(operation);
-            }
+            MarkSuccess(operation);
+            return result;
         }
-
-        public async Task<CityGeoLocationDto> GetCityGeoLocation(string address, CancellationToken cancellationToken = default)
+        catch (GeoIP2Exception ex)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(address);
-
-            var operation = StartOperation("MaxMindCityQuery", address);
-
-            try
-            {
-                var lookupResult = await webServiceClient.CityAsync(address).WaitAsync(cancellationToken);
-                var result = MapToCityDto(address, lookupResult);
-                MarkSuccess(operation);
-                return result;
-            }
-            catch (GeoIP2Exception ex)
-            {
-                HandleException(operation, ex);
-                throw;
-            }
-            finally
-            {
-                telemetryClient.StopOperation(operation);
-            }
+            HandleException(operation, ex);
+            throw;
         }
-
-        public async Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address, CancellationToken cancellationToken = default)
+        finally
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(address);
-
-            var operation = StartOperation("MaxMindInsightsQuery", address);
-
-            try
-            {
-                var lookupResult = await webServiceClient.InsightsAsync(address).WaitAsync(cancellationToken);
-                var anonymizer = lookupResult.Anonymizer;
-
-                var dto = MapToInsightsDto(address, lookupResult);
-                dto.Anonymizer = new AnonymizerDto
-                {
-                    Confidence = anonymizer?.Confidence,
-                    IsAnonymous = anonymizer?.IsAnonymous ?? false,
-                    IsAnonymousVpn = anonymizer?.IsAnonymousVpn ?? false,
-                    IsHostingProvider = anonymizer?.IsHostingProvider ?? false,
-                    IsPublicProxy = anonymizer?.IsPublicProxy ?? false,
-                    IsResidentialProxy = anonymizer?.IsResidentialProxy ?? false,
-                    IsTorExitNode = anonymizer?.IsTorExitNode ?? false,
-                    NetworkLastSeen = anonymizer?.NetworkLastSeen?.ToString("yyyy-MM-dd"),
-                    ProviderName = anonymizer?.ProviderName
-                };
-
-                MarkSuccess(operation);
-                return dto;
-            }
-            catch (GeoIP2Exception ex)
-            {
-                HandleException(operation, ex);
-                throw;
-            }
-            finally
-            {
-                telemetryClient.StopOperation(operation);
-            }
+            telemetryClient.StopOperation(operation);
         }
+    }
 
-        private static CityGeoLocationDto MapToCityDto(string address, MaxMind.GeoIP2.Responses.AbstractCityResponse lookupResult)
+    public async Task<CityGeoLocationDto> GetCityGeoLocation(string address, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
+        var operation = StartOperation("MaxMindCityQuery", address);
+
+        try
         {
-            return PopulateCityFields(new CityGeoLocationDto(), address, lookupResult);
+            var lookupResult = await webServiceClient.CityAsync(address).WaitAsync(cancellationToken);
+            var result = MapToCityDto(address, lookupResult);
+            MarkSuccess(operation);
+            return result;
         }
-
-        private static InsightsGeoLocationDto MapToInsightsDto(string address, MaxMind.GeoIP2.Responses.AbstractCityResponse lookupResult)
+        catch (GeoIP2Exception ex)
         {
-            return PopulateCityFields(new InsightsGeoLocationDto(), address, lookupResult);
+            HandleException(operation, ex);
+            throw;
         }
-
-        private static T PopulateCityFields<T>(T dto, string address, MaxMind.GeoIP2.Responses.AbstractCityResponse lookupResult) where T : CityGeoLocationDto
+        finally
         {
-            dto.Address = address;
-            dto.TranslatedAddress = address;
-            dto.ContinentCode = lookupResult.Continent?.Code ?? string.Empty;
-            dto.ContinentName = lookupResult.Continent?.Name ?? string.Empty;
-            dto.CountryCode = lookupResult.Country?.IsoCode ?? string.Empty;
-            dto.CountryName = lookupResult.Country?.Name ?? string.Empty;
-            dto.IsEuropeanUnion = lookupResult.Country?.IsInEuropeanUnion ?? false;
-            dto.CityName = lookupResult.City?.Name ?? string.Empty;
-            dto.PostalCode = lookupResult.Postal?.Code ?? string.Empty;
-            dto.RegisteredCountry = lookupResult.RegisteredCountry?.IsoCode ?? string.Empty;
-            dto.RepresentedCountry = lookupResult.RepresentedCountry?.IsoCode ?? string.Empty;
-            dto.Latitude = lookupResult.Location?.Latitude ?? 0.0;
-            dto.Longitude = lookupResult.Location?.Longitude ?? 0.0;
-            dto.AccuracyRadius = lookupResult.Location?.AccuracyRadius ?? 0;
-            dto.Timezone = lookupResult.Location?.TimeZone ?? string.Empty;
-            dto.Subdivisions = lookupResult.Subdivisions?
-                .Select(s => s.Name ?? string.Empty)
-                .Where(n => !string.IsNullOrEmpty(n))
-                .ToList() ?? [];
-            dto.NetworkTraits = MapNetworkTraits(lookupResult.Traits);
+            telemetryClient.StopOperation(operation);
+        }
+    }
+
+    public async Task<InsightsGeoLocationDto> GetInsightsGeoLocation(string address, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(address);
+
+        var operation = StartOperation("MaxMindInsightsQuery", address);
+
+        try
+        {
+            var lookupResult = await webServiceClient.InsightsAsync(address).WaitAsync(cancellationToken);
+            var anonymizer = lookupResult.Anonymizer;
+
+            var dto = MapToInsightsDto(address, lookupResult);
+            dto.Anonymizer = new AnonymizerDto
+            {
+                Confidence = anonymizer?.Confidence,
+                IsAnonymous = anonymizer?.IsAnonymous ?? false,
+                IsAnonymousVpn = anonymizer?.IsAnonymousVpn ?? false,
+                IsHostingProvider = anonymizer?.IsHostingProvider ?? false,
+                IsPublicProxy = anonymizer?.IsPublicProxy ?? false,
+                IsResidentialProxy = anonymizer?.IsResidentialProxy ?? false,
+                IsTorExitNode = anonymizer?.IsTorExitNode ?? false,
+                NetworkLastSeen = anonymizer?.NetworkLastSeen?.ToString("yyyy-MM-dd"),
+                ProviderName = anonymizer?.ProviderName
+            };
+
+            MarkSuccess(operation);
             return dto;
         }
-
-        private static NetworkTraitsDto MapNetworkTraits(MaxMind.GeoIP2.Model.Traits? traits)
+        catch (GeoIP2Exception ex)
         {
-            return new NetworkTraitsDto
-            {
-                AutonomousSystemNumber = traits?.AutonomousSystemNumber,
-                AutonomousSystemOrganization = traits?.AutonomousSystemOrganization,
-                ConnectionType = traits?.ConnectionType,
-                Domain = traits?.Domain,
-                IPAddress = traits?.IPAddress,
-                IsAnycast = traits?.IsAnycast ?? false,
-                Isp = traits?.Isp,
-                MobileCountryCode = traits?.MobileCountryCode,
-                MobileNetworkCode = traits?.MobileNetworkCode,
-                Network = traits?.Network?.ToString(),
-                Organization = traits?.Organization,
-                StaticIPScore = traits?.StaticIPScore,
-                UserCount = traits?.UserCount,
-                UserType = traits?.UserType
-            };
+            HandleException(operation, ex);
+            throw;
         }
-
-        private IOperationHolder<DependencyTelemetry> StartOperation(string operationName, string address)
+        finally
         {
-            var operation = telemetryClient.StartOperation<DependencyTelemetry>(operationName);
-            operation.Telemetry.Type = "HTTP";
-            operation.Telemetry.Target = "geoip.maxmind.com";
-            operation.Telemetry.Data = address;
-            return operation;
+            telemetryClient.StopOperation(operation);
         }
+    }
 
-        private static void MarkSuccess(IOperationHolder<DependencyTelemetry> operation)
-        {
-            operation.Telemetry.Success = true;
-            operation.Telemetry.ResultCode = "200";
-        }
+    private static CityGeoLocationDto MapToCityDto(string address, MaxMind.GeoIP2.Responses.AbstractCityResponse lookupResult)
+    {
+        return PopulateCityFields(new CityGeoLocationDto(), address, lookupResult);
+    }
 
-        private void HandleException(IOperationHolder<DependencyTelemetry> operation, Exception ex)
+    private static InsightsGeoLocationDto MapToInsightsDto(string address, MaxMind.GeoIP2.Responses.AbstractCityResponse lookupResult)
+    {
+        return PopulateCityFields(new InsightsGeoLocationDto(), address, lookupResult);
+    }
+
+    private static T PopulateCityFields<T>(T dto, string address, MaxMind.GeoIP2.Responses.AbstractCityResponse lookupResult) where T : CityGeoLocationDto
+    {
+        dto.Address = address;
+        dto.TranslatedAddress = address;
+        dto.ContinentCode = lookupResult.Continent?.Code ?? string.Empty;
+        dto.ContinentName = lookupResult.Continent?.Name ?? string.Empty;
+        dto.CountryCode = lookupResult.Country?.IsoCode ?? string.Empty;
+        dto.CountryName = lookupResult.Country?.Name ?? string.Empty;
+        dto.IsEuropeanUnion = lookupResult.Country?.IsInEuropeanUnion ?? false;
+        dto.CityName = lookupResult.City?.Name ?? string.Empty;
+        dto.PostalCode = lookupResult.Postal?.Code ?? string.Empty;
+        dto.RegisteredCountry = lookupResult.RegisteredCountry?.IsoCode ?? string.Empty;
+        dto.RepresentedCountry = lookupResult.RepresentedCountry?.IsoCode ?? string.Empty;
+        dto.Latitude = lookupResult.Location?.Latitude ?? 0.0;
+        dto.Longitude = lookupResult.Location?.Longitude ?? 0.0;
+        dto.AccuracyRadius = lookupResult.Location?.AccuracyRadius ?? 0;
+        dto.Timezone = lookupResult.Location?.TimeZone ?? string.Empty;
+        dto.Subdivisions = lookupResult.Subdivisions?
+            .Select(s => s.Name ?? string.Empty)
+            .Where(n => !string.IsNullOrEmpty(n))
+            .ToList() ?? [];
+        dto.NetworkTraits = MapNetworkTraits(lookupResult.Traits);
+        return dto;
+    }
+
+    private static NetworkTraitsDto MapNetworkTraits(MaxMind.GeoIP2.Model.Traits? traits)
+    {
+        return new NetworkTraitsDto
         {
-            operation.Telemetry.Success = false;
-            operation.Telemetry.ResultCode = ex.Message;
-            telemetryClient.TrackException(ex);
-        }
+            AutonomousSystemNumber = traits?.AutonomousSystemNumber,
+            AutonomousSystemOrganization = traits?.AutonomousSystemOrganization,
+            ConnectionType = traits?.ConnectionType,
+            Domain = traits?.Domain,
+            IPAddress = traits?.IPAddress,
+            IsAnycast = traits?.IsAnycast ?? false,
+            Isp = traits?.Isp,
+            MobileCountryCode = traits?.MobileCountryCode,
+            MobileNetworkCode = traits?.MobileNetworkCode,
+            Network = traits?.Network?.ToString(),
+            Organization = traits?.Organization,
+            StaticIPScore = traits?.StaticIPScore,
+            UserCount = traits?.UserCount,
+            UserType = traits?.UserType
+        };
+    }
+
+    private IOperationHolder<DependencyTelemetry> StartOperation(string operationName, string address)
+    {
+        var operation = telemetryClient.StartOperation<DependencyTelemetry>(operationName);
+        operation.Telemetry.Type = "HTTP";
+        operation.Telemetry.Target = "geoip.maxmind.com";
+        operation.Telemetry.Data = address;
+        return operation;
+    }
+
+    private static void MarkSuccess(IOperationHolder<DependencyTelemetry> operation)
+    {
+        operation.Telemetry.Success = true;
+        operation.Telemetry.ResultCode = "200";
+    }
+
+    private void HandleException(IOperationHolder<DependencyTelemetry> operation, Exception ex)
+    {
+        operation.Telemetry.Success = false;
+        operation.Telemetry.ResultCode = ex.Message;
+        telemetryClient.TrackException(ex);
     }
 }

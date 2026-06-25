@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MX.GeoLocation.Api.Client.V1;
 using MX.Api.Client;
 using MX.Api.Client.Auth;

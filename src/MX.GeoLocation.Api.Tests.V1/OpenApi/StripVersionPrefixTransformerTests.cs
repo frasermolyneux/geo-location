@@ -92,9 +92,12 @@ public class StripVersionPrefixTransformerTests
 
     private static OpenApiDocument CreateDocumentWithPaths(params string[] paths)
     {
-        var doc = new OpenApiDocument { Paths = new OpenApiPaths() };
+        var doc = new OpenApiDocument { Paths = [] };
         foreach (var path in paths)
+        {
             doc.Paths.Add(path, new OpenApiPathItem());
+        }
+
         return doc;
     }
 }

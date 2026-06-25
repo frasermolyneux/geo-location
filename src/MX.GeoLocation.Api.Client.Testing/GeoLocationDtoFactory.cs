@@ -1,4 +1,3 @@
-using System.Net;
 using MX.GeoLocation.Abstractions.Models;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Abstractions.Models.V1_1;
@@ -49,7 +48,7 @@ public static class GeoLocationDtoFactory
             Longitude = longitude,
             AccuracyRadius = accuracyRadius,
             Timezone = timezone,
-            Traits = traits ?? new Dictionary<string, string?>()
+            Traits = traits ?? []
         };
     }
 

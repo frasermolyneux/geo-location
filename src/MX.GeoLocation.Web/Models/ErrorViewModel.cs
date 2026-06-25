@@ -1,14 +1,13 @@
-namespace MX.GeoLocation.Web.Models
-{
-    public class ErrorViewModel
-    {
-        public ErrorViewModel(string requestId)
-        {
-            RequestId = requestId;
-        }
+namespace MX.GeoLocation.Web.Models;
 
-        public string RequestId { get; set; }
-        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-        public string? Message { get; set; }
+public class ErrorViewModel
+{
+    public ErrorViewModel(string requestId)
+    {
+        RequestId = requestId;
     }
+
+    public string RequestId { get; set; }
+    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    public string? Message { get; set; }
 }

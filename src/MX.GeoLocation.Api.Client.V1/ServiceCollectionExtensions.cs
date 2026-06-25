@@ -5,44 +5,43 @@ using MX.GeoLocation.Abstractions.Interfaces.V1;
 
 using MX.Api.Client.Extensions;
 
-namespace MX.GeoLocation.Api.Client.V1
+namespace MX.GeoLocation.Api.Client.V1;
+
+/// <summary>
+/// Extension methods for configuring GeoLocation API client services
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Extension methods for configuring GeoLocation API client services
+    /// Adds the GeoLocation API client services with custom configuration
     /// </summary>
-    public static class ServiceCollectionExtensions
+    /// <param name="serviceCollection">The service collection</param>
+    /// <param name="configureOptions">Action to configure the GeoLocation API options</param>
+    /// <returns>The service collection for chaining</returns>
+    public static IServiceCollection AddGeoLocationApiClient(
+        this IServiceCollection serviceCollection,
+        Action<GeoLocationApiOptionsBuilder> configureOptions)
     {
-        /// <summary>
-        /// Adds the GeoLocation API client services with custom configuration
-        /// </summary>
-        /// <param name="serviceCollection">The service collection</param>
-        /// <param name="configureOptions">Action to configure the GeoLocation API options</param>
-        /// <returns>The service collection for chaining</returns>
-        public static IServiceCollection AddGeoLocationApiClient(
-            this IServiceCollection serviceCollection,
-            Action<GeoLocationApiOptionsBuilder> configureOptions)
-        {
-            // Register V1 API using the new typed API client pattern
-            serviceCollection.AddTypedApiClient<IGeoLookupApi, GeoLookupApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
+        // Register V1 API using the new typed API client pattern
+        serviceCollection.AddTypedApiClient<IGeoLookupApi, GeoLookupApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
-            // Register V1.1 API
-            serviceCollection.AddTypedApiClient<Abstractions.Interfaces.V1_1.IGeoLookupApi, GeoLookupApiV1_1, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
+        // Register V1.1 API
+        serviceCollection.AddTypedApiClient<Abstractions.Interfaces.V1_1.IGeoLookupApi, GeoLookupApiV1_1, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
-            // Register API info endpoint
-            serviceCollection.AddTypedApiClient<IApiInfoApi, ApiInfoApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
+        // Register API info endpoint
+        serviceCollection.AddTypedApiClient<IApiInfoApi, ApiInfoApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
-            // Register API health endpoint
-            serviceCollection.AddTypedApiClient<IApiHealthApi, ApiHealthApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
+        // Register API health endpoint
+        serviceCollection.AddTypedApiClient<IApiHealthApi, ApiHealthApi, GeoLocationApiClientOptions, GeoLocationApiOptionsBuilder>(configureOptions);
 
-            // Register version selectors as scoped
-            serviceCollection.AddScoped<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
-            serviceCollection.AddScoped<IVersionedApiHealthApi, VersionedApiHealthApi>();
-            serviceCollection.AddScoped<IVersionedApiInfoApi, VersionedApiInfoApi>();
+        // Register version selectors as scoped
+        serviceCollection.AddScoped<IVersionedGeoLookupApi, VersionedGeoLookupApi>();
+        serviceCollection.AddScoped<IVersionedApiHealthApi, VersionedApiHealthApi>();
+        serviceCollection.AddScoped<IVersionedApiInfoApi, VersionedApiInfoApi>();
 
-            // Register the unified client as scoped
-            serviceCollection.AddScoped<IGeoLocationApiClient, GeoLocationApiClient>();
+        // Register the unified client as scoped
+        serviceCollection.AddScoped<IGeoLocationApiClient, GeoLocationApiClient>();
 
-            return serviceCollection;
-        }
+        return serviceCollection;
     }
 }

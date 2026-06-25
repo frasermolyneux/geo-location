@@ -89,9 +89,9 @@ builder.Services.AddSingleton<TableServiceClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
     var tableEndpoint = configuration["Storage:TableEndpoint"];
-    if (string.IsNullOrWhiteSpace(tableEndpoint))
-        throw new InvalidOperationException("Storage:TableEndpoint is not configured.");
-    return new TableServiceClient(new Uri(tableEndpoint), new DefaultAzureCredential());
+    return string.IsNullOrWhiteSpace(tableEndpoint)
+        ? throw new InvalidOperationException("Storage:TableEndpoint is not configured.")
+        : new TableServiceClient(new Uri(tableEndpoint), new DefaultAzureCredential());
 });
 
 builder.Services.AddSingleton<ITableStorageGeoLocationRepository, TableStorageGeoLocationRepository>();
@@ -113,7 +113,10 @@ builder.Services.AddSingleton<WebServiceClient>(sp =>
     var configuration = sp.GetRequiredService<IConfiguration>();
     var userIdString = configuration["maxmind_userid"];
     if (!int.TryParse(userIdString, out var userId))
+    {
         throw new InvalidOperationException($"The 'maxmind_userid' configuration value '{userIdString}' is not a valid integer.");
+    }
+
     var licenseKey = configuration["maxmind_apikey"] ?? throw new InvalidOperationException("The 'maxmind_apikey' configuration value is not set.");
     var handler = new SocketsHttpHandler
     {

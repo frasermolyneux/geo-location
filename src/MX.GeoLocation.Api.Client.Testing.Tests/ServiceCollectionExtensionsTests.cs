@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using MX.GeoLocation.Abstractions.Interfaces;
 using MX.GeoLocation.Abstractions.Interfaces.V1;
-using MX.GeoLocation.Api.Client.Testing;
 using MX.GeoLocation.Api.Client.V1;
 
 using V1_1 = MX.GeoLocation.Abstractions.Interfaces.V1_1;

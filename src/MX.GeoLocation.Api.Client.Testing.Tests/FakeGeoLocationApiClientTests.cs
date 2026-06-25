@@ -1,7 +1,4 @@
-using MX.GeoLocation.Api.Client.Testing;
 using MX.GeoLocation.Api.Client.V1;
-using MX.GeoLocation.Abstractions.Interfaces;
-using MX.GeoLocation.Abstractions.Interfaces.V1;
 
 namespace MX.GeoLocation.Api.Client.Testing.Tests;
 

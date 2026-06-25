@@ -24,13 +24,11 @@ public class GeoLookupService : IGeoLookupService
         try
         {
             var (success, address) = await _hostnameResolver.ResolveHostname(hostname, cancellationToken);
-            if (!success || address is null)
-                return new ApiResponse<T>(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToApiResult(HttpStatusCode.BadRequest);
-
-            if (_hostnameResolver.IsLocalAddress(hostname) || _hostnameResolver.IsPrivateOrReservedAddress(address))
-                return new ApiResponse<T>(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS)).ToApiResult(HttpStatusCode.BadRequest);
-
-            return await lookupFunc(address);
+            return !success || address is null
+                ? new ApiResponse<T>(new ApiError(ErrorCodes.INVALID_HOSTNAME, ErrorMessages.INVALID_HOSTNAME)).ToApiResult(HttpStatusCode.BadRequest)
+                : _hostnameResolver.IsLocalAddress(hostname) || _hostnameResolver.IsPrivateOrReservedAddress(address)
+                ? new ApiResponse<T>(new ApiError(ErrorCodes.LOCAL_ADDRESS, ErrorMessages.LOCAL_ADDRESS)).ToApiResult(HttpStatusCode.BadRequest)
+                : await lookupFunc(address);
         }
         catch (AddressNotFoundException ex)
         {

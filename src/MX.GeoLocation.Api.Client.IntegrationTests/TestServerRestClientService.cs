@@ -1,5 +1,3 @@
-using System.Net;
-
 using RestSharp;
 
 using MX.Api.Client;
@@ -64,9 +62,13 @@ public class TestServerRestClientService : IRestClientService
             string bodyString;
 
             if (bodyValue is string s)
+            {
                 bodyString = s;
+            }
             else
+            {
                 bodyString = Newtonsoft.Json.JsonConvert.SerializeObject(bodyValue);
+            }
 
             httpRequest.Content = new StringContent(
                 bodyString,
@@ -99,11 +101,9 @@ public class TestServerRestClientService : IRestClientService
         if (!string.IsNullOrEmpty(baseUrl))
         {
             // Strip the base URL scheme/host since TestServer HttpClient handles routing
-            if (Uri.TryCreate(baseUrl, UriKind.Absolute, out _))
-            {
-                return $"/{resource.TrimStart('/')}";
-            }
-            return $"/{baseUrl.TrimStart('/')}/{resource.TrimStart('/')}".TrimEnd('/');
+            return Uri.TryCreate(baseUrl, UriKind.Absolute, out _)
+                ? $"/{resource.TrimStart('/')}"
+                : $"/{baseUrl.TrimStart('/')}/{resource.TrimStart('/')}".TrimEnd('/');
         }
 
         return $"/{resource.TrimStart('/')}";

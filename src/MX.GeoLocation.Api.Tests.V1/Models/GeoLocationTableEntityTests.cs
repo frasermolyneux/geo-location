@@ -120,22 +120,25 @@ public class GeoLocationTableEntityTests
         Assert.Throws<ArgumentNullException>(() => new GeoLocationTableEntity(dto));
     }
 
-    private static GeoLocationDto CreateFullDto() => new()
+    private static GeoLocationDto CreateFullDto()
     {
-        Address = "google.co.uk",
-        TranslatedAddress = "142.250.187.195",
-        ContinentCode = "NA",
-        ContinentName = "North America",
-        CountryCode = "US",
-        CountryName = "United States",
-        IsEuropeanUnion = false,
-        CityName = "Mountain View",
-        PostalCode = "94035",
-        RegisteredCountry = "US",
-        Latitude = 37.386,
-        Longitude = -122.0838,
-        AccuracyRadius = 1000,
-        Timezone = "America/Los_Angeles",
-        Traits = new Dictionary<string, string?> { { "Isp", "Google" }, { "UserType", null } }
-    };
+        return new()
+        {
+            Address = "google.co.uk",
+            TranslatedAddress = "142.250.187.195",
+            ContinentCode = "NA",
+            ContinentName = "North America",
+            CountryCode = "US",
+            CountryName = "United States",
+            IsEuropeanUnion = false,
+            CityName = "Mountain View",
+            PostalCode = "94035",
+            RegisteredCountry = "US",
+            Latitude = 37.386,
+            Longitude = -122.0838,
+            AccuracyRadius = 1000,
+            Timezone = "America/Los_Angeles",
+            Traits = new Dictionary<string, string?> { { "Isp", "Google" }, { "UserType", null } }
+        };
+    }
 }

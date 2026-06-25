@@ -1,11 +1,7 @@
-using System.Net;
-
 using MaxMind.GeoIP2.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-
-using MX.Api.Abstractions;
 using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.LookupWebApi.Controllers.V1;
 using MX.GeoLocation.LookupWebApi.Repositories;

@@ -19,16 +19,10 @@ public class MaxMindConfigurationHealthCheck : IHealthCheck
         var userId = _configuration["maxmind_userid"];
         var apiKey = _configuration["maxmind_apikey"];
 
-        if (string.IsNullOrWhiteSpace(userId) || !int.TryParse(userId, out _))
-        {
-            return Task.FromResult(HealthCheckResult.Unhealthy("MaxMind user ID is not configured or invalid."));
-        }
-
-        if (string.IsNullOrWhiteSpace(apiKey))
-        {
-            return Task.FromResult(HealthCheckResult.Unhealthy("MaxMind API key is not configured."));
-        }
-
-        return Task.FromResult(HealthCheckResult.Healthy());
+        return string.IsNullOrWhiteSpace(userId) || !int.TryParse(userId, out _)
+            ? Task.FromResult(HealthCheckResult.Unhealthy("MaxMind user ID is not configured or invalid."))
+            : string.IsNullOrWhiteSpace(apiKey)
+            ? Task.FromResult(HealthCheckResult.Unhealthy("MaxMind API key is not configured."))
+            : Task.FromResult(HealthCheckResult.Healthy());
     }
 }
