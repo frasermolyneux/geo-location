@@ -2,7 +2,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "dotnet: clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet: build",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -14,7 +26,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "build-api",
+            "label": "dotnet: build-api",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -26,7 +38,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "build-web",
+            "label": "dotnet: build-web",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -38,7 +50,34 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "publish",
+            "label": "dotnet: test",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "--filter",
+                "FullyQualifiedName!~IntegrationTests"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "dotnet: format",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "format",
+                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "--verify-no-changes"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "dotnet: publish",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -50,31 +89,19 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "watch",
+            "label": "dotnet: watch-web",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/src/MX.GeoLocation.sln"
+                "${workspaceFolder}/src/MX.GeoLocation.Web/MX.GeoLocation.Web.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "test-unit",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "test",
-                "${workspaceFolder}/src/MX.GeoLocation.sln",
-                "--filter",
-                "FullyQualifiedName!~IntegrationTests"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "test-integration-api",
+            "label": "dotnet: test-integration-api",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -84,7 +111,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "test-integration-client",
+            "label": "dotnet: test-integration-client",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -94,7 +121,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "test-integration-web",
+            "label": "dotnet: test-integration-web",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -104,7 +131,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "test-all",
+            "label": "dotnet: test-all",
             "command": "dotnet",
             "type": "process",
             "args": [

@@ -2,31 +2,81 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "clean",
+			"label": "dotnet: clean",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"clean",
-				"${workspaceFolder}",
+				"${workspaceFolder}/../MX.GeoLocation.sln",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
 			"problemMatcher": "$msCompile"
 		},
 		{
-			"label": "publish-release",
+			"label": "dotnet: build",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"build",
+				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"/property:GenerateFullPaths=true",
+				"/consoleloggerparameters:NoSummary"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet: test",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"test",
+				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"--filter",
+				"FullyQualifiedName!~IntegrationTests"
+			],
+			"problemMatcher": "$msCompile",
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "dotnet: format",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"format",
+				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"--verify-no-changes"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet: run-web",
+			"command": "dotnet",
+			"type": "process",
+			"args": [
+				"run",
+				"--project",
+				"${workspaceFolder}/MX.GeoLocation.Web.csproj"
+			],
+			"problemMatcher": "$msCompile"
+		},
+		{
+			"label": "dotnet: publish",
 			"command": "dotnet",
 			"type": "process",
 			"args": [
 				"publish",
-				"${workspaceFolder}",
+				"${workspaceFolder}/MX.GeoLocation.Web.csproj",
 				"--configuration",
 				"Release",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
 			"problemMatcher": "$msCompile",
-			"dependsOn": "clean"
+			"dependsOn": "dotnet: clean"
 		}
 	]
 }
