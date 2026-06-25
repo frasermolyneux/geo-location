@@ -64,6 +64,7 @@ dotnet_diagnostic.IDE0072.severity = suggestion
 dotnet_diagnostic.IDE0001.severity = suggestion
 dotnet_diagnostic.JSON002.severity = suggestion
 
+dotnet_diagnostic.IDE0011.severity = warning
 [**/*Tests.cs]
 # Keep descriptive xUnit method names with underscores for readability in test code.
 dotnet_diagnostic.CA1707.severity = none
@@ -99,3 +100,4 @@ dotnet_analyzer_diagnostic.severity = none
 
 [*.AssemblyInfo.cs]
 dotnet_analyzer_diagnostic.severity = none
+
