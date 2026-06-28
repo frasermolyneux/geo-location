@@ -4,6 +4,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.DataContracts;
 
 using MX.GeoLocation.Abstractions.Models.V1_1;
+using MX.GeoLocation.LookupWebApi.Services;
 
 namespace MX.GeoLocation.LookupWebApi.Repositories;
 
@@ -33,16 +34,18 @@ public class ProxyCheckRepository : IProxyCheckRepository
     public async Task<ProxyCheckDto> GetProxyCheckData(string address, CancellationToken cancellationToken = default)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(address);
+        var normalizedAddress = AddressNormalizer.NormalizeIpLiteral(address) ?? address;
 
         var operation = _telemetryClient.StartOperation<DependencyTelemetry>("ProxyCheckQuery");
         operation.Telemetry.Type = "HTTP";
         operation.Telemetry.Target = "proxycheck.io";
-        operation.Telemetry.Data = address;
+        operation.Telemetry.Data = normalizedAddress;
 
         try
         {
             var httpClient = _httpClientFactory.CreateClient("ProxyCheck");
-            var apiUrl = $"{_baseUrl}{address}?key={_apiKey}&vpn=1&asn=1&risk=1&seen=1&tag=geolocation";
+            var encodedAddress = Uri.EscapeDataString(normalizedAddress);
+            var apiUrl = $"{_baseUrl}{encodedAddress}?key={_apiKey}&vpn=1&asn=1&risk=1&seen=1&tag=geolocation";
 
             var response = await httpClient.GetAsync(apiUrl, cancellationToken).ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -50,11 +53,11 @@ public class ProxyCheckRepository : IProxyCheckRepository
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogError("ProxyCheck API error for {Address}: {StatusCode} - {Response}",
-                    address, response.StatusCode, responseContent);
+                    normalizedAddress, response.StatusCode, responseContent);
                 throw new HttpRequestException($"ProxyCheck API returned {response.StatusCode}");
             }
 
-            var result = ParseResponse(address, responseContent);
+            var result = ParseResponse(normalizedAddress, responseContent);
 
             operation.Telemetry.Success = true;
             operation.Telemetry.ResultCode = "200";
@@ -84,20 +87,49 @@ public class ProxyCheckRepository : IProxyCheckRepository
             throw new InvalidOperationException($"ProxyCheck returned non-ok status: {errorMsg}");
         }
 
-        return !root.TryGetProperty(address, out var ipElement)
-            ? throw new InvalidOperationException($"ProxyCheck response did not contain data for {address}")
-            : new ProxyCheckDto
+        _ = TryGetAddressElement(root, address, out var ipElement)
+            ? true
+            : throw new InvalidOperationException($"ProxyCheck response did not contain data for {address}");
+
+        return new ProxyCheckDto
+        {
+            Address = address,
+            TranslatedAddress = address,
+            RiskScore = ipElement.TryGetProperty("risk", out var riskEl) && riskEl.TryGetInt32(out var risk) ? risk : 0,
+            IsProxy = ipElement.TryGetProperty("proxy", out var proxyEl) && proxyEl.GetString() == "yes",
+            IsVpn = ipElement.TryGetProperty("type", out var typeEl) && string.Equals(typeEl.GetString(), "vpn", StringComparison.OrdinalIgnoreCase),
+            ProxyType = ipElement.TryGetProperty("type", out var typeVal) ? typeVal.GetString() ?? string.Empty : string.Empty,
+            Country = ipElement.TryGetProperty("country", out var countryEl) ? countryEl.GetString() ?? string.Empty : string.Empty,
+            Region = ipElement.TryGetProperty("region", out var regionEl) ? regionEl.GetString() ?? string.Empty : string.Empty,
+            AsNumber = ipElement.TryGetProperty("asn", out var asnEl) ? asnEl.GetString() ?? string.Empty : string.Empty,
+            AsOrganization = ipElement.TryGetProperty("provider", out var providerEl) ? providerEl.GetString() ?? string.Empty : string.Empty
+        };
+    }
+
+    private static bool TryGetAddressElement(JsonElement root, string normalizedAddress, out JsonElement ipElement)
+    {
+        if (root.TryGetProperty(normalizedAddress, out ipElement))
+        {
+            return true;
+        }
+
+        foreach (var property in root.EnumerateObject())
+        {
+            if (string.Equals(property.Name, "status", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(property.Name, "message", StringComparison.OrdinalIgnoreCase))
             {
-                Address = address,
-                TranslatedAddress = address,
-                RiskScore = ipElement.TryGetProperty("risk", out var riskEl) && riskEl.TryGetInt32(out var risk) ? risk : 0,
-                IsProxy = ipElement.TryGetProperty("proxy", out var proxyEl) && proxyEl.GetString() == "yes",
-                IsVpn = ipElement.TryGetProperty("type", out var typeEl) && string.Equals(typeEl.GetString(), "vpn", StringComparison.OrdinalIgnoreCase),
-                ProxyType = ipElement.TryGetProperty("type", out var typeVal) ? typeVal.GetString() ?? string.Empty : string.Empty,
-                Country = ipElement.TryGetProperty("country", out var countryEl) ? countryEl.GetString() ?? string.Empty : string.Empty,
-                Region = ipElement.TryGetProperty("region", out var regionEl) ? regionEl.GetString() ?? string.Empty : string.Empty,
-                AsNumber = ipElement.TryGetProperty("asn", out var asnEl) ? asnEl.GetString() ?? string.Empty : string.Empty,
-                AsOrganization = ipElement.TryGetProperty("provider", out var providerEl) ? providerEl.GetString() ?? string.Empty : string.Empty
-            };
+                continue;
+            }
+
+            var normalizedProperty = AddressNormalizer.NormalizeIpLiteral(property.Name);
+            if (normalizedProperty is not null && string.Equals(normalizedProperty, normalizedAddress, StringComparison.OrdinalIgnoreCase))
+            {
+                ipElement = property.Value;
+                return true;
+            }
+        }
+
+        ipElement = default;
+        return false;
     }
 }

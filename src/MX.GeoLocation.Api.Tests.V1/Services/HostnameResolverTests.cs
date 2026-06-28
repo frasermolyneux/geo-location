@@ -196,6 +196,52 @@ public class HostnameResolverTests
         Assert.NotNull(resolved);
     }
 
+    [Theory]
+    [InlineData("[2001:4860:4860::8888]", "2001:4860:4860::8888")]
+    [InlineData("fe80::1%eth0", "fe80::1")]
+    [InlineData("fe80::1%1", "fe80::1")]
+    [InlineData("[fe80::1%eth0]", "fe80::1")]
+    public async Task ResolveHostname_NormalizesIpv6Input_ReturnsCanonicalAddress(string input, string expected)
+    {
+        var (success, resolved) = await _resolver.ResolveHostname(input, CancellationToken.None);
+
+        Assert.True(success);
+        Assert.Equal(expected, resolved);
+    }
+
+    [Theory]
+    [InlineData("ff02::1")]
+    [InlineData("2001:db8::1")]
+    [InlineData("::")]
+    [InlineData("::ffff:192.0.2.1")]
+    public void IsPrivateOrReservedAddress_AdditionalIpv6SpecialRanges_ReturnsTrue(string ip)
+    {
+        Assert.True(_resolver.IsPrivateOrReservedAddress(ip));
+    }
+
+    [Fact]
+    public void IsPrivateOrReservedAddress_NormalizedBracketedIpv6_ReturnsFalseForPublicAddress()
+    {
+        Assert.False(_resolver.IsPrivateOrReservedAddress("[2606:4700:4700::1111]"));
+    }
+
+    [Theory]
+    [InlineData("::ffff:8.8.8.8")]
+    [InlineData("::ffff:1.1.1.1")]
+    public void IsPrivateOrReservedAddress_Ipv4MappedPublicAddress_ReturnsFalse(string ip)
+    {
+        Assert.False(_resolver.IsPrivateOrReservedAddress(ip));
+    }
+
+    [Theory]
+    [InlineData("::ffff:10.0.0.1")]
+    [InlineData("::ffff:127.0.0.1")]
+    [InlineData("::ffff:192.168.1.1")]
+    public void IsPrivateOrReservedAddress_Ipv4MappedPrivateOrLocalAddress_ReturnsTrue(string ip)
+    {
+        Assert.True(_resolver.IsPrivateOrReservedAddress(ip));
+    }
+
     [Fact]
     public async Task ResolveHostname_InvalidHostname_ReturnsFalse()
     {

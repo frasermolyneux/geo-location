@@ -21,7 +21,8 @@ public class HostnameResolver : IHostnameResolver
 
     public bool IsPrivateOrReservedAddress(string ipAddress)
     {
-        if (!IPAddress.TryParse(ipAddress, out var ip))
+        var normalized = AddressNormalizer.NormalizeIpLiteral(ipAddress);
+        if (normalized is null || !IPAddress.TryParse(normalized, out var ip))
         {
             return false;
         }
@@ -109,6 +110,11 @@ public class HostnameResolver : IHostnameResolver
 
         if (ip.AddressFamily == AddressFamily.InterNetworkV6)
         {
+            if (ip.IsIPv4MappedToIPv6)
+            {
+                return IsPrivateOrReservedAddress(ip.MapToIPv4().ToString());
+            }
+
             // fe80::/10 (link-local)
             if (bytes[0] == 0xfe && (bytes[1] & 0xc0) == 0x80)
             {
@@ -116,6 +122,16 @@ public class HostnameResolver : IHostnameResolver
             }
             // fc00::/7 (unique local)
             if ((bytes[0] & 0xfe) == 0xfc)
+            {
+                return true;
+            }
+            // ff00::/8 (multicast)
+            if (bytes[0] == 0xff)
+            {
+                return true;
+            }
+            // 2001:db8::/32 (documentation prefix)
+            if (bytes[0] == 0x20 && bytes[1] == 0x01 && bytes[2] == 0x0d && bytes[3] == 0xb8)
             {
                 return true;
             }
@@ -131,15 +147,19 @@ public class HostnameResolver : IHostnameResolver
 
     public async Task<(bool Success, string? ResolvedAddress)> ResolveHostname(string hostname, CancellationToken cancellationToken)
     {
-        if (IPAddress.TryParse(hostname, out var ipAddress))
+        var normalizedInput = AddressNormalizer.NormalizeIpLiteral(hostname);
+        if (normalizedInput is not null)
         {
-            return (true, ipAddress.ToString());
+            return (true, normalizedInput);
         }
 
         try
         {
             var hostEntry = await Dns.GetHostEntryAsync(hostname, cancellationToken);
-            if (hostEntry.AddressList.FirstOrDefault() is { } addr)
+            // Prefer globally routable addresses where possible.
+            var addr = hostEntry.AddressList.FirstOrDefault(a => !IsPrivateOrReservedAddress(a.ToString()))
+                       ?? hostEntry.AddressList.FirstOrDefault();
+            if (addr is not null)
             {
                 return (true, addr.ToString());
             }
