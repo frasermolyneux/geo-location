@@ -1,4 +1,4 @@
-﻿
+
 using Newtonsoft.Json;
 
 namespace MX.GeoLocation.Web.Extensions;

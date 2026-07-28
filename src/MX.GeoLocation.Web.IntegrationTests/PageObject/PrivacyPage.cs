@@ -1,4 +1,4 @@
-﻿using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
+using MX.GeoLocation.Web.IntegrationTests.PageObject.PageParts;
 using Microsoft.Extensions.Configuration;
 
 namespace MX.GeoLocation.Web.IntegrationTests.PageObject;

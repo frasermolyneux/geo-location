@@ -1,4 +1,4 @@
-﻿namespace MX.GeoLocation.Api.Client.V1;
+namespace MX.GeoLocation.Api.Client.V1;
 
 /// <summary>
 /// Interface for the GeoLocation API client

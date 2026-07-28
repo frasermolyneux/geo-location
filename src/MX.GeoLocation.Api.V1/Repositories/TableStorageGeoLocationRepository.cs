@@ -1,4 +1,4 @@
-﻿using Azure;
+using Azure;
 using Azure.Data.Tables;
 
 using MX.GeoLocation.Abstractions.Models.V1;

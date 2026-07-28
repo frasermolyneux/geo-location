@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 using MX.GeoLocation.Abstractions.Interfaces;
 using MX.GeoLocation.Abstractions.Interfaces.V1;

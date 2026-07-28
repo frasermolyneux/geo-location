@@ -1,4 +1,4 @@
-﻿using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Abstractions.Models.V1_1;
 
 namespace MX.GeoLocation.LookupWebApi.Repositories;

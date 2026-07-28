@@ -1,4 +1,4 @@
-﻿using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
 using MX.GeoLocation.Web.Extensions;
 
 namespace MX.GeoLocation.Web.Tests.Extensions;

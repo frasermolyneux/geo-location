@@ -1,4 +1,4 @@
-﻿using MaxMind.GeoIP2;
+using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Exceptions;
 
 using Microsoft.ApplicationInsights;

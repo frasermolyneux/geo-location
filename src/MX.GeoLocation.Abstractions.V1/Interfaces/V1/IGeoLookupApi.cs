@@ -1,4 +1,4 @@
-﻿using MX.GeoLocation.Abstractions.Models.V1;
+using MX.GeoLocation.Abstractions.Models.V1;
 
 using MX.Api.Abstractions;
 

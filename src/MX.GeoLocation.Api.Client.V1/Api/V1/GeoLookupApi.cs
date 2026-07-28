@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 using MX.GeoLocation.Abstractions.Interfaces.V1;
 using MX.GeoLocation.Abstractions.Models.V1;

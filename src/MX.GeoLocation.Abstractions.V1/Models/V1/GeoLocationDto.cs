@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace MX.GeoLocation.Abstractions.Models.V1;
 
