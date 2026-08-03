@@ -20,7 +20,7 @@
 	<PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.10" />
 	<PackageReference Include="Microsoft.Identity.Web" Version="4.13.0" />
 	<PackageReference Include="MX.Api.Abstractions" Version="2.3.77" />
-	<PackageReference Include="MX.Api.Web.Extensions" Version="2.3.67" />
+	<PackageReference Include="MX.Api.Web.Extensions" Version="2.3.77" />
 	<PackageReference Include="MX.Observability.ApplicationInsights.AspNetCore" Version="1.1.24" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	<PackageReference Include="Asp.Versioning.Mvc" Version="8.1.1" />
