@@ -10,18 +10,18 @@ resource "azurerm_storage_account" "data" {
 }
 
 resource "azurerm_storage_table" "geolocations" {
-  name                 = "geolocations"
-  storage_account_name = azurerm_storage_account.data.name
+  name               = "geolocations"
+  storage_account_id = azurerm_storage_account.data.id
 }
 
 resource "azurerm_storage_table" "geolocationsv11" {
-  name                 = "geolocationsv11"
-  storage_account_name = azurerm_storage_account.data.name
+  name               = "geolocationsv11"
+  storage_account_id = azurerm_storage_account.data.id
 }
 
 resource "azurerm_storage_table" "proxycheck" {
-  name                 = "proxycheck"
-  storage_account_name = azurerm_storage_account.data.name
+  name               = "proxycheck"
+  storage_account_id = azurerm_storage_account.data.id
 }
 
 resource "azurerm_role_assignment" "api_table_data_contributor" {
