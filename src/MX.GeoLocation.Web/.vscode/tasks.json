@@ -7,7 +7,7 @@
 			"type": "process",
 			"args": [
 				"clean",
-				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"${workspaceFolder}/../MX.GeoLocation.slnx",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
@@ -19,7 +19,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"${workspaceFolder}/../MX.GeoLocation.slnx",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
@@ -31,7 +31,7 @@
 			"type": "process",
 			"args": [
 				"test",
-				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"${workspaceFolder}/../MX.GeoLocation.slnx",
 				"--filter",
 				"FullyQualifiedName!~IntegrationTests"
 			],
@@ -47,7 +47,7 @@
 			"type": "process",
 			"args": [
 				"format",
-				"${workspaceFolder}/../MX.GeoLocation.sln",
+				"${workspaceFolder}/../MX.GeoLocation.slnx",
 				"--verify-no-changes"
 			],
 			"problemMatcher": "$msCompile"

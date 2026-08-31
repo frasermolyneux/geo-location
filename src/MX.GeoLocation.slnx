@@ -1,0 +1,27 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/abstractions/">
+    <Project Path="MX.GeoLocation.Abstractions.V1/MX.GeoLocation.Abstractions.V1.csproj" />
+  </Folder>
+  <Folder Name="/libraries/">
+    <Project Path="MX.GeoLocation.Api.Client.V1/MX.GeoLocation.Api.Client.V1.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="MX.GeoLocation.Api.Client.Tests.V1/MX.GeoLocation.Api.Client.Tests.V1.csproj" />
+    <Project Path="MX.GeoLocation.Api.Tests.V1/MX.GeoLocation.Api.Tests.V1.csproj" />
+    <Project Path="MX.GeoLocation.Web.IntegrationTests/MX.GeoLocation.Web.IntegrationTests.csproj" />
+    <Project Path="MX.GeoLocation.Web.Tests/MX.GeoLocation.Web.Tests.csproj" />
+  </Folder>
+  <Folder Name="/web-apps/">
+    <Project Path="MX.GeoLocation.Api.V1/MX.GeoLocation.Api.V1.csproj" />
+    <Project Path="MX.GeoLocation.Web/MX.GeoLocation.Web.csproj" />
+  </Folder>
+  <Project Path="MX.GeoLocation.Api.Client.IntegrationTests/MX.GeoLocation.Api.Client.IntegrationTests.csproj" />
+  <Project Path="MX.GeoLocation.Api.Client.Testing.Tests/MX.GeoLocation.Api.Client.Testing.Tests.csproj" />
+  <Project Path="MX.GeoLocation.Api.Client.Testing/MX.GeoLocation.Api.Client.Testing.csproj" />
+  <Project Path="MX.GeoLocation.Api.IntegrationTests/MX.GeoLocation.Api.IntegrationTests.csproj" />
+</Solution>

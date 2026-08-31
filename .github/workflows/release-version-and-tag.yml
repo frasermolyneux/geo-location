@@ -92,7 +92,7 @@ jobs:
         src-folder: "src"
 
     - name: Verify .NET formatting
-      run: dotnet format src/MX.GeoLocation.sln --verify-no-changes
+      run: dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 
   tag-release:
     permissions:

@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "clean",
-                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "${workspaceFolder}/src/MX.GeoLocation.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "${workspaceFolder}/src/MX.GeoLocation.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -55,7 +55,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "${workspaceFolder}/src/MX.GeoLocation.slnx",
                 "--filter",
                 "FullyQualifiedName!~IntegrationTests"
             ],
@@ -71,7 +71,7 @@
             "type": "process",
             "args": [
                 "format",
-                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "${workspaceFolder}/src/MX.GeoLocation.slnx",
                 "--verify-no-changes"
             ],
             "problemMatcher": "$msCompile"
@@ -82,7 +82,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/MX.GeoLocation.sln",
+                "${workspaceFolder}/src/MX.GeoLocation.slnx",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -136,7 +136,7 @@
             "type": "process",
             "args": [
                 "test",
-                "${workspaceFolder}/src/MX.GeoLocation.sln"
+                "${workspaceFolder}/src/MX.GeoLocation.slnx"
             ],
             "problemMatcher": "$msCompile"
         },

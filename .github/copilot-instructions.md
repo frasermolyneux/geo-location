@@ -6,7 +6,7 @@ GeoLocation is a mixed .NET service and package repository: a .NET 9 API and MVC
 
 - SDK: `10.0.301` from `global.json`.
 - Applications and tests target `net9.0`; published packages target `net9.0` and `net10.0`.
-- Solution: `src/MX.GeoLocation.sln`.
+- Solution: `src/MX.GeoLocation.slnx`.
 - API: `src/MX.GeoLocation.Api.V1`; web: `src/MX.GeoLocation.Web`.
 - Published contracts: `MX.GeoLocation.Abstractions.V1`, `MX.GeoLocation.Api.Client.V1`, and `MX.GeoLocation.Api.Client.Testing`.
 - Infrastructure: `terraform/`.
@@ -24,10 +24,10 @@ GeoLocation is a mixed .NET service and package repository: a .NET 9 API and MVC
 ## Validation
 
 ```pwsh
-dotnet build src/MX.GeoLocation.sln
-dotnet test src/MX.GeoLocation.sln --filter "FullyQualifiedName!~IntegrationTests"
-dotnet test src/MX.GeoLocation.sln --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
-dotnet format src/MX.GeoLocation.sln --verify-no-changes
+dotnet build src/MX.GeoLocation.slnx
+dotnet test src/MX.GeoLocation.slnx --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test src/MX.GeoLocation.slnx --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
+dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 terraform -chdir=terraform fmt -check -recursive
 ```
 
