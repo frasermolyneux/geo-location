@@ -4,7 +4,7 @@
 
 ## Locations
 
-- Solution: `src/MX.GeoLocation.sln`
+- Solution: `src/MX.GeoLocation.slnx`
 - Applications: `src/MX.GeoLocation.Api.V1`, `src/MX.GeoLocation.Web`
 - Packages: `src/MX.GeoLocation.Abstractions.V1`, `src/MX.GeoLocation.Api.Client.V1`, `src/MX.GeoLocation.Api.Client.Testing`
 - Unit and integration tests: matching projects under `src/`
@@ -14,10 +14,10 @@
 ## Commands
 
 ```pwsh
-dotnet build src/MX.GeoLocation.sln
-dotnet test src/MX.GeoLocation.sln --filter "FullyQualifiedName!~IntegrationTests"
-dotnet test src/MX.GeoLocation.sln --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
-dotnet format src/MX.GeoLocation.sln --verify-no-changes
+dotnet build src/MX.GeoLocation.slnx
+dotnet test src/MX.GeoLocation.slnx --filter "FullyQualifiedName!~IntegrationTests"
+dotnet test src/MX.GeoLocation.slnx --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
+dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 terraform -chdir=terraform fmt -check -recursive
 ```
 
