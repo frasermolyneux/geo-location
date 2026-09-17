@@ -27,6 +27,8 @@ GeoLocation is a .NET 9 workload that fronts MaxMind lookups with an Entra-prote
 
 Both versions enforce the `LookupApiUser` Entra role. An MVC web front end calls the API using API-key and Entra authentication, handles Cloudflare/X-Forwarded-For headers, and stores the user’s last lookup in session. The API serves its OpenAPI specs at runtime at `/openapi/v1.0.json` and `/openapi/v1.1.json`, and infrastructure is managed by Terraform under `terraform/`. Build versioning uses Nerdbank.GitVersioning.
 
+Development runs both applications on the workload-owned Linux B1 plan `asp-geo-location-dev-swedencentral-default`. Production keeps both applications on platform-hosting's shared `app_service_plans["default"]` plan.
+
 ## NuGet Packages
 
 | Package                                                                                                 | Latest                                                                                                                                              | Description                                                                                             |
