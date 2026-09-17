@@ -2,10 +2,10 @@ resource "azurerm_linux_web_app" "web" {
   name = local.web_app_name
   tags = var.tags
 
-  resource_group_name = local.platform_hosting_app_service_plan.resource_group_name
-  location            = local.platform_hosting_app_service_plan.location
+  resource_group_name = local.app_service_plan_resource_group_name
+  location            = local.app_service_plan_location
 
-  service_plan_id = local.platform_hosting_app_service_plan.id
+  service_plan_id = local.app_service_plan_id
 
   https_only = true
 
