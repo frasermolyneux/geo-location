@@ -62,16 +62,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: api-ci
-        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
+        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2.1
         with:
+          test-reporting: "true"
           dotnet-project: "MX.GeoLocation.Api.V1"
           dotnet-version: |
             9.0.x
             10.0.x
           src-folder: "src"
 
-      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
+      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2.1
         with:
+          test-reporting: "true"
           dotnet-project: "MX.GeoLocation.Web"
           dotnet-version: |
             9.0.x
@@ -82,8 +84,9 @@ jobs:
       - name: Verify .NET formatting
         run: dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 
-      - uses: frasermolyneux/actions/dotnet-playwright-tests@main
+      - uses: frasermolyneux/actions/dotnet-playwright-tests@dotnet-playwright-tests/v1.2
         with:
+          test-reporting: "true"
           test-project: "MX.GeoLocation.Web.IntegrationTests"
           src-folder: "src"
 

@@ -32,8 +32,9 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-ci@dotnet-ci/v2
+      - uses: frasermolyneux/actions/dotnet-ci@dotnet-ci/v2.1
         with:
+          test-reporting: "true"
           dotnet-version: |
             9.0.x
             10.0.x
@@ -42,8 +43,9 @@ jobs:
       - name: Verify .NET formatting
         run: dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 
-      - uses: frasermolyneux/actions/dotnet-playwright-tests@main
+      - uses: frasermolyneux/actions/dotnet-playwright-tests@dotnet-playwright-tests/v1.2
         with:
+          test-reporting: "true"
           test-project: "MX.GeoLocation.Web.IntegrationTests"
           src-folder: "src"
 

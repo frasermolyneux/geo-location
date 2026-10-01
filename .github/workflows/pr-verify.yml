@@ -19,22 +19,23 @@ jobs:
   build-and-test:
     permissions:
       contents: read
-      id-token: write
-      pull-requests: write
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - id: api-ci
-        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
+        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2.1
         with:
+          test-reporting: "true"
           dotnet-project: "MX.GeoLocation.Api.V1"
           dotnet-version: |
             9.0.x
             10.0.x
           src-folder: "src"
 
-      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2
+      - id: shared-tests-2
+        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2.1
         with:
+          test-reporting: "true"
           dotnet-project: "MX.GeoLocation.Web"
           dotnet-version: |
             9.0.x
@@ -45,12 +46,17 @@ jobs:
       - name: Verify .NET formatting
         run: dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 
-      - uses: frasermolyneux/actions/dotnet-playwright-tests@main
+      - id: shared-tests-3
+        uses: frasermolyneux/actions/dotnet-playwright-tests@dotnet-playwright-tests/v1.2
         with:
+          test-reporting: "true"
           test-project: "MX.GeoLocation.Web.IntegrationTests"
           src-folder: "src"
 
     outputs:
+      test_report: ${{ steps.api-ci.outputs.test-report }}
+      shared_tests_2_test_report: ${{ steps.shared-tests-2.outputs.test-report }}
+      shared_tests_3_test_report: ${{ steps.shared-tests-3.outputs.test-report }}
       build_version: ${{ steps.api-ci.outputs.build_version }}
 
   terraform-plan-dev:
@@ -227,3 +233,18 @@ jobs:
           AZURE_CLIENT_ID: ${{ env.AZURE_CLIENT_ID }}
           AZURE_TENANT_ID: ${{ env.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ env.AZURE_SUBSCRIPTION_ID }}
+
+  test-results:
+    name: Test results summary
+    if: always() && github.event.pull_request.draft == false
+    needs: [build-and-test]
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    concurrency:
+      group: test-results-${{ github.repository }}-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    steps:
+      - uses: frasermolyneux/actions/test-results-summary@test-results-summary/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
