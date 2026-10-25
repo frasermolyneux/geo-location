@@ -28,7 +28,7 @@ terraform -chdir=terraform fmt -check -recursive
 - Do not weaken hostname/local-address validation, batch limits, cache semantics, secret handling, or forwarded-header trust configuration.
 - OpenAPI documents are generated at runtime; do not create source-controlled generated specifications.
 - Package identities, target frameworks, and NBGV behavior in `version.json` are release boundaries.
-- Terraform lock files are local-only and ignored; do not commit `.terraform.lock.hcl`.
+- Commit each root's `.terraform-version` and `.terraform.lock.hcl`. Select the exact root CLI pin before invoking Terraform; normal initialization uses `-lockfile=readonly`. Regenerate provider selections only in a reviewed dependency-update PR; never commit state, plans, or `.terraform/`.
 - Do not publish packages, deploy applications, apply Terraform, or run state-backed plans during validation.
 
 ## Documentation
