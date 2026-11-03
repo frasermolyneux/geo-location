@@ -17,6 +17,7 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1;
 [ApiVersion("1.0")]
 [Route("v{version:apiVersion}")]
 [Authorize(Roles = "LookupApiUser")]
+[IgnoreAntiforgeryToken]
 public class GeoLookupController : ControllerBase
 {
     private const int MaxBatchSize = 20;
@@ -177,7 +178,7 @@ public class GeoLookupController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", hostname);
+            _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", SanitizeForLog(hostname));
             return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, "An error occurred while deleting data"))
                 .ToApiResult(HttpStatusCode.InternalServerError).ToHttpResult();
         }
@@ -186,5 +187,11 @@ public class GeoLookupController : ControllerBase
     private static IActionResult ErrorResult<T>(HttpStatusCode statusCode, string code, string message) where T : class
     {
         return new ApiResponse<T>(new ApiError(code, message)).ToApiResult(statusCode).ToHttpResult();
+    }
+
+    private static string SanitizeForLog(string value)
+    {
+        return value.Replace("\r", string.Empty, StringComparison.Ordinal)
+            .Replace("\n", string.Empty, StringComparison.Ordinal);
     }
 }

@@ -20,6 +20,8 @@ resource "azurerm_linux_web_app" "web" {
 
     always_on           = true
     ftps_state          = "Disabled"
+    health_check_path   = "/api/health/live"
+    http2_enabled       = true
     minimum_tls_version = "1.2"
   }
 
