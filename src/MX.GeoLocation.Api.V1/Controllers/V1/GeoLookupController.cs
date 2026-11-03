@@ -54,7 +54,7 @@ public class GeoLookupController : ControllerBase
 
         using var scope = _logger.BeginScope(new Dictionary<string, object>
         {
-            ["Hostname"] = hostname,
+            ["Hostname"] = LogSanitizer.Sanitize(hostname),
             ["Operation"] = "GetGeoLocation"
         });
 
