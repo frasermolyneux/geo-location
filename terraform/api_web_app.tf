@@ -20,6 +20,7 @@ resource "azurerm_linux_web_app" "api" {
 
     always_on                         = true
     ftps_state                        = "Disabled"
+    http2_enabled                     = true
     minimum_tls_version               = "1.2"
     health_check_path                 = "/v1.0/health/live"
     health_check_eviction_time_in_min = 5

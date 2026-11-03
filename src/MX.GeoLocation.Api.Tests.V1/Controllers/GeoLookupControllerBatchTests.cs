@@ -193,4 +193,34 @@ public class GeoLookupControllerBatchTests
         Assert.NotNull(response.Errors);
         Assert.NotEmpty(response.Errors);
     }
+
+    [Fact]
+    public async Task GetGeoLocations_MixedValidAndNull_PreservesValidResultAndReportsError()
+    {
+        var validDto = new GeoLocationDto
+        {
+            Address = "8.8.8.8",
+            TranslatedAddress = "8.8.8.8",
+            CountryName = "United States"
+        };
+
+        _mockTableStorage
+            .Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(validDto);
+        _mockHostnameResolver
+            .Setup(x => x.ResolveHostname(null!, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Null hostname"));
+
+        var result = await _controller.GetGeoLocations(["8.8.8.8", null!], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        var response = objectResult.Value as ApiResponse<CollectionModel<GeoLocationDto>>;
+        Assert.NotNull(response);
+        Assert.Single(response.Data!.Items);
+        Assert.NotNull(response.Errors);
+        Assert.NotEmpty(response.Errors);
+    }
 }
