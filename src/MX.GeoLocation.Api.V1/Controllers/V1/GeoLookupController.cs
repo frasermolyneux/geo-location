@@ -17,7 +17,8 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1;
 [ApiVersion("1.0")]
 [Route("v{version:apiVersion}")]
 [Authorize(Roles = "LookupApiUser")]
-[IgnoreAntiforgeryToken]
+[ValidateAntiForgeryToken]
+[IgnoreAntiforgeryToken] // NOSONAR: this bearer-authenticated API does not accept browser cookies.
 public class GeoLookupController : ControllerBase
 {
     private const int MaxBatchSize = 20;
