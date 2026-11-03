@@ -193,4 +193,92 @@ public class GeoLookupControllerBatchTests
         Assert.NotNull(response.Errors);
         Assert.NotEmpty(response.Errors);
     }
+
+    [Fact]
+    public async Task GetGeoLocations_MixedValidAndNull_PreservesValidResultAndReportsError()
+    {
+        var validDto = new GeoLocationDto
+        {
+            Address = "8.8.8.8",
+            TranslatedAddress = "8.8.8.8",
+            CountryName = "United States"
+        };
+
+        _mockTableStorage
+            .Setup(x => x.GetGeoLocation("8.8.8.8", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(validDto);
+        _mockHostnameResolver
+            .Setup(x => x.ResolveHostname(null!, It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Null hostname"));
+
+        var result = await _controller.GetGeoLocations(["8.8.8.8", null!], CancellationToken.None);
+
+        var objectResult = result as ObjectResult;
+        Assert.NotNull(objectResult);
+        Assert.Equal(200, objectResult.StatusCode);
+
+        var response = objectResult.Value as ApiResponse<CollectionModel<GeoLocationDto>>;
+        Assert.NotNull(response);
+        Assert.Single(response.Data!.Items);
+        Assert.NotNull(response.Errors);
+        Assert.NotEmpty(response.Errors);
+    }
+
+    [Theory]
+    [InlineData("host\rname", "hostname")]
+    [InlineData("host\nname", "hostname")]
+    [InlineData("host\r\nname", "hostname")]
+    public async Task GetGeoLocation_SanitizesHostnameInLoggingScope(string hostname, string expectedHostname)
+    {
+        var logger = new CapturingLogger<GeoLookupController>();
+        var controller = new GeoLookupController(
+            logger,
+            _mockTableStorage.Object,
+            _mockMaxMind.Object,
+            _mockHostnameResolver.Object,
+            new GeoLookupService(
+                Mock.Of<ILogger<GeoLookupService>>(),
+                _mockHostnameResolver.Object));
+
+        _mockHostnameResolver
+            .Setup(x => x.ResolveHostname(hostname, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((false, (string?)null));
+
+        await controller.GetGeoLocation(hostname, CancellationToken.None);
+
+        var scope = Assert.IsType<Dictionary<string, object>>(Assert.Single(logger.Scopes));
+        var sanitizedHostname = Assert.IsType<string>(scope["Hostname"]);
+        Assert.Equal(expectedHostname, sanitizedHostname);
+    }
+
+    private sealed class CapturingLogger<T> : ILogger<T>
+    {
+        public List<object?> Scopes { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+        {
+            Scopes.Add(state);
+            return NullScope.Instance;
+        }
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
+        }
+    }
 }

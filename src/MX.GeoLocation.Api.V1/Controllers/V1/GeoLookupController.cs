@@ -17,6 +17,8 @@ namespace MX.GeoLocation.LookupWebApi.Controllers.V1;
 [ApiVersion("1.0")]
 [Route("v{version:apiVersion}")]
 [Authorize(Roles = "LookupApiUser")]
+[ValidateAntiForgeryToken]
+[IgnoreAntiforgeryToken] // NOSONAR: this bearer-authenticated API does not accept browser cookies.
 public class GeoLookupController : ControllerBase
 {
     private const int MaxBatchSize = 20;
@@ -52,7 +54,7 @@ public class GeoLookupController : ControllerBase
 
         using var scope = _logger.BeginScope(new Dictionary<string, object>
         {
-            ["Hostname"] = hostname,
+            ["Hostname"] = LogSanitizer.Sanitize(hostname),
             ["Operation"] = "GetGeoLocation"
         });
 
@@ -177,7 +179,7 @@ public class GeoLookupController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", hostname);
+            _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", LogSanitizer.Sanitize(hostname));
             return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, "An error occurred while deleting data"))
                 .ToApiResult(HttpStatusCode.InternalServerError).ToHttpResult();
         }
