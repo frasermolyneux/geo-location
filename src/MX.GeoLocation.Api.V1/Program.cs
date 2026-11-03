@@ -49,6 +49,7 @@ builder.Services.AddObservability();
 builder.Services.AddServiceProfiler();
 
 builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration);
+builder.Services.AddAntiforgery();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
