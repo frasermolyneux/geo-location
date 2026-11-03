@@ -54,7 +54,7 @@ public class GeoLookupController : ControllerBase
 
         using var scope = _logger.BeginScope(new Dictionary<string, object>
         {
-            ["Hostname"] = hostname,
+            ["Hostname"] = LogSanitizer.Sanitize(hostname),
             ["Operation"] = "GetGeoLocation"
         });
 
@@ -189,5 +189,4 @@ public class GeoLookupController : ControllerBase
     {
         return new ApiResponse<T>(new ApiError(code, message)).ToApiResult(statusCode).ToHttpResult();
     }
-
 }
