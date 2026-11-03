@@ -32,24 +32,18 @@ public class GeoLookupService : IGeoLookupService
         }
         catch (AddressNotFoundException ex)
         {
-            _logger.LogWarning(ex, "Address not found for {Hostname}", SanitizeForLog(hostname));
+            _logger.LogWarning(ex, "Address not found for {Hostname}", LogSanitizer.Sanitize(hostname));
             return new ApiResponse<T>(new ApiError(ErrorCodes.ADDRESS_NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND)).ToApiResult(HttpStatusCode.NotFound);
         }
         catch (GeoIP2Exception ex)
         {
-            _logger.LogError(ex, "GeoIP2 error for {Hostname}", SanitizeForLog(hostname));
+            _logger.LogError(ex, "GeoIP2 error for {Hostname}", LogSanitizer.Sanitize(hostname));
             return new ApiResponse<T>(new ApiError(ErrorCodes.GEOIP_ERROR, ex.Message)).ToApiResult(HttpStatusCode.BadRequest);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error during geolocation lookup for {Hostname}", SanitizeForLog(hostname));
+            _logger.LogError(ex, "Unexpected error during geolocation lookup for {Hostname}", LogSanitizer.Sanitize(hostname));
             return new ApiResponse<T>(new ApiError(ErrorCodes.INTERNAL_ERROR, "An unexpected error occurred")).ToApiResult(HttpStatusCode.InternalServerError);
         }
-    }
-
-    private static string SanitizeForLog(string value)
-    {
-        return value.Replace("\r", string.Empty, StringComparison.Ordinal)
-            .Replace("\n", string.Empty, StringComparison.Ordinal);
     }
 }

@@ -19,6 +19,10 @@
       "reason": "Overlapping optional overloads are retained unless they cause a demonstrated correctness problem."
     },
     {
+      "key": "csharpsquid:S4502",
+      "reason": "Bearer-authenticated API controllers do not use browser cookie authentication, so CSRF protection is not applicable; endpoint authorization remains enforced by the LookupApiUser role."
+    },
+    {
       "key": "javascript:S2004",
       "reason": "Nesting depth is deferred as maintainability work under the initial actionable-only baseline."
     },

@@ -178,7 +178,7 @@ public class GeoLookupController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", SanitizeForLog(hostname));
+            _logger.LogError(ex, "Error deleting geolocation data for {Hostname}", LogSanitizer.Sanitize(hostname));
             return new ApiResponse(new ApiError(ErrorCodes.INTERNAL_ERROR, "An error occurred while deleting data"))
                 .ToApiResult(HttpStatusCode.InternalServerError).ToHttpResult();
         }
@@ -189,9 +189,4 @@ public class GeoLookupController : ControllerBase
         return new ApiResponse<T>(new ApiError(code, message)).ToApiResult(statusCode).ToHttpResult();
     }
 
-    private static string SanitizeForLog(string value)
-    {
-        return value.Replace("\r", string.Empty, StringComparison.Ordinal)
-            .Replace("\n", string.Empty, StringComparison.Ordinal);
-    }
 }
