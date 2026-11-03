@@ -6,7 +6,19 @@ resource "azurerm_storage_account" "data" {
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
+  shared_access_key_enabled       = false
   tags                            = var.tags
+
+  blob_properties {
+    delete_retention_policy {
+      days = 7
+    }
+  }
+
+  sas_policy {
+    expiration_period = "07.00:00:00"
+    expiration_action = "Log"
+  }
 }
 
 resource "azurerm_storage_table" "geolocations" {

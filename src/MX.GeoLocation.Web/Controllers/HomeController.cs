@@ -13,6 +13,7 @@ namespace MX.GeoLocation.Web.Controllers;
 
 public class HomeController : Controller
 {
+    private const string CfConnectingIpHeader = "CF-Connecting-IP";
     private const string UserLocationSessionKey = "UserCityGeoLocationDto";
     private const string BatchLookupSessionKey = "BatchLookupAddressData";
 
@@ -30,7 +31,9 @@ public class HomeController : Controller
         webHostEnvironment = environment ?? throw new ArgumentNullException(nameof(environment));
     }
 
-    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(
+        CancellationToken cancellationToken,
+        [FromHeader(Name = CfConnectingIpHeader)] string? cfConnectingIp = null)
     {
         var sessionDto = httpContextAccessor.HttpContext?.Session.GetObjectFromJson<CityGeoLocationDto>(UserLocationSessionKey);
 
@@ -39,7 +42,7 @@ public class HomeController : Controller
             return View(sessionDto);
         }
 
-        var address = GetUsersIpForLookup();
+        var address = GetUsersIpForLookup(cfConnectingIp);
 
         var lookupResponse = await geoLocationApiClient.GeoLookup.V1_1.GetCityGeoLocation(address.ToString(), cancellationToken);
 
@@ -256,9 +259,10 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public IActionResult RemoveData()
+    public IActionResult RemoveData(
+        [FromHeader(Name = CfConnectingIpHeader)] string? cfConnectingIp = null)
     {
-        var model = new RemoveMyDataViewModel(GetUsersIpForLookup().ToString());
+        var model = new RemoveMyDataViewModel(GetUsersIpForLookup(cfConnectingIp).ToString());
         return View(model);
     }
 
@@ -304,10 +308,8 @@ public class HomeController : Controller
         }
     }
 
-    private IPAddress GetUsersIpForLookup()
+    private IPAddress GetUsersIpForLookup(string? cfConnectingIp = null)
     {
-        const string cfConnectingIpKey = "CF-Connecting-IP";
-
         if (webHostEnvironment.IsDevelopment())
         {
             return IPAddress.Parse("8.8.8.8");
@@ -315,7 +317,7 @@ public class HomeController : Controller
 
         IPAddress? address = null;
 
-        if (httpContextAccessor.HttpContext?.Request.Headers.TryGetValue(cfConnectingIpKey, out var cfConnectingIp) ?? false)
+        if (!string.IsNullOrWhiteSpace(cfConnectingIp))
         {
             IPAddress.TryParse(cfConnectingIp, out address);
         }
