@@ -189,5 +189,4 @@ public class GeoLookupController : ControllerBase
     {
         return new ApiResponse<T>(new ApiError(code, message)).ToApiResult(statusCode).ToHttpResult();
     }
-
 }

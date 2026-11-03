@@ -225,10 +225,10 @@ public class GeoLookupControllerBatchTests
     }
 
     [Theory]
-    [InlineData("host\rname")]
-    [InlineData("host\nname")]
-    [InlineData("host\r\nname")]
-    public async Task GetGeoLocation_SanitizesHostnameInLoggingScope(string hostname)
+    [InlineData("host\rname", "hostname")]
+    [InlineData("host\nname", "hostname")]
+    [InlineData("host\r\nname", "hostname")]
+    public async Task GetGeoLocation_SanitizesHostnameInLoggingScope(string hostname, string expectedHostname)
     {
         var logger = new CapturingLogger<GeoLookupController>();
         var controller = new GeoLookupController(
@@ -248,8 +248,7 @@ public class GeoLookupControllerBatchTests
 
         var scope = Assert.IsType<Dictionary<string, object>>(Assert.Single(logger.Scopes));
         var sanitizedHostname = Assert.IsType<string>(scope["Hostname"]);
-        Assert.DoesNotContain('\r', sanitizedHostname);
-        Assert.DoesNotContain('\n', sanitizedHostname);
+        Assert.Equal(expectedHostname, sanitizedHostname);
     }
 
     private sealed class CapturingLogger<T> : ILogger<T>
