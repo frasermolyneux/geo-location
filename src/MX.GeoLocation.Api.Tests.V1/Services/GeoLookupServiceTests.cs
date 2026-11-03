@@ -110,6 +110,41 @@ public class GeoLookupServiceTests
         Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
     }
 
+    [Theory]
+    [InlineData("address-not-found", LogLevel.Warning)]
+    [InlineData("geoip", LogLevel.Error)]
+    [InlineData("unexpected", LogLevel.Error)]
+    public async Task ExecuteLookup_SanitizesHostnameInExceptionLog(string exceptionType, LogLevel expectedLevel)
+    {
+        const string hostname = "host\r\nname";
+        var logger = new CapturingLogger<GeoLookupService>();
+        var service = new GeoLookupService(logger, _mockHostnameResolver.Object);
+
+        _mockHostnameResolver.Setup(x => x.ResolveHostname(hostname, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((true, "8.8.8.8"));
+        _mockHostnameResolver.Setup(x => x.IsLocalAddress(hostname)).Returns(false);
+        _mockHostnameResolver.Setup(x => x.IsPrivateOrReservedAddress("8.8.8.8")).Returns(false);
+
+        var result = await service.ExecuteLookup<GeoLocationDto>(hostname, CancellationToken.None, _ =>
+            exceptionType switch
+            {
+                "address-not-found" => throw new AddressNotFoundException("Not found"),
+                "geoip" => throw new GeoIP2Exception("Service error"),
+                _ => throw new InvalidOperationException("Unexpected")
+            });
+
+        Assert.Equal(expectedLevel == LogLevel.Warning
+            ? HttpStatusCode.NotFound
+            : exceptionType == "geoip"
+                ? HttpStatusCode.BadRequest
+                : HttpStatusCode.InternalServerError, result.StatusCode);
+
+        var entry = Assert.Single(logger.Entries);
+        Assert.Equal(expectedLevel, entry.Level);
+        var values = Assert.IsAssignableFrom<IEnumerable<KeyValuePair<string, object?>>>(entry.State);
+        Assert.Equal("hostname", values.Single(x => x.Key == "Hostname").Value);
+    }
+
     [Fact]
     public async Task ExecuteLookup_GeoIP2Exception_ReturnsBadRequest()
     {
@@ -202,5 +237,33 @@ public class GeoLookupServiceTests
             _ => throw new OperationCanceledException());
 
         Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
+    }
+
+    private sealed class CapturingLogger<T> : ILogger<T>
+    {
+        public List<(LogLevel Level, object State)> Entries { get; } = [];
+
+        public IDisposable? BeginScope<TState>(TState state) where TState : notnull => NullScope.Instance;
+
+        public bool IsEnabled(LogLevel logLevel) => true;
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            Entries.Add((logLevel, state!));
+        }
+
+        private sealed class NullScope : IDisposable
+        {
+            public static NullScope Instance { get; } = new();
+
+            public void Dispose()
+            {
+            }
+        }
     }
 }
