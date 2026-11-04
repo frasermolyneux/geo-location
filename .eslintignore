@@ -9,8 +9,3 @@
 **/wwwroot/lib/**
 # Minified JavaScript is a generated distribution asset rather than maintained source.
 **/*.min.js
-# Minified CSS and generated theme distributions are not maintained JavaScript source.
-**/*.min.css
-**/wwwroot/css/all.css
-**/wwwroot/less/**
-**/wwwroot/scss/**
