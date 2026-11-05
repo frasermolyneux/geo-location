@@ -14,6 +14,11 @@ output "web_app_name" {
   value = azurerm_linux_web_app.web.name
 }
 
+output "application_insights_workspace_id" {
+  description = "The noncritical Log Analytics workspace connected to GeoLocation Application Insights and App Service diagnostics."
+  value       = azurerm_application_insights.ai.workspace_id
+}
+
 output "web_app_resource_group_name" {
   value = azurerm_linux_web_app.web.resource_group_name
 }
