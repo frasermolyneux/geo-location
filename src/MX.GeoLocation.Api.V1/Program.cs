@@ -46,8 +46,6 @@ builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceO
 });
 builder.Services.AddObservability();
 
-builder.Services.AddServiceProfiler();
-
 builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration);
 
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>

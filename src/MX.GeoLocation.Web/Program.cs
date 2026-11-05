@@ -42,8 +42,6 @@ builder.Services.AddApplicationInsightsTelemetry(new ApplicationInsightsServiceO
 });
 builder.Services.AddObservability();
 
-builder.Services.AddServiceProfiler();
-
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddGeoLocationApiClient(options => options

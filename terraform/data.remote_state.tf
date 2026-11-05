@@ -1,17 +1,3 @@
-data "terraform_remote_state" "platform_monitoring" {
-  backend = "azurerm"
-
-  config = {
-    resource_group_name  = var.platform_monitoring_state.resource_group_name
-    storage_account_name = var.platform_monitoring_state.storage_account_name
-    container_name       = var.platform_monitoring_state.container_name
-    key                  = var.platform_monitoring_state.key
-    use_oidc             = true
-    subscription_id      = var.platform_monitoring_state.subscription_id
-    tenant_id            = var.platform_monitoring_state.tenant_id
-  }
-}
-
 data "terraform_remote_state" "platform_hosting" {
   count   = var.environment == "prd" ? 1 : 0
   backend = "azurerm"

@@ -112,24 +112,13 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<TableServiceClient>();
             services.AddSingleton(Mock.Of<TableServiceClient>());
 
-            // Provide a stub TelemetryConfiguration with connection string so AppInsights/Profiler services can resolve
+            // Provide a stub TelemetryConfiguration with connection string so Application Insights services can resolve
             services.RemoveAll<TelemetryConfiguration>();
             var telemetryConfig = new TelemetryConfiguration
             {
                 ConnectionString = "InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://localhost"
             };
             services.AddSingleton(telemetryConfig);
-
-            // Remove ServiceProfiler hosted services to avoid CryptographicException
-            // when multiple test factories run in parallel
-            var profilerDescriptors = services
-                .Where(d => d.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService) &&
-                            d.ImplementationType?.FullName?.Contains("Profiler") == true)
-                .ToList();
-            foreach (var descriptor in profilerDescriptors)
-            {
-                services.Remove(descriptor);
-            }
 
             // Remove real health checks that fail without live Azure/MaxMind services
             services.RemoveAll<Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck>();

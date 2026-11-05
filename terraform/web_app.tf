@@ -13,6 +13,15 @@ resource "azurerm_linux_web_app" "web" {
     type = "SystemAssigned"
   }
 
+  logs {
+    http_logs {
+      file_system {
+        retention_in_days = 7
+        retention_in_mb   = 35
+      }
+    }
+  }
+
   site_config {
     application_stack {
       dotnet_version = "9.0"
@@ -27,16 +36,13 @@ resource "azurerm_linux_web_app" "web" {
   }
 
   app_settings = {
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"      = azurerm_application_insights.ai.connection_string
-    "ApplicationInsightsAgent_EXTENSION_VERSION" = "~3"
-    "ASPNETCORE_ENVIRONMENT"                     = var.environment == "prd" ? "Production" : "Development"
-    "WEBSITE_RUN_FROM_PACKAGE"                   = "1"
-    "GeoLocationApi__BaseUrl"                    = "${azurerm_api_management.apim.gateway_url}/geolocation"
-    "GeoLocationApi__ApiKey"                     = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.web_apim_subscription_key.versionless_id})"
-    "GeoLocationApi__ApplicationAudience"        = local.entra_api_identifier_uri
-    "APPINSIGHTS_PROFILERFEATURE_VERSION"        = "1.0.0"
-    "DiagnosticServices_EXTENSION_VERSION"       = "~3"
-    "GoogleMaps__ApiKey"                         = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.google_maps_api_key.versionless_id})"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING" = azurerm_application_insights.ai.connection_string
+    "ASPNETCORE_ENVIRONMENT"                = var.environment == "prd" ? "Production" : "Development"
+    "WEBSITE_RUN_FROM_PACKAGE"              = "1"
+    "GeoLocationApi__BaseUrl"               = "${azurerm_api_management.apim.gateway_url}/geolocation"
+    "GeoLocationApi__ApiKey"                = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.web_apim_subscription_key.versionless_id})"
+    "GeoLocationApi__ApplicationAudience"   = local.entra_api_identifier_uri
+    "GoogleMaps__ApiKey"                    = "@Microsoft.KeyVault(SecretUri=${azurerm_key_vault_secret.google_maps_api_key.versionless_id})"
   }
 }
 
