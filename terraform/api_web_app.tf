@@ -13,6 +13,15 @@ resource "azurerm_linux_web_app" "api" {
     type = "SystemAssigned"
   }
 
+  logs {
+    http_logs {
+      file_system {
+        retention_in_days = 7
+        retention_in_mb   = 35
+      }
+    }
+  }
+
   site_config {
     application_stack {
       dotnet_version = "9.0"
