@@ -6,14 +6,7 @@ subscription_id = "903b6685-c12a-4703-ac54-7ec1ff15ca43"
 
 alert_action_group_id = "/subscriptions/903b6685-c12a-4703-ac54-7ec1ff15ca43/resourceGroups/rg-platform-monitoring-smart-detection-prd-swedencentral/providers/Microsoft.Insights/actionGroups/Application Insights Smart Detection"
 
-platform_monitoring_state = {
-  resource_group_name  = "rg-tf-platform-monitoring-prd-uksouth-01"
-  storage_account_name = "sa74f04c5f984e"
-  container_name       = "tfstate"
-  key                  = "terraform.tfstate"
-  subscription_id      = "7760848c-794d-4a19-8cb2-52f71a21ac2b"
-  tenant_id            = "e56a6947-bb9a-4a6e-846a-1f118d1c3a14"
-}
+noncritical_monitoring_workspace_id = "/subscriptions/6cad03c1-9e98-4160-8ebe-64dd30f1bbc7/resourceGroups/rg-platform-monitoring-noncritical-prd-uksouth/providers/Microsoft.OperationalInsights/workspaces/log-platform-monitoring-noncritical-prd-uksouth"
 
 platform_hosting_state = {
   resource_group_name  = "rg-tf-platform-hosting-prd-uksouth-01"

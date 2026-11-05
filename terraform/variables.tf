@@ -29,16 +29,14 @@ variable "alert_action_group_id" {
   }
 }
 
-variable "platform_monitoring_state" {
-  description = "Backend config for platform-monitoring remote state"
-  type = object({
-    resource_group_name  = string
-    storage_account_name = string
-    container_name       = string
-    key                  = string
-    subscription_id      = string
-    tenant_id            = string
-  })
+variable "noncritical_monitoring_workspace_id" {
+  description = "Resource ID of the platform noncritical Log Analytics workspace used by GeoLocation telemetry."
+  type        = string
+
+  validation {
+    condition     = can(regex("(?i)^/subscriptions/[0-9a-f-]{36}/resourceGroups/rg-platform-monitoring-noncritical-[^/]+/providers/Microsoft\\.OperationalInsights/workspaces/log-platform-monitoring-noncritical-[^/]+$", var.noncritical_monitoring_workspace_id))
+    error_message = "noncritical_monitoring_workspace_id must reference a platform noncritical Log Analytics workspace."
+  }
 }
 
 variable "platform_hosting_state" {

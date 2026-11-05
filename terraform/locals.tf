@@ -1,6 +1,6 @@
 locals {
   resource_group_name              = "rg-${var.workload}-${var.environment}-${var.location}"
-  platform_monitoring_workspace_id = data.terraform_remote_state.platform_monitoring.outputs.log_analytics_workspaces["noncritical"].id
+  platform_monitoring_workspace_id = var.noncritical_monitoring_workspace_id
 
   app_service_plan_id                  = var.environment == "dev" ? azurerm_service_plan.default[0].id : data.terraform_remote_state.platform_hosting[0].outputs.app_service_plans["default"].id
   app_service_plan_resource_group_name = var.environment == "dev" ? data.azurerm_resource_group.rg.name : data.terraform_remote_state.platform_hosting[0].outputs.app_service_plans["default"].resource_group_name
