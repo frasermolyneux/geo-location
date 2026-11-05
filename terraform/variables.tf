@@ -17,6 +17,18 @@ variable "location" {
 
 variable "subscription_id" {}
 
+variable "alert_action_group_id" {
+  description = "Action group used for production performance and reliability alerts."
+  type        = string
+  default     = null
+  nullable    = true
+
+  validation {
+    condition     = var.environment != "prd" || var.alert_action_group_id != null
+    error_message = "alert_action_group_id must be set for production."
+  }
+}
+
 variable "platform_monitoring_state" {
   description = "Backend config for platform-monitoring remote state"
   type = object({

@@ -4,6 +4,8 @@ location    = "swedencentral"
 
 subscription_id = "903b6685-c12a-4703-ac54-7ec1ff15ca43"
 
+alert_action_group_id = "/subscriptions/903b6685-c12a-4703-ac54-7ec1ff15ca43/resourceGroups/rg-platform-monitoring-smart-detection-prd-swedencentral/providers/Microsoft.Insights/actionGroups/Application Insights Smart Detection"
+
 platform_monitoring_state = {
   resource_group_name  = "rg-tf-platform-monitoring-prd-uksouth-01"
   storage_account_name = "sa74f04c5f984e"
