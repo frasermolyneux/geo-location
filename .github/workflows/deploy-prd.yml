@@ -26,7 +26,7 @@ jobs:
       terraform: ${{ steps.changes.outputs.terraform }}
     steps:
       - id: changes
-        uses: frasermolyneux/actions/detect-changes@detect-changes/v1.0
+        uses: frasermolyneux/actions/detect-changes@8e7ca58b7821e01192ee4f23756c55e4ee057496 # detect-changes/v1.0.4
         with:
           filters: |
             src:src/**
@@ -44,7 +44,7 @@ jobs:
       state_tainted: ${{ steps.state-check.outputs.state_tainted }}
     steps:
       - id: state-check
-        uses: frasermolyneux/actions/terraform-state-check@terraform-state-check/v2.0.1
+        uses: frasermolyneux/actions/terraform-state-check@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-state-check/v2.0.2
         with:
           terraform-folder: "terraform"
           terraform-var-file: "tfvars/dev.tfvars"
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: api-ci
-        uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2.1
+        uses: frasermolyneux/actions/dotnet-web-ci@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # dotnet-web-ci/v3.0.1
         with:
           test-reporting: "true"
           dotnet-project: "MX.GeoLocation.Api.V1"
@@ -74,7 +74,7 @@ jobs:
             10.0.x
           src-folder: "src"
 
-      - uses: frasermolyneux/actions/dotnet-web-ci@dotnet-web-ci/v2.1
+      - uses: frasermolyneux/actions/dotnet-web-ci@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # dotnet-web-ci/v3.0.1
         with:
           test-reporting: "true"
           dotnet-project: "MX.GeoLocation.Web"
@@ -87,7 +87,7 @@ jobs:
       - name: Verify .NET formatting
         run: dotnet format src/MX.GeoLocation.slnx --verify-no-changes
 
-      - uses: frasermolyneux/actions/dotnet-playwright-tests@dotnet-playwright-tests/v1.2
+      - uses: frasermolyneux/actions/dotnet-playwright-tests@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # dotnet-playwright-tests/v1.2.2
         with:
           test-reporting: "true"
           test-project: "MX.GeoLocation.Web.IntegrationTests"
@@ -118,7 +118,7 @@ jobs:
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
       - if: needs.detect-changes.outputs.terraform == 'true' || needs.terraform-state-check-dev.outputs.state_tainted == 'true'
-        uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.1
+        uses: frasermolyneux/actions/terraform-plan-and-apply@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-plan-and-apply/v5.0.0
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
@@ -129,7 +129,7 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - if: needs.detect-changes.outputs.terraform != 'true' && needs.terraform-state-check-dev.outputs.state_tainted != 'true'
-        uses: frasermolyneux/actions/terraform-output@terraform-output/v2.0.1
+        uses: frasermolyneux/actions/terraform-output@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-output/v2.0.2
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
@@ -184,7 +184,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
+      - uses: frasermolyneux/actions/deploy-app-service@027d7e31bb32b734090aaed01b36d74f1d658b61 # deploy-app-service/v1.3.1
         with:
           web-artifact-name: "MX.GeoLocation.Api.V1"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}
@@ -195,7 +195,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+      - uses: frasermolyneux/actions/wait-for-version@027d7e31bb32b734090aaed01b36d74f1d658b61 # wait-for-version/v1.0.2
         with:
           info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
           expected-version: ${{ needs.build-and-test.outputs.build_version }}
@@ -218,7 +218,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
+      - uses: frasermolyneux/actions/deploy-app-service@027d7e31bb32b734090aaed01b36d74f1d658b61 # deploy-app-service/v1.3.1
         with:
           web-artifact-name: "MX.GeoLocation.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}
@@ -229,7 +229,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+      - uses: frasermolyneux/actions/wait-for-version@027d7e31bb32b734090aaed01b36d74f1d658b61 # wait-for-version/v1.0.2
         with:
           info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}.azurewebsites.net/info"
           expected-version: ${{ needs.build-and-test.outputs.build_version }}
@@ -251,7 +251,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/apim-api-import@apim-api-import/v1.0
+      - uses: frasermolyneux/actions/apim-api-import@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # apim-api-import/v1.0.4
         with:
           api-id: "geolocation-api-v1"
           api-display-name: "GeoLocation Lookup API"
@@ -270,7 +270,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/apim-api-import@apim-api-import/v1.0
+      - uses: frasermolyneux/actions/apim-api-import@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # apim-api-import/v1.0.4
         with:
           api-id: "geolocation-api-v1-1"
           api-display-name: "GeoLocation Lookup API"
@@ -315,7 +315,7 @@ jobs:
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
       - if: needs.detect-changes.outputs.terraform == 'true'
-        uses: frasermolyneux/actions/terraform-plan-and-apply@terraform-plan-and-apply/v2.0.1
+        uses: frasermolyneux/actions/terraform-plan-and-apply@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-plan-and-apply/v5.0.0
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
@@ -326,7 +326,7 @@ jobs:
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
       - if: needs.detect-changes.outputs.terraform != 'true'
-        uses: frasermolyneux/actions/terraform-output@terraform-output/v2.0.1
+        uses: frasermolyneux/actions/terraform-output@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-output/v2.0.2
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
@@ -380,7 +380,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-prd
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
+      - uses: frasermolyneux/actions/deploy-app-service@027d7e31bb32b734090aaed01b36d74f1d658b61 # deploy-app-service/v1.3.1
         with:
           web-artifact-name: "MX.GeoLocation.Api.V1"
           web-app-name: ${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}
@@ -391,7 +391,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+      - uses: frasermolyneux/actions/wait-for-version@027d7e31bb32b734090aaed01b36d74f1d658b61 # wait-for-version/v1.0.2
         with:
           info-url: "https://${{ needs.terraform-plan-and-apply-prd.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
           expected-version: ${{ needs.build-and-test.outputs.build_version }}
@@ -413,7 +413,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-prd
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@deploy-app-service/v1.3
+      - uses: frasermolyneux/actions/deploy-app-service@027d7e31bb32b734090aaed01b36d74f1d658b61 # deploy-app-service/v1.3.1
         with:
           web-artifact-name: "MX.GeoLocation.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-prd.outputs.web_app_name }}
@@ -424,7 +424,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/wait-for-version@wait-for-version/v1.0
+      - uses: frasermolyneux/actions/wait-for-version@027d7e31bb32b734090aaed01b36d74f1d658b61 # wait-for-version/v1.0.2
         with:
           info-url: "https://${{ needs.terraform-plan-and-apply-prd.outputs.web_app_name }}.azurewebsites.net/info"
           expected-version: ${{ needs.build-and-test.outputs.build_version }}
@@ -445,7 +445,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-prd
     steps:
-      - uses: frasermolyneux/actions/apim-api-import@apim-api-import/v1.0
+      - uses: frasermolyneux/actions/apim-api-import@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # apim-api-import/v1.0.4
         with:
           api-id: "geolocation-api-v1"
           api-display-name: "GeoLocation Lookup API"
@@ -464,7 +464,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/apim-api-import@apim-api-import/v1.0
+      - uses: frasermolyneux/actions/apim-api-import@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # apim-api-import/v1.0.4
         with:
           api-id: "geolocation-api-v1-1"
           api-display-name: "GeoLocation Lookup API"
