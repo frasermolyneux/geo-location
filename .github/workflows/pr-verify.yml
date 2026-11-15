@@ -83,7 +83,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - uses: frasermolyneux/actions/terraform-plan@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-plan/v5.0.0
+      - uses: frasermolyneux/actions/terraform-plan@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # terraform-plan/v6.0.0
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
@@ -113,7 +113,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - uses: frasermolyneux/actions/terraform-plan-and-apply@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-plan-and-apply/v5.0.0
+      - uses: frasermolyneux/actions/terraform-plan-and-apply@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # terraform-plan-and-apply/v6.0.0
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
@@ -156,7 +156,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@027d7e31bb32b734090aaed01b36d74f1d658b61 # deploy-app-service/v1.3.1
+      - uses: frasermolyneux/actions/deploy-app-service@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # deploy-app-service/v6.0.0
         with:
           web-artifact-name: "MX.GeoLocation.Api.V1"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}
@@ -167,7 +167,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/wait-for-version@027d7e31bb32b734090aaed01b36d74f1d658b61 # wait-for-version/v1.0.2
+      - uses: frasermolyneux/actions/wait-for-version@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # wait-for-version/v6.0.0
         with:
           info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.api_app_name }}.azurewebsites.net/v1.0/info"
           expected-version: ${{ needs.build-and-test.outputs.build_version }}
@@ -184,7 +184,7 @@ jobs:
     concurrency:
       group: ${{ github.repository }}-dev
     steps:
-      - uses: frasermolyneux/actions/deploy-app-service@027d7e31bb32b734090aaed01b36d74f1d658b61 # deploy-app-service/v1.3.1
+      - uses: frasermolyneux/actions/deploy-app-service@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # deploy-app-service/v6.0.0
         with:
           web-artifact-name: "MX.GeoLocation.Web"
           web-app-name: ${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}
@@ -195,7 +195,7 @@ jobs:
           AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
-      - uses: frasermolyneux/actions/wait-for-version@027d7e31bb32b734090aaed01b36d74f1d658b61 # wait-for-version/v1.0.2
+      - uses: frasermolyneux/actions/wait-for-version@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # wait-for-version/v6.0.0
         with:
           info-url: "https://${{ needs.terraform-plan-and-apply-dev.outputs.web_app_name }}.azurewebsites.net/info"
           expected-version: ${{ needs.build-and-test.outputs.build_version }}
@@ -224,7 +224,7 @@ jobs:
           workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
-      - uses: frasermolyneux/actions/terraform-plan@027d7e31bb32b734090aaed01b36d74f1d658b61 # terraform-plan/v5.0.0
+      - uses: frasermolyneux/actions/terraform-plan@977ddbedf7f5c6e2fae98ff1d6ec6a9c7669d778 # terraform-plan/v6.0.0
         with:
           perform-checkout: "false"
           terraform-folder: "terraform"
