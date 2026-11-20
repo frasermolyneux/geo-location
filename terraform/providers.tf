@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/azuread"
       version = "~> 3.10.0"
     }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 5.29.0"
+    }
     google = {
       source  = "hashicorp/google"
       version = "~> 8.0"
@@ -51,6 +55,8 @@ provider "azurerm" {
 }
 
 provider "azuread" {}
+
+provider "cloudflare" {}
 
 provider "google" {
   project = var.gcp_project_id

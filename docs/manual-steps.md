@@ -3,6 +3,10 @@
 * `maxmind_apikey` and `maxmind_userid` secrets need to be added to the Key Vault
 * `ProxyCheck:ApiKey` secret needs to be added to the Key Vault (ProxyCheck.io API key for IP risk assessment)
 
+## DNS
+
+The Development and Production GitHub environments need the `CLOUDFLARE_API_KEY` secret provisioned by platform-workloads. Terraform manages each environment's web CNAME and App Service verification TXT record in the `geo-location.net` Cloudflare zone. Production's CNAME is proxied; Development's is DNS-only.
+
 ## NuGet Trusted Publishing
 
 * Configure a NuGet.org trusted publishing policy for GitHub owner `frasermolyneux`, repository `geo-location`, workflow filename `release-publish-nuget.yml`, and GitHub environment `NuGet`.
