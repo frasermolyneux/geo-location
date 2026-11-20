@@ -11,6 +11,7 @@ resource "azurerm_api_management_subscription" "consumers" {
   display_name        = each.value.workload
   product_id          = azurerm_api_management_product.api_product.id
   state               = "active"
+  allow_tracing       = false
 }
 
 resource "random_id" "consumer" {
