@@ -52,6 +52,7 @@ resource "azurerm_api_management_subscription" "web" {
   display_name        = local.web_app_name
   product_id          = azurerm_api_management_product.api_product.id
   state               = "active"
+  allow_tracing       = false
 }
 
 resource "azurerm_key_vault_secret" "web_apim_subscription_key" {
