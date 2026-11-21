@@ -23,6 +23,7 @@ dns = {
   resource_group_name = "rg-platform-dns-prd-uksouth-01"
   domain              = "geo-location.net"
   web_subdomain       = "www"
+  cloudflare_zone_id  = "f3fd7ec770e796be651a15ae1b33aa74"
 }
 
 api_consumers = [

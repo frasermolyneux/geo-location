@@ -65,6 +65,7 @@ variable "dns" {
     resource_group_name = string
     domain              = string
     web_subdomain       = string
+    cloudflare_zone_id  = string
   })
 }
 
