@@ -1,5 +1,9 @@
 using System.Net;
 
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 
 using MX.Api.Client;
@@ -51,5 +55,36 @@ public class ClientInfoTests : IClassFixture<CustomWebApplicationFactory>, IAsyn
         // Assert
         Assert.NotNull(result);
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(HealthStatus.Healthy, true)]
+    [InlineData(HealthStatus.Unhealthy, false)]
+    public async Task CheckHealth_ReturnsApiReadinessStatus(HealthStatus healthStatus, bool expectedSuccess)
+    {
+        var healthService = new Mock<HealthCheckService>();
+        var entry = new HealthReportEntry(healthStatus, null, TimeSpan.Zero, null, null);
+        var report = new HealthReport(new Dictionary<string, HealthReportEntry> { ["test"] = entry }, TimeSpan.Zero);
+        healthService.Setup(service => service.CheckHealthAsync(
+                It.IsAny<Func<HealthCheckRegistration, bool>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(report);
+
+        using var factory = _factory.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<HealthCheckService>();
+            services.AddSingleton(healthService.Object);
+        }));
+        using var client = factory.CreateClient();
+        var healthApi = new ApiHealthApi(
+            Mock.Of<ILogger<BaseApi<GeoLocationApiClientOptions>>>(),
+            Mock.Of<IApiTokenProvider>(),
+            new TestServerRestClientService(client),
+            new GeoLocationApiClientOptions { BaseUrl = "http://localhost" });
+
+        var result = await healthApi.CheckHealth();
+
+        Assert.Equal(expectedSuccess, result.IsSuccess);
+        healthService.Verify(service => service.CheckHealthAsync(
+            It.IsAny<Func<HealthCheckRegistration, bool>>(), It.IsAny<CancellationToken>()), Times.AtLeastOnce);
     }
 }
