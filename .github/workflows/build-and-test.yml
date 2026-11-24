@@ -32,16 +32,14 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: frasermolyneux/actions/dotnet-ci@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # dotnet-ci/v2.1.2
+      - uses: frasermolyneux/actions/dotnet-ci@a6e30cdad5013f520dfbef81d10c3bdf737aa47e # dotnet-ci/v2.2.0
         with:
           test-reporting: "true"
           dotnet-version: |
             9.0.x
             10.0.x
           src-folder: "src"
-
-      - name: Verify .NET formatting
-        run: dotnet format src/MX.GeoLocation.slnx --verify-no-changes
+          format-target: "MX.GeoLocation.slnx"
 
       - uses: frasermolyneux/actions/dotnet-playwright-tests@a6271c58ed8e8f3b6fbdb738ac7566863fdc38c8 # dotnet-playwright-tests/v1.2.2
         with:
